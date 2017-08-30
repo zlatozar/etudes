@@ -1,0 +1,26 @@
+?papersize 42 40
+?mode justify
+This sample section of text will be set justified. Notice that
+   the way    spaces are left  has  no effect
+on     the output.
+Only word separation is caused by spaces.
+Thus, it is a good idea to start each source text sentence on a
+new line to make editing easier.
+?mode fill
+In the fill mode,  spaces    still have no effect,
+but now the words are all run close up and the right margin is
+raggedy.
+Research suggests that the ragged right  edge
+may improve reading speed.
+Notice also the paragraph break caused by ?mode.
+?mode unfilled
+This text   will be taken exactly  as
+   seen and it   better  not  run
+past      column    40.
+?mode justify
+?paragraph 10 2
+Finally, the ?paragraph command causes a gap and an
+indentation which looks like normal text.
+The commands buried in these lines cause no problems because
+the question marks are not in column 1.
+?page

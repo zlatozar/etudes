@@ -1,0 +1,20 @@
+?papersize 40 72
+WRONG?papersize
+?mode fill fill
+?paragraph 3 0
+??paragraph
+?margin 10 20
+                                 ?margin?
+?linespacing 1
+?linespacing?linespacing
+?space 0
+?space.
+?blank 10 ?blank
+?center
+?page
+?testpage 10
+?heading 20 center 10
+?number 2
+?break
+?footnote 2
+?alias fake real

@@ -1,0 +1,17 @@
+# Maven
+target/
+
+# Package Files
+*.jar
+
+# Log file
+log/
+*.log
+
+# Compiled class file
+*.class
+
+# IntelliJ
+.idea/
+*.iml
+*.iws
