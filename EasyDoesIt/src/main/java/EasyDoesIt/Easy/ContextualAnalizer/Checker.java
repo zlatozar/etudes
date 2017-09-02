@@ -380,72 +380,167 @@ public final class Checker implements Visitor {
     @Override
     public Object visitInternalProcedure(InternalProcedure ast, Object o) {
         System.out.println("InternalProcedure");
+
+        ast.blockCode.visit(this, null);
+
         return null;
     }
 
     @Override
     public Object visitProcedureDefinition(ProcedureDefinition ast, Object o) {
         System.out.println("ProcedureDefinition");
-        return null;
-    }
 
-    @Override
-    public Object visitFunctionDefinition(FunctionDefinition ast, Object o) {
-        System.out.println("FunctionDefinition");
+        indTable.openScope();
+
+        String procName = (String) ast.procHead.visit(this, ast);
+        ast.segment.visit(this, null);
+        ast.procEnd.visit(this, procName);
+
+        indTable.closeScope();
+
         return null;
     }
 
     @Override
     public Object visitProcedureHead(ProcedureHead ast, Object o) {
         System.out.println("ProcedureHead");
-        return null;
+
+        String procName = (String) ast.blockCodeName.visit(this, o);
+
+        return procName;
     }
 
     @Override
     public Object visitProcedureEnd(ProcedureEnd ast, Object o) {
         System.out.println("ProcedureEnd");
+
+        ast.procName.visit(this, null);
+
+        String procNameHead = (String) o;
+        String procNameEnd = ast.procName.spelling;
+
+        if (!procNameHead.equals(procNameEnd)) {
+            reporter.reportError("procedure should end with \"%\" identifier", procNameHead, ast.position);
+        }
+
         return null;
     }
 
     @Override
     public Object visitProcedureName(ProcedureName ast, Object o) {
         System.out.println("ProcedureName");
-        return null;
+
+        Definition procDefinition = (Definition) o;
+
+        String procName = ast.I.spelling;
+
+        indTable.enter(procName, (Definition) o);
+
+        if (procDefinition.duplicated) {
+            reporter.reportError("procedure \"%\" already declared", procName, ast.position);
+        }
+
+        return procName;
     }
 
     @Override
     public Object visitParameterList(ParameterList ast, Object o) {
-        System.out.println("ParameterList");
+
+        ast.paramSeq.visit(this, null);
+        ast.param.visit(this, null);
+
         return null;
     }
 
     @Override
     public Object visitProcedureNameWithParams(ProcedureNameWithParams ast, Object o) {
         System.out.println("ProcedureNameWithParams");
-        return null;
+
+        Definition procDefinition = (Definition) o;
+
+        String procName = ast.procName.spelling;
+
+        indTable.enter(procName, (Definition) o);
+
+        if (procDefinition.duplicated) {
+            reporter.reportError("procedure \"%\" already declared", procName, ast.position);
+        }
+
+        ast.params.visit(this, o);
+
+        return procName;
     }
 
     @Override
     public Object visitParameterByValue(ParameterByValue ast, Object o) {
         System.out.println("ParameterByValue");
+
+        ast.typeDenoter = (TypeDenoter) ast.typeDenoter.visit(this, null);
+        ast.identifier.visit(this, ast.typeDenoter);
+
+        indTable.enter(ast.identifier.spelling, ast.typeDenoter);
+
+        if (ast.typeDenoter.duplicated) {
+            reporter.reportError("parameter \"%\" already declared", ast.identifier.spelling, ast.position);
+        }
+
         return null;
     }
 
     @Override
     public Object visitParameterByName(ParameterByName ast, Object o) {
         System.out.println("ParameterByName");
+
+        ast.typeDenoter = (TypeDenoter) ast.typeDenoter.visit(this, null);
+        ast.identifier.visit(this, ast.typeDenoter);
+
+        indTable.enter(ast.identifier.spelling, ast.typeDenoter);
+
+        if (ast.typeDenoter.duplicated) {
+            reporter.reportError("parameter \"%\" already declared", ast.identifier.spelling, ast.position);
+        }
+
+        return null;
+    }
+
+    @Override
+    public Object visitFunctionDefinition(FunctionDefinition ast, Object o) {
+        System.out.println("FunctionDefinition");
+
+        indTable.openScope();
+
+        String funcName = (String) ast.funcHead.visit(this, ast);
+        ast.segment.visit(this, null);
+        ast.funcEnd.visit(this, funcName);
+
+        indTable.closeScope();
+
+
         return null;
     }
 
     @Override
     public Object visitFunctionHead(FunctionHead ast, Object o) {
         System.out.println("FunctionHead");
-        return null;
+
+        String funcName = (String) ast.blockCodeName.visit(this, o);
+
+        return funcName;
     }
 
     @Override
     public Object visitFunctionEnd(FunctionEnd ast, Object o) {
         System.out.println("FunctionEnd");
+
+        ast.identifier.visit(this, null);
+
+        String funcNameHead = (String) o;
+        String funcNameEnd = ast.identifier.spelling;
+
+        if (!funcNameHead.equals(funcNameEnd)) {
+            reporter.reportError("procedure/function should end with \"%\" identifier", funcNameHead, ast.position);
+        }
+
         return null;
     }
 
@@ -525,6 +620,10 @@ public final class Checker implements Visitor {
     @Override
     public Object visitReturnWithExpression(ReturnWithExpression ast, Object o) {
         System.out.println("ReturnWithExpression");
+
+        // TODO: should be the same as function return type
+        TypeDenoter rType = (TypeDenoter) ast.expression.visit(this, null);
+
         return null;
     }
 

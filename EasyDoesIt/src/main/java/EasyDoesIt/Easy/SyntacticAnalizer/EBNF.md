@@ -219,8 +219,8 @@ A function returns a value and a procedure just executes commands.
 ```
 <executable statement> ::=  <assignment statement>
                         |   <call statement>
-                        |   <return statement>
-                        |   <exit statement>
+                        |   <return statement>      // only inside of procedure definition
+                        |   <exit statement>        // last statement in a program 
                         |   <conditional statement>
                         |   <compound statement>
                         |   <iteration statement>

@@ -4,12 +4,12 @@ import EasyDoesIt.Easy.ASTSpec
 import EasyDoesIt.Easy.AbstractSyntaxTrees.AST
 import EasyDoesIt.Easy.SyntacticAnalizer.Parser
 
-class DeclarationSpec extends ASTSpec {
+class RepeatRepentSpec extends ASTSpec {
 
-    def 'Single variable declaration'() {
+    def 'Repeat definition'() {
 
-        given: 'Parser and declaration code'
-        Parser parser = getParserFor('DECLARE x REAL;')
+        given: 'Parser and repeat statement'
+        Parser parser = getParserFor('REPEAT repeat;')
 
         when: 'Parser finish'
         AST theAST = parser.parseProgram();
@@ -19,10 +19,10 @@ class DeclarationSpec extends ASTSpec {
         assert theAST
     }
 
-    def 'Book example'() {
+    def 'Repent definition'() {
 
-        given: 'Parser and declaration code'
-        Parser parser = getParserFor('DECLARE (x, ra) REAL;')
+        given: 'Parser and repent statement'
+        Parser parser = getParserFor('REPENT repent;')
 
         when: 'Parser finish'
         AST theAST = parser.parseProgram();
