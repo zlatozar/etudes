@@ -201,11 +201,11 @@ A function returns a value and a procedure just executes commands.
 <function end>            ::=  END FUNCTION <identifier> ;
 
 <procedure name>          ::=  <identifier>
-                           |   <identifier> <internal parameter list>
+                           |   <identifier> <formal parameter list>
 
-<internal parameter list> ::=  ( <internal parameter> | {, <internal parameter>}* )
+<formal parameter list>   ::=  ( <formal parameter> | {, <formal parameter>}* )
 
-<internal parameter>      ::=  <pass value>
+<formal parameter>        ::=  <pass value>
                            |   <pass name>
 
 <pass by value>           ::= <identifier> <type>

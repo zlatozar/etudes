@@ -2,9 +2,9 @@ package EasyDoesIt.Easy.AbstractSyntaxTrees;
 
 import EasyDoesIt.Easy.SyntacticAnalizer.SourcePosition;
 
-public abstract class Parameter extends AST {
+public abstract class ActualParameterSequence extends AST {
 
-    public Parameter(SourcePosition srcPos) {
+    public ActualParameterSequence(SourcePosition srcPos) {
         super(srcPos);
     }
 }

@@ -550,8 +550,12 @@ public class Parser {
 
         if (currentToken.kind == Token.LPAREN) {
 
-            Parameter params = parseParameters();
+            accept(Token.LPAREN);
+
+            FormalParameterSequence params = parseFormalParameters();
             finish(srcPos);
+
+            accept(Token.RPAREN);
 
             blockCodeName = new ProcedureNameWithParams(srcPos, identifier, params);
 
@@ -563,32 +567,34 @@ public class Parser {
         return blockCodeName;
     }
 
-    Parameter parseParameters() throws SyntaxError {
+    FormalParameterSequence parseFormalParameters() throws SyntaxError {
+
+        FormalParameterSequence formalParameterSequence;
+
         SourcePosition srcPos = new SourcePosition();
         start(srcPos);
 
-        accept(Token.LPAREN);
+        FormalParameter param = parseSingleParameter();
 
-        Parameter param = parseSingleParameter();
-
-        while (currentToken.kind == Token.COMMA) {
+        if (currentToken.kind == Token.COMMA) {
             acceptIt();
 
-            Parameter param2 = parseSingleParameter();
+            FormalParameterSequence param2 = parseFormalParameters();
             finish(srcPos);
 
-            param = new ParameterList(srcPos, param, param2);
+            formalParameterSequence = new FormalParameterList(srcPos, param, param2);
+
+        } else {
+            finish(srcPos);
+            formalParameterSequence = new SingleFormalParameterSequence(srcPos, param);
         }
 
-        accept(Token.RPAREN);
-        finish(srcPos);
-
-        return param;
+        return formalParameterSequence;
     }
 
-    Parameter parseSingleParameter() throws SyntaxError {
+    FormalParameter parseSingleParameter() throws SyntaxError {
 
-        Parameter parameter;
+        FormalParameter formalParameter;
 
         SourcePosition srcPos = new SourcePosition();
         start(srcPos);
@@ -600,15 +606,15 @@ public class Parser {
             acceptIt();
             finish(srcPos);
 
-            parameter = new ParameterByName(srcPos, identifier, typeDenoter);
+            formalParameter = new FormalParameterByName(srcPos, identifier, typeDenoter);
 
         } else {
             finish(srcPos);
 
-            parameter = new ParameterByValue(srcPos, identifier, typeDenoter);
+            formalParameter = new FormalParameterByValue(srcPos, identifier, typeDenoter);
         }
 
-        return parameter;
+        return formalParameter;
     }
 
     ProcedureEnd parseProcedureEnd() throws SyntaxError {
@@ -770,8 +776,11 @@ public class Parser {
         accept(Token.SET);
 
         Vname targetList = parseVariableList();
+
         accept(Token.BECOMES);
+
         Expression expression = parseExpression();
+
         accept(Token.SEMICOLON);
 
         finish(srcPos);
@@ -821,7 +830,7 @@ public class Parser {
         finish(srcPos);
 
         if (currentToken.kind == Token.LPAREN) {
-            Expression params = parseProcedureRefParams();
+            ActualParameterSequence params = parseProcedureRefParams();
             finish(srcPos);
 
             procedureRef = new CallWithParams(srcPos, identifier, params);
@@ -833,29 +842,90 @@ public class Parser {
         return procedureRef;
     }
 
-    Expression parseProcedureRefParams() throws SyntaxError {
+    ActualParameterSequence parseProcedureRefParams() throws SyntaxError {
+
+        ActualParameterSequence actualParameterSequence;
 
         SourcePosition srcPos = new SourcePosition();
         start(srcPos);
 
         accept(Token.LPAREN);
 
-        Expression param = parseExpression();
+        ActualParameter param = parseCallActualParameter();
         finish(srcPos);
 
-        while (currentToken.kind == Token.COMMA) {
+        if (currentToken.kind == Token.COMMA) {
             acceptIt();
 
-            Expression nextParam = parseExpression();
+            ActualParameterSequence nextParam = parseActualParameterSequence();
             finish(srcPos);
 
-            param = new ExpressionList(srcPos, param, nextParam);
+            actualParameterSequence = new MultipleActualParameterSequence(srcPos, param, nextParam);
+        } else {
+            finish(srcPos);
+
+            actualParameterSequence = new SingleActualParameterSequence(srcPos, param);
         }
 
         accept(Token.RPAREN);
         finish(srcPos);
 
-        return param;
+        return actualParameterSequence;
+    }
+
+    ActualParameterSequence parseActualParameterSequence() throws SyntaxError {
+        ActualParameterSequence actualsAST;
+
+        SourcePosition actualsPos = new SourcePosition();
+
+        start(actualsPos);
+
+        if (currentToken.kind == Token.RPAREN) {
+            finish(actualsPos);
+            actualsAST = new EmptyActualParameterSequence(actualsPos);
+
+        } else {
+            actualsAST = parseProperActualParameterSequence();
+        }
+
+        return actualsAST;
+    }
+
+    ActualParameterSequence parseProperActualParameterSequence() throws SyntaxError {
+
+        // in case there's a syntactic error
+        ActualParameterSequence actualsAST;
+
+        SourcePosition actualsPos = new SourcePosition();
+
+        start(actualsPos);
+        ActualParameter apAST = parseCallActualParameter();
+
+        if (currentToken.kind == Token.COMMA) {
+            acceptIt();
+
+            ActualParameterSequence apsAST = parseProperActualParameterSequence();  // recursive call
+            finish(actualsPos);
+
+            actualsAST = new MultipleActualParameterSequence(actualsPos, apAST, apsAST);
+
+        } else {
+            finish(actualsPos);
+            actualsAST = new SingleActualParameterSequence(actualsPos, apAST);
+        }
+
+        return actualsAST;
+    }
+
+    ActualParameter parseCallActualParameter() throws SyntaxError {
+        SourcePosition srcPos = new SourcePosition();
+
+        start(srcPos);
+
+        Expression identifier = parseExpression();
+        finish(srcPos);
+
+        return new CallActualParameter(srcPos, identifier);
     }
 
     Statement parseReturns() throws SyntaxError {
@@ -1439,22 +1509,11 @@ public class Parser {
                 if (currentToken.kind == Token.LPAREN) {
                     acceptIt();
 
-                    Expression param = parseExpression();
-                    finish(srcPos);
-
-                    while (currentToken.kind == Token.COMMA) {
-                        acceptIt();
-
-                        Expression nextParam = parseExpression();
-                        finish(srcPos);
-
-                        param = new ExpressionList(srcPos, param, nextParam);
-                    }
-
+                    ActualParameterSequence apsAST = parseActualParameterSequence();
                     accept(Token.RPAREN);
                     finish(srcPos);
 
-                    expressionAST = new FunctionCall(srcPos, iAST, param);
+                    expressionAST = new FunctionCall(srcPos, iAST, apsAST);
 
                 } else {
                     Vname vAST = parseRestOfVname(iAST);
@@ -1467,7 +1526,7 @@ public class Parser {
 
             case Token.OPERATOR: {
                 Operator opAST = parseOperator();
-                Expression eAST = parseExpression();  // recursive call
+                Expression eAST = parseExpression();
                 finish(srcPos);
 
                 expressionAST = new UnaryExpression(srcPos, opAST, eAST);

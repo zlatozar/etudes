@@ -390,9 +390,12 @@ public final class Checker implements Visitor {
     public Object visitProcedureDefinition(ProcedureDefinition ast, Object o) {
         System.out.println("ProcedureDefinition");
 
+        String procName = (String) ast.procHead.visit(this, ast);
+
+        indTable.enter(procName, ast);
+
         indTable.openScope();
 
-        String procName = (String) ast.procHead.visit(this, ast);
         ast.segment.visit(this, null);
         ast.procEnd.visit(this, procName);
 
@@ -406,6 +409,56 @@ public final class Checker implements Visitor {
         System.out.println("ProcedureHead");
 
         String procName = (String) ast.blockCodeName.visit(this, o);
+
+        return procName;
+    }
+
+    @Override
+    public Object visitProcedureName(ProcedureName ast, Object o) {
+        System.out.println("ProcedureName");
+
+        Definition procDefinition = (Definition) o;
+
+        String procName = ast.I.spelling;
+
+        indTable.enter(procName, (Definition) o);
+
+        if (procDefinition.duplicated) {
+            reporter.reportError("procedure \"%\" already declared", procName, ast.position);
+        }
+
+        return procName;
+    }
+
+    @Override
+    public Object visitFormalParameterList(FormalParameterList ast, Object o) {
+
+        ast.paramSeq.visit(this, null);
+        ast.param.visit(this, null);
+
+        return null;
+    }
+
+    @Override
+    public Object visitCallActualParameter(CallActualParameter ast, Object o) {
+        return null;
+    }
+
+    @Override
+    public Object visitProcedureNameWithParams(ProcedureNameWithParams ast, Object o) {
+        System.out.println("ProcedureNameWithParams");
+
+        Definition procDefinition = (Definition) o;
+
+        String procName = ast.procName.spelling;
+
+        indTable.enter(procName, (Definition) o);
+
+        if (procDefinition.duplicated) {
+            reporter.reportError("procedure \"%\" already declared", procName, ast.position);
+        }
+
+        ast.FPS.visit(this, o);
 
         return procName;
     }
@@ -427,55 +480,12 @@ public final class Checker implements Visitor {
     }
 
     @Override
-    public Object visitProcedureName(ProcedureName ast, Object o) {
-        System.out.println("ProcedureName");
-
-        Definition procDefinition = (Definition) o;
-
-        String procName = ast.I.spelling;
-
-        indTable.enter(procName, (Definition) o);
-
-        if (procDefinition.duplicated) {
-            reporter.reportError("procedure \"%\" already declared", procName, ast.position);
-        }
-
-        return procName;
-    }
-
-    @Override
-    public Object visitParameterList(ParameterList ast, Object o) {
-
-        ast.paramSeq.visit(this, null);
-        ast.param.visit(this, null);
-
-        return null;
-    }
-
-    @Override
-    public Object visitProcedureNameWithParams(ProcedureNameWithParams ast, Object o) {
-        System.out.println("ProcedureNameWithParams");
-
-        Definition procDefinition = (Definition) o;
-
-        String procName = ast.procName.spelling;
-
-        indTable.enter(procName, (Definition) o);
-
-        if (procDefinition.duplicated) {
-            reporter.reportError("procedure \"%\" already declared", procName, ast.position);
-        }
-
-        ast.params.visit(this, o);
-
-        return procName;
-    }
-
-    @Override
-    public Object visitParameterByValue(ParameterByValue ast, Object o) {
+    public Object visitFormalParameterByValue(FormalParameterByValue ast, Object o) {
         System.out.println("ParameterByValue");
 
+        // eliminate type identifiers
         ast.typeDenoter = (TypeDenoter) ast.typeDenoter.visit(this, null);
+
         ast.identifier.visit(this, ast.typeDenoter);
 
         indTable.enter(ast.identifier.spelling, ast.typeDenoter);
@@ -488,7 +498,7 @@ public final class Checker implements Visitor {
     }
 
     @Override
-    public Object visitParameterByName(ParameterByName ast, Object o) {
+    public Object visitFormalParameterByName(FormalParameterByName ast, Object o) {
         System.out.println("ParameterByName");
 
         ast.typeDenoter = (TypeDenoter) ast.typeDenoter.visit(this, null);
@@ -590,24 +600,63 @@ public final class Checker implements Visitor {
     @Override
     public Object visitProcedureCallStmt(ProcedureCallStmt ast, Object o) {
         System.out.println("ProcedureCallStmt");
+
+        ast.prcRef.visit(this, null);
+
         return null;
     }
 
     @Override
     public Object visitCall(Call ast, Object o) {
         System.out.println("Call");
-        return null;
-    }
 
-    @Override
-    public Object visitExpressionList(ExpressionList ast, Object o) {
-        System.out.println("ExpressionList");
+        Definition binding = (Definition) ast.identifier.visit(this, null);
+
+        if (binding == null) {
+            reportUndeclared(ast.identifier);
+        }
+
+        if (!(binding instanceof ProcedureDefinition)) {
+            reporter.reportError("\"%\" is not a procedure identifier", ast.identifier.spelling, ast.identifier.position);
+        }
+
         return null;
     }
 
     @Override
     public Object visitCallWithParams(CallWithParams ast, Object o) {
         System.out.println("CallWithParams");
+
+        Definition binding = (Definition) ast.identifier.visit(this, null);
+
+        if (binding == null) {
+            reportUndeclared(ast.identifier);
+        }
+
+        if (!(binding instanceof ProcedureDefinition)) {
+            reporter.reportError("\"%\" is not a procedure identifier", ast.identifier.spelling, ast.identifier.position);
+        }
+
+        ast.params.visit(this, binding);
+
+        return null;
+    }
+
+    @Override
+    public Object visitExpressionList(ExpressionList ast, Object o) {
+        System.out.println("ExpressionList");
+
+        ast.exprSeq.visit(this, o);
+
+//        if(first != null && o != null) {
+//            if (o instanceof ProcedureDefinition) {
+//                System.out.println("success");
+//            }
+//        }
+
+
+        ast.expr.visit(this, o);
+
         return null;
     }
 
@@ -951,6 +1000,31 @@ public final class Checker implements Visitor {
         return null;
     }
 
+    @Override
+    public Object visitSingleActualParameterSequence(SingleActualParameterSequence ast, Object o) {
+        return null;
+    }
+
+    @Override
+    public Object visitMultipleActualParameterSequence(MultipleActualParameterSequence ast, Object o) {
+        return null;
+    }
+
+    @Override
+    public Object visitEmptyActualParameterSequence(EmptyActualParameterSequence ast, Object o) {
+        return null;
+    }
+
+    @Override
+    public Object visitSingleFormalParameterSequence(SingleFormalParameterSequence ast, Object o) {
+        return null;
+    }
+
+    @Override
+    public Object visitEmptyFormalParameterSequence(EmptyFormalParameterSequence ast, Object o) {
+        return null;
+    }
+
 //_____________________________________________________________________________
 //
 
@@ -980,7 +1054,7 @@ public final class Checker implements Visitor {
         return binding;
     }
 
-    private FunctionDefinition declareStdFunc(String id, Parameter fps, TypeDenoter resultType) {
+    private FunctionDefinition declareStdFunc(String id, FormalParameterSequence fps, TypeDenoter resultType) {
 
         FunctionDefinition binding;
 
@@ -1054,13 +1128,12 @@ public final class Checker implements Visitor {
         StdEnvironment.charDecl = declareStdType("STRING", StdEnvironment.charType);
 
         StdEnvironment.substrDecl = declareStdFunc("SUBSTR",
-                new ParameterList(dummyPos,
-                        new ParameterList(dummyPos,
-                                new ParameterByValue(dummyPos, dummyI, StdEnvironment.charType),
-                                new ParameterByValue(dummyPos, dummyI, StdEnvironment.integerType)),
-                        new ParameterByValue(dummyPos, dummyI, StdEnvironment.integerType)), StdEnvironment.charType);
+                new FormalParameterList(dummyPos, new FormalParameterByValue(dummyPos, dummyI, StdEnvironment.charType),
+                        new FormalParameterList(dummyPos, new FormalParameterByValue(dummyPos, dummyI, StdEnvironment.charType),
+                        new SingleFormalParameterSequence(dummyPos, new FormalParameterByValue(dummyPos, dummyI, StdEnvironment.charType)))), StdEnvironment.charType);
 
-        StdEnvironment.lengthDecl = declareStdFunc("LENGTH", new ParameterByValue(dummyPos, dummyI, StdEnvironment.integerType), StdEnvironment.charType);
+        StdEnvironment.lengthDecl = declareStdFunc("LENGTH", new SingleFormalParameterSequence(dummyPos,
+                new FormalParameterByValue(dummyPos, dummyI, StdEnvironment.integerType)), StdEnvironment.charType);
         StdEnvironment.concatDecl = declareStdBinaryOp("||", StdEnvironment.charType, StdEnvironment.charType, StdEnvironment.charType);
 
         StdEnvironment.equalDecl = declareStdBinaryOp("=", StdEnvironment.anyType, StdEnvironment.anyType, StdEnvironment.booleanType);

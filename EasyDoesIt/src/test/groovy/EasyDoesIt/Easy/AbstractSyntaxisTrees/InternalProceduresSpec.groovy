@@ -10,9 +10,9 @@ class InternalProceduresSpec extends ASTSpec {
 
         given: 'Parser and simple procedure (param pass by name)'
         Parser parser = getParserFor(
-                ' PROCEDURE abs(x REAL NAME):\n' +
-                        '    ;\n' +
-                        ' END PROCEDURE abs;')
+                'PROCEDURE abs(x REAL NAME):' +
+                '   ;' +
+                'END PROCEDURE abs;')
 
         when: 'Parser finish'
 
@@ -25,9 +25,9 @@ class InternalProceduresSpec extends ASTSpec {
 
         given: 'Parser and simple procedure (param pass by name)'
         Parser parser = getParserFor(
-                ' PROCEDURE abs(x REAL, y INTEGER, z STRING):\n' +
-                        '    ;\n' +
-                        ' END PROCEDURE abs;')
+                'PROCEDURE abs(x REAL, y INTEGER, z STRING):' +
+                '   ;' +
+                'END PROCEDURE abs;')
 
         when: 'Parser finish'
 
@@ -40,8 +40,8 @@ class InternalProceduresSpec extends ASTSpec {
 
         given: 'Parser and simple function (param pass by name)'
         Parser parser = getParserFor(
-                ' FUNCTION abs(x REAL NAME) REAL:\n' +
-                '    ;\n' +
+                ' FUNCTION abs(x REAL NAME) REAL:' +
+                '    ;' +
                 ' END FUNCTION abs;')
 
         when: 'Parser finish'
@@ -55,9 +55,26 @@ class InternalProceduresSpec extends ASTSpec {
 
         given: 'Parser and simple function'
         Parser parser = getParserFor(
-                ' FUNCTION abs(x REAL, y INTEGER, z STRING) REAL:\n' +
-                        '    ;\n' +
-                        ' END FUNCTION abs;')
+                'FUNCTION abs(x REAL, y INTEGER, z STRING) REAL:' +
+                '   ;' +
+                'END FUNCTION abs;')
+
+        when: 'Parser finish'
+
+        then: 'AST should be constructed'
+        AST theAST = parser.parseProgram();
+        assert theAST
+    }
+
+    def 'Function definition with many parameters and function call'() {
+
+        given: 'Parser and simple function'
+        Parser parser = getParserFor(
+                'FUNCTION dummy(x INTEGER, y INTEGER, z INTEGER) REAL:' +
+                '   ;' +
+                'END FUNCTION dummy;' +
+
+                'SET a := dummy(1, 2, 3)')
 
         when: 'Parser finish'
 
@@ -70,12 +87,13 @@ class InternalProceduresSpec extends ASTSpec {
 
         given: 'Parser both'
         Parser parser = getParserFor(
-                ' FUNCTION abs(x REAL NAME) REAL:\n' +
-                        '    ;\n' +
-                        ' END FUNCTION abs;' +
-                ' PROCEDURE abs(x REAL, y INTEGER, z STRING):\n' +
-                        '    ;\n' +
-                        ' END PROCEDURE abs;')
+                'FUNCTION abs(x REAL NAME) REAL:' +
+                '   ;' +
+                'END FUNCTION abs;' +
+
+                'PROCEDURE abs(x REAL, y INTEGER, z STRING):' +
+                '   ;' +
+                'END PROCEDURE abs;')
 
         when: 'Parser finish'
 

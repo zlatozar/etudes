@@ -8,7 +8,7 @@ class CallsSpec extends ASTSpec {
 
     def 'Call definition without parameters'() {
 
-        given: 'Simple call'
+        given: 'Call procedure without parameters'
         Parser parser = getParserFor('CALL procedureName;')
 
         when: 'Parser finish'
@@ -18,7 +18,7 @@ class CallsSpec extends ASTSpec {
         assert theAST
     }
 
-    def 'Call definition with three parameters'() {
+    def 'Call procedure with three parameters'() {
 
         given: 'Parser and call with parameters'
         Parser parser = getParserFor('CALL procedureName(1, 2, 3, 4);')
@@ -29,4 +29,17 @@ class CallsSpec extends ASTSpec {
         AST theAST = parser.parseProgram();
         assert theAST
     }
+
+    def 'Call function with one parameter'() {
+
+        given: 'Parser and call with parameters'
+        Parser parser = getParserFor('SET limit := integersqrt(topnum) + 1;')
+
+        when: 'Parser finish'
+
+        then: 'AST should be constructed'
+        AST theAST = parser.parseProgram();
+        assert theAST
+    }
+
 }

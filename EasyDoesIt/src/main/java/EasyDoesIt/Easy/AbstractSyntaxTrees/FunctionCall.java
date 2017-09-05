@@ -5,13 +5,13 @@ import EasyDoesIt.Easy.SyntacticAnalizer.SourcePosition;
 public class FunctionCall extends Expression {
 
     public Identifier I;
-    public Expression E;
+    public ActualParameterSequence APS;
 
-    public FunctionCall(SourcePosition srcPos, Identifier iAST, Expression E) {
+    public FunctionCall(SourcePosition srcPos, Identifier iAST, ActualParameterSequence APS) {
         super(srcPos);
 
         this.I = iAST;
-        this.E = E;
+        this.APS = APS;
     }
 
     @Override

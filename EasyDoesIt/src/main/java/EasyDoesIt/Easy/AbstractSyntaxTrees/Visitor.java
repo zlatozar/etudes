@@ -61,13 +61,19 @@ public interface Visitor {
     Object visitProcedureHead(ProcedureHead ast, Object o);
     Object visitProcedureEnd(ProcedureEnd ast, Object o);
     Object visitProcedureName(ProcedureName ast, Object o);
-    Object visitParameterList(ParameterList ast, Object o);
+    Object visitFormalParameterList(FormalParameterList ast, Object o);
+    Object visitCallActualParameter(CallActualParameter ast, Object o);
     Object visitProcedureNameWithParams(ProcedureNameWithParams ast, Object o);
-    Object visitParameterByValue(ParameterByValue ast, Object o);
-    Object visitParameterByName(ParameterByName ast, Object o);
+    Object visitFormalParameterByValue(FormalParameterByValue ast, Object o);
+    Object visitFormalParameterByName(FormalParameterByName ast, Object o);
     Object visitFunctionHead(FunctionHead ast, Object o);
     Object visitFunctionEnd(FunctionEnd ast, Object o);
 
+    Object visitSingleActualParameterSequence(SingleActualParameterSequence ast, Object o);
+    Object visitMultipleActualParameterSequence(MultipleActualParameterSequence ast, Object o);
+    Object visitEmptyActualParameterSequence(EmptyActualParameterSequence ast, Object o);
+    Object visitSingleFormalParameterSequence(SingleFormalParameterSequence ast, Object o);
+    Object visitEmptyFormalParameterSequence(EmptyFormalParameterSequence ast, Object o);
 
 //_____________________________________________________________________________
 //                                                                  Statements
@@ -147,4 +153,5 @@ public interface Visitor {
     Object visitCharTypeDenoter(CharTypeDenoter ast, Object o);
     Object visitFloatTypeDenoter(FloatTypeDenoter ast, Object o);
     Object visitRealTypeDenoter(RealTypeDenoter ast, Object o);
+
 }
