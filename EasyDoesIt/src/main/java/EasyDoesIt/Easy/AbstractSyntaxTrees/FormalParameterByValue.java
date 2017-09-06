@@ -5,7 +5,6 @@ import EasyDoesIt.Easy.SyntacticAnalizer.SourcePosition;
 public class FormalParameterByValue extends FormalParameter {
 
     public Identifier identifier;
-    public TypeDenoter typeDenoter;
 
     public FormalParameterByValue(SourcePosition srcPos, Identifier identifier, TypeDenoter typeDenoter) {
         super(srcPos);

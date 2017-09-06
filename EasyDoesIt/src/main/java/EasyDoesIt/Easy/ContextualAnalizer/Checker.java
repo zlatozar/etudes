@@ -426,6 +426,21 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitCallActualParameter(CallActualParameter ast, Object o) {
+        System.out.println("CallActualParameter");
+
+        TypeDenoter apType = (TypeDenoter) ast.expression.visit(this, null);
+
+        if (o instanceof FormalParameter) {
+            FormalParameter fp = (FormalParameter) o;
+
+            if (!(fp.typeDenoter.equals(apType))) {
+                reporter.reportError("wrong type for expression \"%\"", ast.expression.toString(), ast.expression.position);
+            }
+
+        } else {
+            reporter.reportError("wrong signature for expression \"%\"",  ast.expression.toString(), ast.expression.position);
+        }
+
         return null;
     }
 
@@ -604,7 +619,7 @@ public final class Checker implements Visitor {
             reporter.reportError("\"%\" is not a procedure identifier", ast.identifier.spelling, ast.identifier.position);
         }
 
-        ast.params.visit(this, binding);
+        ast.params.visit(this, ((ProcedureDefinition) binding).procHead.FPS);
 
         return null;
     }
@@ -612,6 +627,17 @@ public final class Checker implements Visitor {
     @Override
     public Object visitSingleActualParameterSequence(SingleActualParameterSequence ast, Object o) {
         System.out.println("SingleActualParameterSequence");
+
+        // use passed FormalParameterSequence because it should be compared to ActualParameterSequence
+        FormalParameterSequence fps = (FormalParameterSequence) o;
+
+        if (!(fps instanceof SingleFormalParameterSequence)) {
+            reporter.reportError("incorrect number of actual parameters", "", ast.position);
+
+        } else {
+            ast.AP.visit(this, ((SingleFormalParameterSequence) fps).FP);
+        }
+
         return null;
     }
 

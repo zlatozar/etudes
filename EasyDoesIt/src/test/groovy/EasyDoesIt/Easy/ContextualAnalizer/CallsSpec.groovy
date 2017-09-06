@@ -51,7 +51,7 @@ class CallsSpec extends ASTSpec {
                 'END FUNCTION dummy;' +
 
                 'DECLARE a INTEGER;' +
-                'SET a := dummy(42);')
+                'SET dummy(42);')
 
         when: 'Parser finish'
         AST theAST = parser.parseProgram();

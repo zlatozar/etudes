@@ -15,4 +15,9 @@ public class ConstantExpression extends Expression {
     public Object visit(Visitor v, Object o) {
         return v.visitConstantExpression(this, o);
     }
+
+    @Override
+    public String toString() {
+        return name.spelling;
+    }
 }
