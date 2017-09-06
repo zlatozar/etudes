@@ -4,12 +4,14 @@ import EasyDoesIt.Easy.SyntacticAnalizer.SourcePosition;
 
 public class FunctionHead extends AST {
 
-    public BlockCodeName blockCodeName;
+    public Identifier identifier;
+    public FormalParameterSequence FPS;
     public TypeDenoter typeDenoter;
 
-    public FunctionHead(SourcePosition srcPos, BlockCodeName blockCodeName, TypeDenoter typeDenoter) {
+    public FunctionHead(SourcePosition srcPos, Identifier identifier, FormalParameterSequence FPS, TypeDenoter typeDenoter) {
         super(srcPos);
-        this.blockCodeName = blockCodeName;
+        this.identifier = identifier;
+        this.FPS = FPS;
         this.typeDenoter = typeDenoter;
     }
 

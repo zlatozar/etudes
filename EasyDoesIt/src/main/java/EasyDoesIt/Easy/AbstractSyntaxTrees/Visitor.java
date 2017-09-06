@@ -60,10 +60,8 @@ public interface Visitor {
     Object visitFunctionDefinition(FunctionDefinition ast, Object o);
     Object visitProcedureHead(ProcedureHead ast, Object o);
     Object visitProcedureEnd(ProcedureEnd ast, Object o);
-    Object visitProcedureName(ProcedureName ast, Object o);
     Object visitFormalParameterList(FormalParameterList ast, Object o);
     Object visitCallActualParameter(CallActualParameter ast, Object o);
-    Object visitProcedureNameWithParams(ProcedureNameWithParams ast, Object o);
     Object visitFormalParameterByValue(FormalParameterByValue ast, Object o);
     Object visitFormalParameterByName(FormalParameterByName ast, Object o);
     Object visitFunctionHead(FunctionHead ast, Object o);

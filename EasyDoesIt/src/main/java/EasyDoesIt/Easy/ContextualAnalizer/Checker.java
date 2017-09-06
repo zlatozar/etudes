@@ -408,30 +408,15 @@ public final class Checker implements Visitor {
     public Object visitProcedureHead(ProcedureHead ast, Object o) {
         System.out.println("ProcedureHead");
 
-        String procName = (String) ast.blockCodeName.visit(this, o);
+        ast.identifier.visit(this, o);
+        ast.FPS.visit(this, o);
 
-        return procName;
-    }
-
-    @Override
-    public Object visitProcedureName(ProcedureName ast, Object o) {
-        System.out.println("ProcedureName");
-
-        Definition procDefinition = (Definition) o;
-
-        String procName = ast.I.spelling;
-
-        indTable.enter(procName, (Definition) o);
-
-        if (procDefinition.duplicated) {
-            reporter.reportError("procedure \"%\" already declared", procName, ast.position);
-        }
-
-        return procName;
+        return ast.identifier.spelling;
     }
 
     @Override
     public Object visitFormalParameterList(FormalParameterList ast, Object o) {
+        System.out.println("FormalParameterList");
 
         ast.paramSeq.visit(this, null);
         ast.param.visit(this, null);
@@ -442,25 +427,6 @@ public final class Checker implements Visitor {
     @Override
     public Object visitCallActualParameter(CallActualParameter ast, Object o) {
         return null;
-    }
-
-    @Override
-    public Object visitProcedureNameWithParams(ProcedureNameWithParams ast, Object o) {
-        System.out.println("ProcedureNameWithParams");
-
-        Definition procDefinition = (Definition) o;
-
-        String procName = ast.procName.spelling;
-
-        indTable.enter(procName, (Definition) o);
-
-        if (procDefinition.duplicated) {
-            reporter.reportError("procedure \"%\" already declared", procName, ast.position);
-        }
-
-        ast.FPS.visit(this, o);
-
-        return procName;
     }
 
     @Override
@@ -533,9 +499,10 @@ public final class Checker implements Visitor {
     public Object visitFunctionHead(FunctionHead ast, Object o) {
         System.out.println("FunctionHead");
 
-        String funcName = (String) ast.blockCodeName.visit(this, o);
+        ast.identifier.visit(this, o);
+        ast.FPS.visit(this, o);
 
-        return funcName;
+        return ast.identifier.spelling;
     }
 
     @Override
@@ -643,20 +610,53 @@ public final class Checker implements Visitor {
     }
 
     @Override
+    public Object visitSingleActualParameterSequence(SingleActualParameterSequence ast, Object o) {
+        System.out.println("SingleActualParameterSequence");
+        return null;
+    }
+
+    @Override
+    public Object visitMultipleActualParameterSequence(MultipleActualParameterSequence ast, Object o) {
+        System.out.println("MultipleActualParameterSequence");
+
+        // use passed FormalParameterSequence
+        FormalParameterSequence fps = (FormalParameterSequence) o;
+
+        if (!(fps instanceof FormalParameterList)) {
+            reporter.reportError("too many actual parameters", "", ast.position);
+
+        } else {
+            ast.AP.visit(this, ((FormalParameterList) fps).param);
+            ast.APS.visit(this, ((FormalParameterList) fps).paramSeq);
+        }
+
+        return null;
+    }
+
+    @Override
+    public Object visitEmptyActualParameterSequence(EmptyActualParameterSequence ast, Object o) {
+        System.out.println("EmptyActualParameterSequence");
+        return null;
+    }
+
+    @Override
+    public Object visitSingleFormalParameterSequence(SingleFormalParameterSequence ast, Object o) {
+        System.out.println("SingleFormalParameterSequence");
+
+        ast.FP.visit(this, null);
+
+        return null;
+    }
+
+    @Override
+    public Object visitEmptyFormalParameterSequence(EmptyFormalParameterSequence ast, Object o) {
+        System.out.println("EmptyFormalParameterSequence");
+        return null;
+    }
+
+    @Override
     public Object visitExpressionList(ExpressionList ast, Object o) {
         System.out.println("ExpressionList");
-
-        ast.exprSeq.visit(this, o);
-
-//        if(first != null && o != null) {
-//            if (o instanceof ProcedureDefinition) {
-//                System.out.println("success");
-//            }
-//        }
-
-
-        ast.expr.visit(this, o);
-
         return null;
     }
 
@@ -1000,31 +1000,6 @@ public final class Checker implements Visitor {
         return null;
     }
 
-    @Override
-    public Object visitSingleActualParameterSequence(SingleActualParameterSequence ast, Object o) {
-        return null;
-    }
-
-    @Override
-    public Object visitMultipleActualParameterSequence(MultipleActualParameterSequence ast, Object o) {
-        return null;
-    }
-
-    @Override
-    public Object visitEmptyActualParameterSequence(EmptyActualParameterSequence ast, Object o) {
-        return null;
-    }
-
-    @Override
-    public Object visitSingleFormalParameterSequence(SingleFormalParameterSequence ast, Object o) {
-        return null;
-    }
-
-    @Override
-    public Object visitEmptyFormalParameterSequence(EmptyFormalParameterSequence ast, Object o) {
-        return null;
-    }
-
 //_____________________________________________________________________________
 //
 
@@ -1059,9 +1034,8 @@ public final class Checker implements Visitor {
         FunctionDefinition binding;
 
         Identifier name = new Identifier(dummyPos, id);
-        BlockCodeName blockCodeName = new ProcedureNameWithParams(dummyPos, name, fps);
 
-        FunctionHead funcHead = new FunctionHead(dummyPos, blockCodeName, resultType);
+        FunctionHead funcHead = new FunctionHead(dummyPos, name, fps, resultType);
         Segment segment = new Segment(dummyPos, new EmptyDefinition(dummyPos), new EmptyStatement(dummyPos));
         FunctionEnd funcEnd = new FunctionEnd(dummyPos, name);
 

@@ -58,9 +58,9 @@ class InternalProceduresSpec extends ASTSpec {
 
         given: 'Parser and simple function'
         Parser parser = getParserFor(
-                ' FUNCTION abs(x REAL, y INTEGER, z STRING) REAL:\n' +
-                        '    ;\n' +
-                        ' END FUNCTION abs;')
+                'FUNCTION abs(x REAL, y INTEGER, z STRING) REAL:' +
+                '    ;' +
+                'END FUNCTION abs;')
 
         when: 'Parser finish'
         AST theAST = parser.parseProgram();
@@ -74,12 +74,13 @@ class InternalProceduresSpec extends ASTSpec {
 
         given: 'Parser both'
         Parser parser = getParserFor(
-                ' FUNCTION abs(x REAL NAME) REAL:\n' +
-                        '    ;\n' +
-                        ' END FUNCTION abs;' +
-                        ' PROCEDURE abs(x REAL, y INTEGER, z STRING):\n' +
-                        '    ;\n' +
-                        ' END PROCEDURE abs;')
+                'FUNCTION abs(x REAL NAME) REAL:' +
+                '   ;' +
+                'END FUNCTION abs;' +
+
+                'PROCEDURE abs(x REAL, y INTEGER, z STRING):' +
+                '   ;' +
+                'END PROCEDURE abs;')
 
         when: 'Parser finish'
         AST theAST = parser.parseProgram();

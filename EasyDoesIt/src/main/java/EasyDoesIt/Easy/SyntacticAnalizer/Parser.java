@@ -504,12 +504,15 @@ public class Parser {
         start(srcPos);
 
         accept(Token.FUNCTION);
-        BlockCodeName blockCodeName = parseBlockCodeName();
+
+        Identifier identifier = parseIdentifier();
+        FormalParameterSequence FPS = parseFormalParameterSequence();
+
         TypeDenoter typeDenoter = parseTypeDenoter();
 
         finish(srcPos);
 
-        return new FunctionHead(srcPos, blockCodeName, typeDenoter);
+        return new FunctionHead(srcPos, identifier, FPS, typeDenoter);
     }
 
     FunctionEnd parseFunctionEnd() throws SyntaxError {
@@ -532,39 +535,36 @@ public class Parser {
         start(srcPos);
 
         accept(Token.PROCEDURE);
-        BlockCodeName prgName = parseBlockCodeName();
+        Identifier prgName = parseIdentifier();
 
+        FormalParameterSequence FPS = parseFormalParameterSequence();
         finish(srcPos);
 
-        return new ProcedureHead(srcPos, prgName);
+        return new ProcedureHead(srcPos, prgName, FPS);
     }
 
-    BlockCodeName parseBlockCodeName() throws SyntaxError {
+    FormalParameterSequence parseFormalParameterSequence() throws SyntaxError {
 
-        BlockCodeName blockCodeName;
+        FormalParameterSequence params;
 
         SourcePosition srcPos = new SourcePosition();
         start(srcPos);
-
-        Identifier identifier = parseIdentifier();
 
         if (currentToken.kind == Token.LPAREN) {
 
             accept(Token.LPAREN);
 
-            FormalParameterSequence params = parseFormalParameters();
+            params = parseFormalParameters();
             finish(srcPos);
 
             accept(Token.RPAREN);
 
-            blockCodeName = new ProcedureNameWithParams(srcPos, identifier, params);
-
         } else {
-            blockCodeName = new ProcedureName(srcPos, identifier);
+            params = new EmptyFormalParameterSequence(srcPos);
             finish(srcPos);
         }
 
-        return blockCodeName;
+        return params;
     }
 
     FormalParameterSequence parseFormalParameters() throws SyntaxError {
