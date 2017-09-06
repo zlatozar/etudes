@@ -174,6 +174,19 @@ public final class Checker implements Visitor {
     @Override
     public Object visitFunctionCall(FunctionCall ast, Object o) {
         System.out.println("FunctionCall");
+
+        Definition binding = (Definition) ast.I.visit(this, null);
+
+        if (binding == null) {
+            reportUndeclared(ast.I);
+        }
+
+        if (!(binding instanceof FunctionDefinition)) {
+            reporter.reportError("\"%\" is not a function identifier", ast.I.spelling, ast.I.position);
+        }
+
+        ast.APS.visit(this, ((FunctionDefinition) binding).funcHead.FPS);
+
         return null;
     }
 
@@ -498,14 +511,16 @@ public final class Checker implements Visitor {
     public Object visitFunctionDefinition(FunctionDefinition ast, Object o) {
         System.out.println("FunctionDefinition");
 
+        String procName = (String) ast.funcHead.visit(this, ast);
+
+        indTable.enter(procName, ast);
+
         indTable.openScope();
 
-        String funcName = (String) ast.funcHead.visit(this, ast);
         ast.segment.visit(this, null);
-        ast.funcEnd.visit(this, funcName);
+        ast.funcEnd.visit(this, procName);
 
         indTable.closeScope();
-
 
         return null;
     }
@@ -683,6 +698,8 @@ public final class Checker implements Visitor {
     @Override
     public Object visitExpressionList(ExpressionList ast, Object o) {
         System.out.println("ExpressionList");
+
+
         return null;
     }
 
@@ -975,7 +992,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitUnaryOperatorDefinition(UnaryOperatorDefinition ast, Object o) {
-        System.out.println("UnaryOperatorDefinition");
         return null;
     }
 
@@ -986,44 +1002,37 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitAnyTypeDenoter(AnyTypeDenoter ast, Object o) {
-        System.out.println("AnyTypeDenoter");
-        return null;
+        return StdEnvironment.anyType;
     }
 
     @Override
     public Object visitErrorTypeDenoter(ErrorTypeDenoter ast, Object o) {
-        System.out.println("ErrorTypeDenoter");
-        return null;
+        return StdEnvironment.errorType;
     }
 
     @Override
     public Object visitBoolTypeDenoter(BoolTypeDenoter ast, Object o) {
-        System.out.println("BoolTypeDenoter");
-        return null;
+        return StdEnvironment.booleanType;
     }
 
     @Override
     public Object visitIntTypeDenoter(IntTypeDenoter ast, Object o) {
-        System.out.println("IntTypeDenoter");
-        return null;
+        return StdEnvironment.integerType;
     }
 
     @Override
     public Object visitCharTypeDenoter(CharTypeDenoter ast, Object o) {
-        System.out.println("CharTypeDenoter");
-        return null;
+        return StdEnvironment.charType;
     }
 
     @Override
     public Object visitFloatTypeDenoter(FloatTypeDenoter ast, Object o) {
-        System.out.println("FloatTypeDenoter");
-        return null;
+        return StdEnvironment.floatType;
     }
 
     @Override
     public Object visitRealTypeDenoter(RealTypeDenoter ast, Object o) {
-        System.out.println("RealTypeDenoter");
-        return null;
+        return StdEnvironment.realType;
     }
 
 //_____________________________________________________________________________
