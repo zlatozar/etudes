@@ -42,13 +42,13 @@ PROGRAM Eratosthenes:
              SET ra := FLOAT(a);
              SET epsilon := 0.0000001*ra;
 
-          FOR x := ra/2.0 BY (ra/x-x)/2.0 WHILE abs(ra-x*x) > epsilon
-             DO ; END FOR;
+             FOR x := ra/2.0 BY (ra/x-x)/2.0 WHILE abs(ra-x*x) > epsilon
+                DO ; END FOR;
 
-          FOR sqrt := FIX(x)-1 BY 1 WHILE (sqrt+1)*(sqrt+1) <= a
-             DO ; END FOR;
+             FOR sqrt := FIX(x)-1 BY 1 WHILE (sqrt+1)*(sqrt+1) <= a
+                DO ; END FOR;
 
-          RETURN sqrt;
+             RETURN sqrt;
 
        END SELECT;
     END FUNCTION integersqrt;

@@ -24,8 +24,8 @@ public final class StdEnvironment {
 //_________________________________________________________________________
 //   These are small ASTs representing "declarations" of standard entities
 
-    public static Declaration falseDecl;
-    public static Declaration trueDecl;
+    public static Definition falseDecl;
+    public static Definition trueDecl;
     public static UnaryOperatorDefinition notDecl;
     public static BinaryOperatorDefinition andDecl;
     public static BinaryOperatorDefinition orDecl;

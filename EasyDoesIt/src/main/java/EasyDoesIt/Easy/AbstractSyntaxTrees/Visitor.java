@@ -40,6 +40,8 @@ public interface Visitor {
 //_____________________________________________________________________________
 //                                                                 Definitions
 
+    Object visitConstDefinition(ConstDefinition ast, Object o);
+
     Object visitDefinitionSeq(DefinitionSeq ast, Object o);
     Object visitEmptyDefinition(EmptyDefinition ast, Object o);
 
@@ -153,4 +155,5 @@ public interface Visitor {
     Object visitCharTypeDenoter(CharTypeDenoter ast, Object o);
     Object visitFloatTypeDenoter(FloatTypeDenoter ast, Object o);
     Object visitRealTypeDenoter(RealTypeDenoter ast, Object o);
+
 }

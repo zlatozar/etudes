@@ -47,7 +47,9 @@ public final class Checker implements Visitor {
     }
 
     public Object visitDotVname(DotVname ast, Object o) {
-       return null;
+        System.out.println("DotVname");
+
+        throw new IllegalArgumentException("not implemented");
     }
 
     @Override
@@ -64,6 +66,15 @@ public final class Checker implements Visitor {
 
         } else if (binding instanceof IntTypeDenoter) {
             ast.type = ((IntTypeDenoter) binding);
+            ast.variable = false;
+
+        } else if (binding instanceof RealTypeDenoter) {
+            ast.type = ((RealTypeDenoter) binding);
+            ast.variable = false;
+
+        } else if (binding instanceof ConstDefinition) {
+            ast.type = ((ConstDefinition) binding).E.type;
+            ast.variable = false;
         }
 
         return ast.type;
@@ -72,7 +83,7 @@ public final class Checker implements Visitor {
     @Override
     public Object visitSubscriptVname(SubscriptVname ast, Object o) {
         System.out.println("SubscriptVname");
-        return null;
+        throw new IllegalArgumentException("not implemented");
     }
 
 //_____________________________________________________________________________
@@ -166,7 +177,8 @@ public final class Checker implements Visitor {
     @Override
     public Object visitUnaryExpression(UnaryExpression ast, Object o) {
         System.out.println("UnaryExpression");
-        return null;
+
+        throw new IllegalArgumentException("not implemented");
     }
 
     @Override
@@ -241,6 +253,12 @@ public final class Checker implements Visitor {
         ast.definition.visit(this, null);
         ast.statement.visit(this, null);
 
+        return null;
+    }
+
+    @Override
+    public Object visitConstDefinition(ConstDefinition ast, Object o) {
+        System.out.println("ConstDefinition");
         return null;
     }
 
@@ -711,6 +729,8 @@ public final class Checker implements Visitor {
     public Object visitExpressionList(ExpressionList ast, Object o) {
         System.out.println("ExpressionList");
 
+        ast.exprSeq.visit(this, null);
+        ast.expr.visit(this, null);
 
         return null;
     }
@@ -724,6 +744,10 @@ public final class Checker implements Visitor {
     @Override
     public Object visitReturnWithExpression(ReturnWithExpression ast, Object o) {
         System.out.println("ReturnWithExpression");
+
+        if (o == null) {
+            reporter.reportError("RETURN should be function", "", ast.expression.position);
+        }
 
         // TODO: should be the same as function return type
         TypeDenoter rType = (TypeDenoter) ast.expression.visit(this, null);
@@ -775,7 +799,13 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitTrueBranch(TrueBranch ast, Object o) {
+
+        indTable.openScope();
+
         ast.segment.visit(this, null);
+
+        indTable.closeScope();
+
         return null;
     }
 
@@ -783,7 +813,11 @@ public final class Checker implements Visitor {
     public Object visitFalseBranch(FalseBranch ast, Object o) {
         System.out.println("FalseBranch");
 
+        indTable.openScope();
+
         ast.segment.visit(this, null);
+
+        indTable.closeScope();
 
         return null;
     }
@@ -834,11 +868,7 @@ public final class Checker implements Visitor {
         System.out.println("ForHead");
 
         TypeDenoter varType = (TypeDenoter) ast.var.visit(this, null);
-        TypeDenoter exprType = (TypeDenoter) ast.loopControl.visit(this, null);
-
-        if (!(varType.equals(exprType))) {
-            reporter.reportError("wrong type for expression \"%\"", ast.loopControl.toString(), ast.loopControl.position);
-        }
+        ast.loopControl.visit(this, varType);
 
         return null;
     }
@@ -846,12 +876,23 @@ public final class Checker implements Visitor {
     @Override
     public Object visitWhile(While ast, Object o) {
         System.out.println("While");
+
+        TypeDenoter binding = (TypeDenoter) ast.expression.visit(this, null);
+
+        if (!binding.equals(StdEnvironment.booleanType)) {
+            reporter.reportError("expression in a WHILE should have boolean type", "", ast.expression.position);
+        }
+
         return null;
     }
 
     @Override
     public Object visitStepperWhile(StepperWhile ast, Object o) {
         System.out.println("StepperWhile");
+
+        ast.stepExpression.visit(this, o);
+        ast.aWhileExpression.visit(this, null);
+
         return null;
     }
 
@@ -859,7 +900,12 @@ public final class Checker implements Visitor {
     public Object visitStepper(Stepper ast, Object o) {
         System.out.println("Stepper");
 
+        TypeDenoter loopExpression = (TypeDenoter) o;
         TypeDenoter binding = (TypeDenoter) ast.stepExpression.visit(this, null);
+
+        if (!(loopExpression.equals(binding))) {
+            reporter.reportError("types of FOR and STEP expressions differ", "", ast.stepExpression.position);
+        }
 
         return binding;
     }
@@ -868,7 +914,12 @@ public final class Checker implements Visitor {
     public Object visitStep(Step ast, Object o) {
         System.out.println("Step");
 
-        ast.step.visit(this, null);
+        TypeDenoter loopType = (TypeDenoter) o;
+        TypeDenoter binding = (TypeDenoter) ast.step.visit(this, null);
+
+        if (!(loopType.equals(binding))) {
+            reporter.reportError("types of FOR and BY expressions differ", "", ast.step.position);
+        }
 
         return null;
     }
@@ -878,7 +929,7 @@ public final class Checker implements Visitor {
         System.out.println("ExpressionStep");
 
         TypeDenoter binding = (TypeDenoter) ast.expression.visit(this, null);
-        ast.step.visit(this, null);
+        ast.step.visit(this, binding);
 
         return binding;
     }
@@ -907,10 +958,14 @@ public final class Checker implements Visitor {
     public Object visitExpressionLimit(ExpressionLimit ast, Object o) {
         System.out.println("ExpressionLimit");
 
-        TypeDenoter binding = (TypeDenoter) ast.expression.visit(this, null);
-        ast.limit.visit(this, null);
+        TypeDenoter exprType = (TypeDenoter) ast.expression.visit(this, null);
+        TypeDenoter limitType = (TypeDenoter) ast.limit.visit(this, null);
 
-        return binding;
+        if (!(exprType.equals(limitType))) {
+            reporter.reportError("expression type and LIMIT type differ", "", ast.limit.position);
+        }
+
+        return exprType;
     }
 
     @Override
@@ -922,30 +977,48 @@ public final class Checker implements Visitor {
     @Override
     public Object visitForEndWithName(ForEndWithName ast, Object o) {
         System.out.println("ForEndWithName");
+
+        ast.identifier.visit(this, null);
+
         return null;
     }
 
     @Override
     public Object visitSelectionStmt(SelectionStmt ast, Object o) {
         System.out.println("SelectionStmt");
+
+        TypeDenoter binding = (TypeDenoter) ast.selectionHead.visit(this, null);
+        ast.selectionBody.visit(this, binding);
+        ast.selectionEnd.visit(this, null);
+
         return null;
     }
 
     @Override
     public Object visitSelectionHead(SelectionHead ast, Object o) {
         System.out.println("SelectionHead");
-        return null;
+
+        TypeDenoter selectType = (TypeDenoter) ast.expression.visit(this, null);
+
+        return selectType;
     }
 
     @Override
     public Object visitSelectBody(SelectBody ast, Object o) {
         System.out.println("SelectBody");
+
+        ast.caseList.visit(this, o);
+
         return null;
     }
 
     @Override
     public Object visitSelectBodyWithEscape(SelectBodyWithEscape ast, Object o) {
         System.out.println("SelectBodyWithEscape");
+
+        ast.caseList.visit(this, o);
+        ast.escapeCase.visit(this, null);
+
         return null;
     }
 
@@ -958,48 +1031,88 @@ public final class Checker implements Visitor {
     @Override
     public Object visitSelectEndWithName(SelectEndWithName ast, Object o) {
         System.out.println("SelectEndWithName");
+
+        ast.identifier.visit(this, null);
+
         return null;
     }
 
     @Override
     public Object visitCaseSeq(CaseSeq ast, Object o) {
         System.out.println("CaseSeq");
+
+        ast.caseSeq.visit(this, o);
+        ast.aCase.visit(this, o);
+
         return null;
     }
 
     @Override
     public Object visitCaseHead(CaseHead ast, Object o) {
         System.out.println("CaseHead");
+
+        ast.selector.visit(this, o);
+
         return null;
     }
 
     @Override
     public Object visitCaseList(CaseList ast, Object o) {
         System.out.println("CaseList");
+
+        ast.caseHead.visit(this, o);
+
+        indTable.openScope();
+
+        ast.segment.visit(this, null);
+
+        indTable.closeScope();
+
         return null;
     }
 
     @Override
     public Object visitSelector(Selector ast, Object o) {
         System.out.println("Selector");
+
+        TypeDenoter selHeadType = (TypeDenoter) o;
+        TypeDenoter caseType = (TypeDenoter) ast.expression.visit(this, null);
+
+        if (!(selHeadType.equals(caseType))) {
+            reporter.reportError("SELECT expression and CASE expression types differ", "", ast.expression.position);
+        }
+
         return null;
     }
 
     @Override
     public Object visitEscapeCase(EscapeCase ast, Object o) {
         System.out.println("EscapeCase");
+
+        indTable.openScope();
+
+        ast.segment.visit(this, null);
+
+        indTable.closeScope();
+
         return null;
     }
 
     @Override
     public Object visitRepeat(Repeat ast, Object o) {
         System.out.println("Repeat");
+
+        ast.identifier.visit(this, null);
+
         return null;
     }
 
     @Override
     public Object visitRepent(Repent ast, Object o) {
         System.out.println("Repent");
+
+        ast.identifier.visit(this, null);
+
         return null;
     }
 
@@ -1103,12 +1216,16 @@ public final class Checker implements Visitor {
         return binding;
     }
 
-    private Declaration declareStdBoolean(String id, TypeDenoter constType) {
+    private Definition declareStdBoolean(String id, TypeDenoter constType) {
 
-        Declaration binding;
-        Identifier identifier = new Identifier(dummyPos, id);
+        IntegerExpression constExpr;
+        ConstDefinition binding;
 
-        binding = new Declaration(dummyPos, new SingleDeclaredName(dummyPos, identifier), constType);
+        // constExpr used only as a placeholder for constType
+        constExpr = new IntegerExpression(dummyPos, null);
+        constExpr.type = constType;
+
+        binding = new ConstDefinition(dummyPos, new Identifier(dummyPos, id), constExpr);
 
         indTable.enter(id, binding);
 
