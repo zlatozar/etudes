@@ -165,13 +165,13 @@ class ScannerPhrasesSpec extends Specification {
 
     def 'Real numbers'() {
         given: 'Real number'
-        SourceFile sourceFile = new SourceFile('2.0', true)
+        SourceFile sourceFile = new SourceFile('200.0', true)
         Scanner scanner = new Scanner(sourceFile)
 
         when: 'Scanner starts'
         Token stringLiteral = scanner.scan()
 
         then: 'Token should be with correct kind'
-        assert stringLiteral.kind == Token.INTLITERAL
+        assert stringLiteral.kind == Token.REALLITERAL
     }
 }

@@ -159,6 +159,11 @@ public final class Checker implements Visitor {
     }
 
     @Override
+    public Object visitRealLiteral(RealLiteral ast, Object o) {
+        return StdEnvironment.realType;
+    }
+
+    @Override
     public Object visitUnaryExpression(UnaryExpression ast, Object o) {
         System.out.println("UnaryExpression");
         return null;
@@ -167,6 +172,13 @@ public final class Checker implements Visitor {
     @Override
     public Object visitIntegerExpression(IntegerExpression ast, Object o) {
         ast.type = StdEnvironment.integerType;
+
+        return ast.type;
+    }
+
+    @Override
+    public Object visitRealExpression(RealExpression ast, Object o) {
+        ast.type = StdEnvironment.realType;
 
         return ast.type;
     }
@@ -545,7 +557,7 @@ public final class Checker implements Visitor {
         String funcNameEnd = ast.identifier.spelling;
 
         if (!funcNameHead.equals(funcNameEnd)) {
-            reporter.reportError("procedure/function should end with \"%\" identifier", funcNameHead, ast.position);
+            reporter.reportError("function should end with \"%\" identifier", funcNameHead, ast.position);
         }
 
         return null;
@@ -805,12 +817,29 @@ public final class Checker implements Visitor {
     @Override
     public Object visitForLoopStmt(ForLoopStmt ast, Object o) {
         System.out.println("ForLoopStmt");
+
+        ast.forHead.visit(this, null);
+
+        indTable.openScope();
+        ast.segment.visit(this, null);
+        indTable.closeScope();
+
+        ast.forEnd.visit(this, null);
+
         return null;
     }
 
     @Override
     public Object visitForHead(ForHead ast, Object o) {
         System.out.println("ForHead");
+
+        TypeDenoter varType = (TypeDenoter) ast.var.visit(this, null);
+        TypeDenoter exprType = (TypeDenoter) ast.loopControl.visit(this, null);
+
+        if (!(varType.equals(exprType))) {
+            reporter.reportError("wrong type for expression \"%\"", ast.loopControl.toString(), ast.loopControl.position);
+        }
+
         return null;
     }
 
@@ -829,37 +858,59 @@ public final class Checker implements Visitor {
     @Override
     public Object visitStepper(Stepper ast, Object o) {
         System.out.println("Stepper");
-        return null;
+
+        TypeDenoter binding = (TypeDenoter) ast.stepExpression.visit(this, null);
+
+        return binding;
     }
 
     @Override
     public Object visitStep(Step ast, Object o) {
         System.out.println("Step");
+
+        ast.step.visit(this, null);
+
         return null;
     }
 
     @Override
     public Object visitExpressionStep(ExpressionStep ast, Object o) {
         System.out.println("ExpressionStep");
-        return null;
+
+        TypeDenoter binding = (TypeDenoter) ast.expression.visit(this, null);
+        ast.step.visit(this, null);
+
+        return binding;
     }
 
     @Override
     public Object visitLimit(Limit ast, Object o) {
         System.out.println("Limit");
-        return null;
+
+        TypeDenoter binding = (TypeDenoter) ast.limit.visit(this, null);
+
+        return binding;
     }
 
     @Override
     public Object visitExpressionStepLimit(ExpressionStepLimit ast, Object o) {
         System.out.println("ExpressionStepLimit");
+
+        ast.expression.visit(this, null);
+        ast.limit.visit(this, null);
+        ast.step.visit(this, null);
+
         return null;
     }
 
     @Override
     public Object visitExpressionLimit(ExpressionLimit ast, Object o) {
         System.out.println("ExpressionLimit");
-        return null;
+
+        TypeDenoter binding = (TypeDenoter) ast.expression.visit(this, null);
+        ast.limit.visit(this, null);
+
+        return binding;
     }
 
     @Override
@@ -1128,7 +1179,6 @@ public final class Checker implements Visitor {
 
         StdEnvironment.realDecl = declareStdType("REAL", StdEnvironment.realType);
 
-        StdEnvironment.floatDecl = declareStdType("FLOAT", StdEnvironment.floatType);
         StdEnvironment.addDecl = declareStdBinaryOp("+", StdEnvironment.floatType, StdEnvironment.floatType, StdEnvironment.floatType);
         StdEnvironment.subtractDecl = declareStdBinaryOp("-", StdEnvironment.floatType, StdEnvironment.floatType, StdEnvironment.floatType);
         StdEnvironment.multiplyDecl = declareStdBinaryOp("*", StdEnvironment.floatType, StdEnvironment.floatType, StdEnvironment.floatType);
@@ -1143,6 +1193,10 @@ public final class Checker implements Visitor {
 
         StdEnvironment.lengthDecl = declareStdFunc("LENGTH", new SingleFormalParameterSequence(dummyPos,
                 new FormalParameterByValue(dummyPos, dummyI, StdEnvironment.integerType)), StdEnvironment.charType);
+
+        StdEnvironment.floatDecl = declareStdFunc("FLOAT", new SingleFormalParameterSequence(dummyPos,
+                new FormalParameterByValue(dummyPos, dummyI, StdEnvironment.realType)), StdEnvironment.realType);
+
         StdEnvironment.concatDecl = declareStdBinaryOp("||", StdEnvironment.charType, StdEnvironment.charType, StdEnvironment.charType);
 
         StdEnvironment.equalDecl = declareStdBinaryOp("=", StdEnvironment.anyType, StdEnvironment.anyType, StdEnvironment.booleanType);

@@ -230,12 +230,23 @@ public final class Scanner {
             case '9':
 
                 takeIt();
+                boolean isReal = false;
 
                 while (isDigit(currentChar) || currentChar == '.') {
+
+                    if (currentChar == '.') {
+
+                        if (!isReal) {
+                            isReal = true;
+
+                        } else {
+                            return Token.ERROR;
+                        }
+                    }
                     takeIt();
                 }
 
-                return Token.INTLITERAL;
+                return isReal ? Token.REALLITERAL : Token.INTLITERAL;
 
             case '+':
             case '-':

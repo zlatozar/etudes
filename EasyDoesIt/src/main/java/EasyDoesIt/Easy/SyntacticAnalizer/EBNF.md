@@ -99,6 +99,7 @@ Expression         ::=  PrimaryExpression
                     |   Expression Operator PrimaryExpression 
 
 PrimaryExpression  ::=  Integer-Literal
+                    |   Real-Literal
                     |   Char-Literal
                     |   Variable
                     |   Operator PrimaryExpression

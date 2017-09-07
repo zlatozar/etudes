@@ -1494,6 +1494,14 @@ public class Parser {
             }
             break;
 
+            case Token.REALLITERAL: {
+                RealLiteral rlAST = parseRealLiteral();
+                finish(srcPos);
+
+                expressionAST = new RealExpression(srcPos, rlAST);
+            }
+            break;
+
             case Token.CHARLITERAL: {
                 CharacterLiteral clAST = parseCharacterLiteral();
                 finish(srcPos);
@@ -1614,6 +1622,25 @@ public class Parser {
 
 //_____________________________________________________________________________
 //                                                                 Microsyntax
+
+    RealLiteral parseRealLiteral() throws SyntaxError {
+        RealLiteral RL;
+
+        if (currentToken.kind == Token.REALLITERAL) {
+            previousTokenPosition = currentToken.position;
+            String spelling = currentToken.spelling;
+
+            RL = new RealLiteral(previousTokenPosition, spelling);
+
+            currentToken = lexicalAnalyser.scan();
+
+        } else {
+            RL = null;
+            syntacticError("real literal expected here", "");
+        }
+
+        return RL;
+    }
 
     IntegerLiteral parseIntegerLiteral() throws SyntaxError {
         IntegerLiteral IL;

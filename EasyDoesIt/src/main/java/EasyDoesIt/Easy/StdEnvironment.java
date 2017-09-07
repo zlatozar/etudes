@@ -19,7 +19,6 @@ public final class StdEnvironment {
     public static TypeDefinition booleanDecl;
     public static TypeDefinition integerDecl;
     public static TypeDefinition realDecl;
-    public static TypeDefinition floatDecl;
     public static TypeDefinition charDecl;
 
 //_________________________________________________________________________
@@ -44,8 +43,9 @@ public final class StdEnvironment {
 
     public static BinaryOperatorDefinition equalDecl;
     public static BinaryOperatorDefinition unequalDecl;
+    public static BinaryOperatorDefinition concatDecl;
 
+    public static FunctionDefinition floatDecl;
     public static FunctionDefinition substrDecl;
     public static FunctionDefinition lengthDecl;
-    public static BinaryOperatorDefinition concatDecl;
 }

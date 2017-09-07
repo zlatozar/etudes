@@ -59,12 +59,12 @@ class ExpressionSpec extends ASTSpec {
 
         given: 'Less expression'
         Parser parser = getParserFor(
-                'SELECT select OF\n' +
-                        '  CASE (select > 0):\n' +
-                        '       DECLARE (x, ra) REAL;\n' +
-                        '       DECLARE sqrt INTEGER;\n' +
-                        '  ;' +
-                        'END SELECT;')
+                'SELECT select OF' +
+                '   CASE (select > 0):' +
+                '       DECLARE (x, ra) REAL;' +
+                '       DECLARE sqrt INTEGER;' +
+                '       ;' +
+                'END SELECT;')
 
         when: 'Parser finish'
 

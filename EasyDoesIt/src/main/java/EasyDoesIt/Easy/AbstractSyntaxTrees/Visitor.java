@@ -22,8 +22,10 @@ public interface Visitor {
     Object visitOperator(Operator ast, Object o);
     Object visitCharacterLiteral(CharacterLiteral ast, Object o);
     Object visitIntegerLiteral(IntegerLiteral ast, Object o);
+    Object visitRealLiteral(RealLiteral ast, Object o);
     Object visitUnaryExpression(UnaryExpression ast, Object o);
     Object visitIntegerExpression(IntegerExpression ast, Object o);
+    Object visitRealExpression(RealExpression ast, Object o);
     Object visitFunctionCall(FunctionCall ast, Object o);
     Object visitCharacterExpression(CharacterExpression ast, Object o);
 
@@ -151,5 +153,4 @@ public interface Visitor {
     Object visitCharTypeDenoter(CharTypeDenoter ast, Object o);
     Object visitFloatTypeDenoter(FloatTypeDenoter ast, Object o);
     Object visitRealTypeDenoter(RealTypeDenoter ast, Object o);
-
 }
