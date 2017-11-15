@@ -38,6 +38,7 @@ public final class StdEnvironment {
 
     public static BinaryOperatorDefinition addDecl;
     public static BinaryOperatorDefinition subtractDecl;
+    public static UnaryOperatorDefinition negativeDecl;
     public static BinaryOperatorDefinition multiplyDecl;
     public static BinaryOperatorDefinition divideDecl;
 

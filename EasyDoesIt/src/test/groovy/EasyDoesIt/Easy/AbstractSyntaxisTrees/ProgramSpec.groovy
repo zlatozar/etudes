@@ -15,11 +15,11 @@ class ProgramSpec extends Specification {
 
     private static final String PROGRAM_STRUCTURE =
             '/* Demo program */' +
-            'PROGRAM simple:\n' +
-            ';\n' +
-            ';\n' +
-            ';\n' +
-            ';\n' +
+            'PROGRAM simple:' +
+            '   ;' +
+            '   ;' +
+            '   ;' +
+            '   ;' +
             'END PROGRAM simple;'
 
 

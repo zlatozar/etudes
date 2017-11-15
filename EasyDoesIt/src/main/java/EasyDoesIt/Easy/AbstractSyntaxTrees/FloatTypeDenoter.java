@@ -20,7 +20,8 @@ public class FloatTypeDenoter extends TypeDenoter {
             return true;
 
         } else {
-            return (obj != null && obj instanceof FloatTypeDenoter);
+            return (obj != null &&
+                    (obj instanceof FloatTypeDenoter || obj instanceof IntTypeDenoter || obj instanceof RealTypeDenoter));
         }
     }
 }

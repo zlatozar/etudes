@@ -178,7 +178,27 @@ public final class Checker implements Visitor {
     public Object visitUnaryExpression(UnaryExpression ast, Object o) {
         System.out.println("UnaryExpression");
 
-        throw new IllegalArgumentException("not implemented");
+        TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
+
+        Definition binding = (Definition) ast.O.visit(this, null);
+
+        if (binding == null) {
+            reportUndeclared(ast.O);
+            ast.type = StdEnvironment.errorType;
+
+        } else if (!(binding instanceof UnaryOperatorDefinition)) {
+            reporter.reportError("\"%\" is not a unary operator", ast.O.spelling, ast.O.position);
+
+        } else {
+            UnaryOperatorDefinition ubinding = (UnaryOperatorDefinition) binding;
+
+            if (!eType.equals(ubinding.ARG)) {
+                reporter.reportError("wrong argument type for \"%\"", ast.O.spelling, ast.O.position);
+            }
+
+            ast.type = ubinding.RES;
+        }
+        return ast.type;
     }
 
     @Override
@@ -745,9 +765,9 @@ public final class Checker implements Visitor {
     public Object visitReturnWithExpression(ReturnWithExpression ast, Object o) {
         System.out.println("ReturnWithExpression");
 
-        if (o == null) {
-            reporter.reportError("RETURN should be function", "", ast.expression.position);
-        }
+//        if (o == null) {
+//            reporter.reportError("RETURN should be in function", "", ast.expression.position);
+//        }
 
         // TODO: should be the same as function return type
         TypeDenoter rType = (TypeDenoter) ast.expression.visit(this, null);
@@ -1273,6 +1293,7 @@ public final class Checker implements Visitor {
 
         StdEnvironment.booleanType = new BoolTypeDenoter(dummyPos);
         StdEnvironment.charType = new CharTypeDenoter(dummyPos);
+
         StdEnvironment.integerType = new IntTypeDenoter(dummyPos);
         StdEnvironment.floatType = new FloatTypeDenoter(dummyPos);
         StdEnvironment.realType = new RealTypeDenoter(dummyPos);
@@ -1298,6 +1319,7 @@ public final class Checker implements Visitor {
 
         StdEnvironment.addDecl = declareStdBinaryOp("+", StdEnvironment.floatType, StdEnvironment.floatType, StdEnvironment.floatType);
         StdEnvironment.subtractDecl = declareStdBinaryOp("-", StdEnvironment.floatType, StdEnvironment.floatType, StdEnvironment.floatType);
+        StdEnvironment.negativeDecl = declareStdUnaryOp("-", StdEnvironment.floatType, StdEnvironment.floatType);
         StdEnvironment.multiplyDecl = declareStdBinaryOp("*", StdEnvironment.floatType, StdEnvironment.floatType, StdEnvironment.floatType);
         StdEnvironment.divideDecl = declareStdBinaryOp("/", StdEnvironment.floatType, StdEnvironment.floatType, StdEnvironment.floatType);
 

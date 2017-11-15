@@ -31,9 +31,9 @@ class ConditionalsSpec extends ASTSpec {
                 'SET con := TRUE;' +
 
                 'IF con THEN' +
-                        ' SET var := 0;' +
+                '   SET var := 0;' +
                 'ELSE' +
-                        ' SET var := 1;' +
+                '   SET var := 1;' +
                 'FI;')
 
         when: 'Parser finish'

@@ -10,11 +10,11 @@ class SelectionSpec extends ASTSpec {
 
         given: 'Parser a selection statment'
         Parser parser = getParserFor(
-                'SELECT select OF\n' +
-                '  CASE (case1):\n' +
-                '       DECLARE (x, ra) REAL;\n' +
-                '       DECLARE sqrt INTEGER;\n' +
-                '  ;' +
+                'SELECT select OF' +
+                '   CASE (case1):' +
+                '      DECLARE (x, ra) REAL;' +
+                '      DECLARE sqrt INTEGER;' +
+                '   ;' +
                 'END SELECT;')
 
         when: 'Parser finish'
@@ -28,14 +28,15 @@ class SelectionSpec extends ASTSpec {
 
         given: 'Parser a selection statment'
         Parser parser = getParserFor(
-                'SELECT select OF\n' +
-                '  CASE (case1):\n' +
-                '       DECLARE (x, ra) REAL;\n' +
-                '       DECLARE sqrt INTEGER;\n' +
-                '  ;' +
+                'SELECT select OF' +
+                '   CASE (case1):' +
+                '      DECLARE (x, ra) REAL;' +
+                '      DECLARE sqrt INTEGER;' +
+                '   ;' +
+
                 'OTHERWISE:' +
-                '  DECLARE (x, ra) REAL;' +
-                '  ;' +
+                '   DECLARE (x, ra) REAL;' +
+                '   ;' +
                 'END SELECT;')
 
         when: 'Parser finish'

@@ -9,29 +9,30 @@ import spock.lang.Title
 class TypeSpec extends ASTSpec {
 
     private final String TYPE_IDENTIFIER = 'TYPE simple IS INTEGER;'
-    private final String TYPE_IDENTIFIER_SEQ = 'TYPE firstName IS INTEGER;\nTYPE secondName IS BOOLEAN;\n' +
+    private final String TYPE_IDENTIFIER_SEQ =
+            'TYPE firstName IS INTEGER;\nTYPE secondName IS BOOLEAN;' +
             'TYPE thirdName IS STRING;'
 
     private final String ARRAYED_TYPE = 'TYPE firstName IS ARRAY [5] OF INTEGER;'
     private final String ARRAYED_TYPE_SECTION = 'TYPE firstName IS ARRAY [5:15] OF STRING;'
 
     private final String ARRAYED_TYPE_SEQ =
-            'TYPE firstName IS ARRAY [5:15] OF STRING;\n' +
+            'TYPE firstName IS ARRAY [5:15] OF STRING;' +
             'TYPE secondName IS ARRAY [5] OF INTEGER;'
 
     private final String STRUCTURE_TYPE =
-            'TYPE fistName IS\n' +
-                    'STRUCTURE\n'+
-                    'FIELD firstField IS STRING\n' +
-                    'END STRUCTURE;'
+            'TYPE fistName IS' +
+            '   STRUCTURE'+
+            '      FIELD firstField IS STRING' +
+            '   END STRUCTURE;'
 
     private final String STRUCTURE_TYPE_MANY_FIELDS =
-            'TYPE fistName IS\n' +
-                    'STRUCTURE\n'+
-                    'FIELD firstField IS STRING,\n' +
-                    'FIELD secondField IS INTEGER,\n' +
-                    'FIELD thirdField IS REAL\n' +
-                    'END STRUCTURE;'
+            'TYPE fistName IS' +
+            '   STRUCTURE\n'+
+            '      FIELD firstField IS STRING,' +
+            '      FIELD secondField IS INTEGER,' +
+            '      FIELD thirdField IS REAL' +
+            '   END STRUCTURE;'
 
     def 'Type definition'() {
 
