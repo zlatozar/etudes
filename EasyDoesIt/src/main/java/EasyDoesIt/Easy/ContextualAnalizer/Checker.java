@@ -4,6 +4,7 @@ import EasyDoesIt.Easy.AbstractSyntaxTrees.*;
 import EasyDoesIt.Easy.ErrorReporter;
 import EasyDoesIt.Easy.StdEnvironment;
 import EasyDoesIt.Easy.SyntacticAnalizer.SourcePosition;
+import sun.reflect.generics.tree.FieldTypeSignature;
 
 public final class Checker implements Visitor {
 
@@ -75,6 +76,10 @@ public final class Checker implements Visitor {
 
         } else if (binding instanceof ConstDefinition) {
             ast.type = ((ConstDefinition) binding).E.type;
+            ast.variable = false;
+
+        } else if (binding instanceof ArrayType) {
+            ast.type = ((ArrayType) binding);
             ast.variable = false;
         }
 
@@ -149,8 +154,10 @@ public final class Checker implements Visitor {
 
             if (bbinding.ARG1 == StdEnvironment.anyType) {
 
-                // this operator must be "=" or "\="
-                if (!e1Type.equals(e2Type)) {
+                // "||" concatenation is an exception
+                String concatenation = StdEnvironment.concatDecl.O.spelling;
+
+                if (!e1Type.equals(e2Type) && !ast.O.spelling.equals(concatenation)) {
                     reporter.reportError("incompatible argument types for \"%\"", ast.O.spelling, ast.position);
                 }
 
@@ -593,7 +600,9 @@ public final class Checker implements Visitor {
 
         indTable.openScope();
 
+        // TODO: Check return type with declared one
         ast.segment.visit(this, null);
+
         ast.funcEnd.visit(this, procName);
 
         indTable.closeScope();
@@ -843,7 +852,7 @@ public final class Checker implements Visitor {
             reporter.reportError("Boolean expression expected here", "", ast.expression.position);
         }
 
-        return null;
+        return eType;
     }
 
     @Override
@@ -970,7 +979,7 @@ public final class Checker implements Visitor {
             reporter.reportError("types of FOR and BY expressions differ", "", ast.step.position);
         }
 
-        return null;
+        return binding;
     }
 
     @Override
@@ -996,11 +1005,11 @@ public final class Checker implements Visitor {
     public Object visitExpressionStepLimit(ExpressionStepLimit ast, Object o) {
         System.out.println("ExpressionStepLimit");
 
-        ast.expression.visit(this, null);
+        TypeDenoter forClauseType = (TypeDenoter) ast.expression.visit(this, null);
         ast.limit.visit(this, null);
-        ast.step.visit(this, null);
+        TypeDenoter stepType = (TypeDenoter) ast.step.visit(this, forClauseType);
 
-        return null;
+        return stepType;
     }
 
     @Override
@@ -1354,7 +1363,7 @@ public final class Checker implements Visitor {
         StdEnvironment.multiplyDecl = declareStdBinaryOp("*", StdEnvironment.floatType, StdEnvironment.floatType, StdEnvironment.floatType);
         StdEnvironment.divideDecl = declareStdBinaryOp("/", StdEnvironment.floatType, StdEnvironment.floatType, StdEnvironment.floatType);
 
-        StdEnvironment.concatDecl = declareStdBinaryOp("||", StdEnvironment.charType, StdEnvironment.charType, StdEnvironment.charType);
+        StdEnvironment.concatDecl = declareStdBinaryOp("||", StdEnvironment.anyType, StdEnvironment.anyType, StdEnvironment.charType);
         StdEnvironment.equalDecl = declareStdBinaryOp("=", StdEnvironment.anyType, StdEnvironment.anyType, StdEnvironment.booleanType);
         StdEnvironment.unequalDecl = declareStdBinaryOp("<>", StdEnvironment.anyType, StdEnvironment.anyType, StdEnvironment.booleanType);
 

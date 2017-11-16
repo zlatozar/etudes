@@ -6,6 +6,22 @@ import EasyDoesIt.Easy.SyntacticAnalizer.Parser
 
 class ExpressionSpec extends ASTSpec {
 
+    def 'String concatenation'() {
+
+        given: 'Output with concatenation in chain'
+        Parser parser = getParserFor(
+                'DECLARE count INTEGER;' +
+                'OUTPUT "Prime[" || count || "] = ";')
+
+        when: 'Parser finish'
+        AST theAST = parser.parseProgram();
+
+        then: 'AST should be constructed'
+        getChecker().check(theAST)
+        assert theAST
+    }
+
+
     def 'Binary expression'() {
 
         given: 'Divide'

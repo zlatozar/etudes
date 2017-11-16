@@ -44,7 +44,7 @@ class ConditionalsSpec extends ASTSpec {
         assert theAST
     }
 
-    def 'Book example'() {
+    def 'Unary and binary operations'() {
 
         given: 'Parser and call with parameters'
         Parser parser = getParserFor(
@@ -59,4 +59,30 @@ class ConditionalsSpec extends ASTSpec {
         assert theAST
     }
 
+    def 'Array index'() {
+
+        given: 'Parser and call with parameters'
+        Parser parser = getParserFor(
+                'DECLARE sieve ARRAY[1:100] OF BOOLEAN;' +
+                'DECLARE (i, limit, count) INTEGER;' +
+
+                'FOR i := 1 TO 100 DO SET sieve[i] := TRUE; END FOR;' +
+
+                'SET limit := 20;' +
+
+                'FOR i := 2 TO limit DO' +
+                '   IF sieve[i] THEN' +
+                '      DECLARE j INTEGER;' +
+                '      FOR j := 2*i BY i TO 10 DO SET sieve[j] := FALSE; END FOR;' +
+                '   FI;' +
+                'END FOR;')
+
+        when: 'Parser finish'
+        AST theAST = parser.parseProgram();
+
+        then: 'AST should be constructed'
+        getChecker().check(theAST)
+        assert theAST
+
+    }
 }
