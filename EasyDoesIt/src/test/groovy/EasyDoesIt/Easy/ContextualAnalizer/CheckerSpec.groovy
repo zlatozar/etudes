@@ -5,7 +5,6 @@ import EasyDoesIt.Easy.AbstractSyntaxTrees.Program
 import EasyDoesIt.Easy.SyntacticAnalizer.Parser
 import spock.lang.Ignore
 
-@Ignore
 class CheckerSpec extends ASTSpec {
 
     // example from the book

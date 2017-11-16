@@ -37,6 +37,7 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitIdentifier(Identifier I, Object o) {
+
         Definition binding = indTable.retrieve(I.spelling);
 
         if (binding != null) {
@@ -83,7 +84,28 @@ public final class Checker implements Visitor {
     @Override
     public Object visitSubscriptVname(SubscriptVname ast, Object o) {
         System.out.println("SubscriptVname");
-        throw new IllegalArgumentException("not implemented");
+
+        TypeDenoter vType = (TypeDenoter) ast.V.visit(this, null);
+        ast.variable = ast.V.variable;
+
+        TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
+
+        if (vType != StdEnvironment.errorType) {
+
+            if (!(vType instanceof ArrayType)) {
+                reporter.reportError("array expected here", "", ast.V.position);
+
+            } else {
+
+                if (!eType.equals(StdEnvironment.integerType)) {
+                    reporter.reportError("Integer expression expected here", "", ast.E.position);
+                }
+
+                ast.type = ((ArrayType) vType).type;
+            }
+        }
+
+        return ast.type;
     }
 
 //_____________________________________________________________________________
@@ -231,7 +253,7 @@ public final class Checker implements Visitor {
 
         ast.APS.visit(this, ((FunctionDefinition) binding).funcHead.FPS);
 
-        return null;
+        return ((FunctionDefinition) binding).funcHead.typeDenoter;
     }
 
     @Override
@@ -565,6 +587,10 @@ public final class Checker implements Visitor {
 
         indTable.enter(procName, ast);
 
+        if (ast.duplicated) {
+           reporter.reportError("identifier \"%\" already declared", ast.funcHead.identifier.spelling, ast.position);
+        }
+
         indTable.openScope();
 
         ast.segment.visit(this, null);
@@ -581,6 +607,9 @@ public final class Checker implements Visitor {
 
         ast.identifier.visit(this, o);
         ast.FPS.visit(this, o);
+
+        // eliminate type identifiers
+        ast.typeDenoter = (TypeDenoter) ast.typeDenoter.visit(this, null);
 
         return ast.identifier.spelling;
     }
@@ -1301,29 +1330,33 @@ public final class Checker implements Visitor {
         StdEnvironment.anyType = new AnyTypeDenoter(dummyPos);
         StdEnvironment.errorType = new ErrorTypeDenoter(dummyPos);
 
-        StdEnvironment.booleanDecl = declareStdType("BOOLEAN", StdEnvironment.booleanType);
         StdEnvironment.trueDecl = declareStdBoolean("TRUE", StdEnvironment.booleanType);
         StdEnvironment.falseDecl = declareStdBoolean("FALSE", StdEnvironment.booleanType);
-        StdEnvironment.notDecl = declareStdUnaryOp("NOT", StdEnvironment.booleanType, StdEnvironment.booleanType);
+
+        StdEnvironment.booleanDecl = declareStdType("BOOLEAN", StdEnvironment.booleanType);
+        StdEnvironment.charDecl = declareStdType("STRING", StdEnvironment.charType);
+        StdEnvironment.integerDecl = declareStdType("INTEGER", StdEnvironment.integerType);
+        StdEnvironment.realDecl = declareStdType("REAL", StdEnvironment.realType);
+
+        // to avoid clash with the binary '-' add arity
+        StdEnvironment.notDecl = declareStdUnaryOp("NOT/1", StdEnvironment.booleanType, StdEnvironment.booleanType);
+        StdEnvironment.negativeDecl = declareStdUnaryOp("-/1", StdEnvironment.floatType, StdEnvironment.floatType);
+
         StdEnvironment.andDecl = declareStdBinaryOp("AND", StdEnvironment.booleanType, StdEnvironment.booleanType, StdEnvironment.booleanType);
         StdEnvironment.orDecl = declareStdBinaryOp("OR", StdEnvironment.booleanType, StdEnvironment.booleanType, StdEnvironment.booleanType);
-
-        StdEnvironment.integerDecl = declareStdType("INTEGER", StdEnvironment.integerType);
         StdEnvironment.moduloDecl = declareStdBinaryOp("MOD", StdEnvironment.integerType, StdEnvironment.integerType, StdEnvironment.integerType);
         StdEnvironment.lessDecl = declareStdBinaryOp("<", StdEnvironment.integerType, StdEnvironment.integerType, StdEnvironment.booleanType);
         StdEnvironment.greaterDecl = declareStdBinaryOp(">", StdEnvironment.integerType, StdEnvironment.integerType, StdEnvironment.booleanType);
         StdEnvironment.notlessDecl = declareStdBinaryOp(">=", StdEnvironment.integerType, StdEnvironment.integerType, StdEnvironment.booleanType);
         StdEnvironment.notgreaterDecl = declareStdBinaryOp("<=", StdEnvironment.integerType, StdEnvironment.integerType, StdEnvironment.booleanType);
-
-        StdEnvironment.realDecl = declareStdType("REAL", StdEnvironment.realType);
-
         StdEnvironment.addDecl = declareStdBinaryOp("+", StdEnvironment.floatType, StdEnvironment.floatType, StdEnvironment.floatType);
         StdEnvironment.subtractDecl = declareStdBinaryOp("-", StdEnvironment.floatType, StdEnvironment.floatType, StdEnvironment.floatType);
-        StdEnvironment.negativeDecl = declareStdUnaryOp("-", StdEnvironment.floatType, StdEnvironment.floatType);
         StdEnvironment.multiplyDecl = declareStdBinaryOp("*", StdEnvironment.floatType, StdEnvironment.floatType, StdEnvironment.floatType);
         StdEnvironment.divideDecl = declareStdBinaryOp("/", StdEnvironment.floatType, StdEnvironment.floatType, StdEnvironment.floatType);
 
-        StdEnvironment.charDecl = declareStdType("STRING", StdEnvironment.charType);
+        StdEnvironment.concatDecl = declareStdBinaryOp("||", StdEnvironment.charType, StdEnvironment.charType, StdEnvironment.charType);
+        StdEnvironment.equalDecl = declareStdBinaryOp("=", StdEnvironment.anyType, StdEnvironment.anyType, StdEnvironment.booleanType);
+        StdEnvironment.unequalDecl = declareStdBinaryOp("<>", StdEnvironment.anyType, StdEnvironment.anyType, StdEnvironment.booleanType);
 
         StdEnvironment.substrDecl = declareStdFunc("SUBSTR",
                 new FormalParameterList(dummyPos, new FormalParameterByValue(dummyPos, dummyI, StdEnvironment.charType),
@@ -1336,9 +1369,7 @@ public final class Checker implements Visitor {
         StdEnvironment.floatDecl = declareStdFunc("FLOAT", new SingleFormalParameterSequence(dummyPos,
                 new FormalParameterByValue(dummyPos, dummyI, StdEnvironment.realType)), StdEnvironment.realType);
 
-        StdEnvironment.concatDecl = declareStdBinaryOp("||", StdEnvironment.charType, StdEnvironment.charType, StdEnvironment.charType);
-
-        StdEnvironment.equalDecl = declareStdBinaryOp("=", StdEnvironment.anyType, StdEnvironment.anyType, StdEnvironment.booleanType);
-        StdEnvironment.unequalDecl = declareStdBinaryOp("<>", StdEnvironment.anyType, StdEnvironment.anyType, StdEnvironment.booleanType);
+        StdEnvironment.fixDecl = declareStdFunc("FIX", new SingleFormalParameterSequence(dummyPos,
+                new FormalParameterByValue(dummyPos, dummyI, StdEnvironment.realType)), StdEnvironment.integerType);
     }
 }

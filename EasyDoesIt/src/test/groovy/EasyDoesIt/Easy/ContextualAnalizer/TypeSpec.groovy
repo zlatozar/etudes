@@ -22,11 +22,11 @@ class TypeSpec extends ASTSpec {
 
         given: 'Easy language source file reader, scanner, parser and checker'
         Parser parser = getParserFor(
-                'TYPE typeName IS\n' +
-                '   STRUCTURE\n'+
-                '      FIELD firstField IS STRING,\n' +
-                '      FIELD secondField IS INTEGER,\n' +
-                '      FIELD thirdField IS REAL\n' +
+                'TYPE typeName IS' +
+                '   STRUCTURE'+
+                '      FIELD firstField IS STRING,' +
+                '      FIELD secondField IS INTEGER,' +
+                '      FIELD thirdField IS REAL' +
                 '   END STRUCTURE;')
 
         when: 'Second pass starts'

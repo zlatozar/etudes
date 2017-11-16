@@ -1537,6 +1537,9 @@ public class Parser {
                 Expression eAST = parseExpression();
                 finish(srcPos);
 
+                // to avoid clash with the binary we add arity to all unary operations
+                opAST.spelling = opAST.spelling + "/1";
+
                 expressionAST = new UnaryExpression(srcPos, opAST, eAST);
             }
             break;

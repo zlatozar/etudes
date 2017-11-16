@@ -47,6 +47,7 @@ public final class StdEnvironment {
     public static BinaryOperatorDefinition concatDecl;
 
     public static FunctionDefinition floatDecl;
+    public static FunctionDefinition fixDecl;
     public static FunctionDefinition substrDecl;
     public static FunctionDefinition lengthDecl;
 }
