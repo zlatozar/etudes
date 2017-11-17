@@ -46,7 +46,7 @@ class CallsSpec extends ASTSpec {
 
         given: 'Parser and function call with parameters'
         Parser parser = getParserFor(
-                'FUNCTION dummy(x INTEGER) INTEGER:\n' +
+                'FUNCTION dummy(x INTEGER) INTEGER:' +
                 '   SET x := 0;' +
                 'END FUNCTION dummy;' +
 

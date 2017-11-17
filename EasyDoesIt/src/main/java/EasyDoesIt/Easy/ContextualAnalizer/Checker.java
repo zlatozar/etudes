@@ -507,7 +507,7 @@ public final class Checker implements Visitor {
         indTable.enter(procName, ast);
 
         if (ast.duplicated) {
-            reporter.reportError("procedure \"%\" already declared", ast.procHead.identifier.spelling, ast.position);
+            reporter.reportError("identifier \"%\" already declared", ast.procHead.identifier.spelling, ast.position);
         }
 
         indTable.openScope();
@@ -676,16 +676,22 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitVariableList(VariableList ast, Object o) {
-        ast.vnameSeq.visit(this, null);
-        ast.vname.visit(this, null);
 
-        return null;
+        TypeDenoter vTypeSeq = (TypeDenoter) ast.vnameSeq.visit(this, null);
+        TypeDenoter vType = (TypeDenoter) ast.vname.visit(this, null);
+
+        return vTypeSeq;
     }
 
     @Override
     public Object visitAssignmentStmt(AssignmentStmt ast, Object o) {
-        ast.variableList.visit(this, null);
-        ast.expression.visit(this, null);
+
+        TypeDenoter vType = (TypeDenoter) ast.variableList.visit(this, null);
+        TypeDenoter eType = (TypeDenoter) ast.expression.visit(this, null);
+
+        if (!eType.equals(vType)) {
+            reporter.reportError("assignment incompatibility", "", ast.position);
+        }
 
         return null;
     }
