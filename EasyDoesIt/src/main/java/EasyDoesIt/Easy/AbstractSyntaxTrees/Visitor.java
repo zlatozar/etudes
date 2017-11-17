@@ -35,7 +35,7 @@ public interface Visitor {
 
     Object visitProgram(Program ast, Object o);
     Object visitProgramBody(ProgramBody ast, Object o);
-    Object visitCommand(Segment ast, Object o);
+    Object visitSegment(Segment ast, Object o);
 
 //_____________________________________________________________________________
 //                                                                 Definitions
@@ -64,7 +64,6 @@ public interface Visitor {
     Object visitFunctionDefinition(FunctionDefinition ast, Object o);
     Object visitProcedureHead(ProcedureHead ast, Object o);
     Object visitProcedureEnd(ProcedureEnd ast, Object o);
-    Object visitFormalParameterList(FormalParameterList ast, Object o);
     Object visitCallActualParameter(CallActualParameter ast, Object o);
     Object visitFormalParameterByValue(FormalParameterByValue ast, Object o);
     Object visitFormalParameterByName(FormalParameterByName ast, Object o);
@@ -75,6 +74,7 @@ public interface Visitor {
     Object visitMultipleActualParameterSequence(MultipleActualParameterSequence ast, Object o);
     Object visitEmptyActualParameterSequence(EmptyActualParameterSequence ast, Object o);
     Object visitSingleFormalParameterSequence(SingleFormalParameterSequence ast, Object o);
+    Object visitMultipleFormalParameterSequence(MultipleFormalParameterSequence ast, Object o);
     Object visitEmptyFormalParameterSequence(EmptyFormalParameterSequence ast, Object o);
 
 //_____________________________________________________________________________
@@ -155,5 +155,4 @@ public interface Visitor {
     Object visitCharTypeDenoter(CharTypeDenoter ast, Object o);
     Object visitFloatTypeDenoter(FloatTypeDenoter ast, Object o);
     Object visitRealTypeDenoter(RealTypeDenoter ast, Object o);
-
 }

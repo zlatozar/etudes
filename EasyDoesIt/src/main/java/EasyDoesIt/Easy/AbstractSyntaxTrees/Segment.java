@@ -15,6 +15,6 @@ public class Segment extends AST {
 
     @Override
     public Object visit(Visitor v, Object o) {
-        return v.visitCommand(this, o);
+        return v.visitSegment(this, o);
     }
 }

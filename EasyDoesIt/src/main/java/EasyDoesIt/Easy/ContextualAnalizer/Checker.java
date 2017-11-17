@@ -325,7 +325,7 @@ public final class Checker implements Visitor {
     }
 
     @Override
-    public Object visitCommand(Segment ast, Object o) {
+    public Object visitSegment(Segment ast, Object o) {
 
         indTable.openScope();
 
@@ -510,12 +510,8 @@ public final class Checker implements Visitor {
             reporter.reportError("identifier \"%\" already declared", ast.procHead.identifier.spelling, ast.position);
         }
 
-        indTable.openScope();
-
         ast.segment.visit(this, null);
         ast.procEnd.visit(this, procName);
-
-        indTable.closeScope();
 
         return null;
     }
@@ -527,15 +523,6 @@ public final class Checker implements Visitor {
         ast.FPS.visit(this, o);
 
         return ast.identifier.spelling;
-    }
-
-    @Override
-    public Object visitFormalParameterList(FormalParameterList ast, Object o) {
-
-        ast.paramSeq.visit(this, null);
-        ast.param.visit(this, null);
-
-        return null;
     }
 
     @Override
@@ -615,13 +602,9 @@ public final class Checker implements Visitor {
            reporter.reportError("identifier \"%\" already declared", ast.funcHead.identifier.spelling, ast.position);
         }
 
-        indTable.openScope();
-
         // TODO: Check return type with declared
         ast.segment.visit(this, null);
         ast.funcEnd.visit(this, procName);
-
-        indTable.closeScope();
 
         return null;
     }
@@ -758,12 +741,12 @@ public final class Checker implements Visitor {
         // use passed FormalParameterSequence
         FormalParameterSequence fps = (FormalParameterSequence) o;
 
-        if (!(fps instanceof FormalParameterList)) {
+        if (!(fps instanceof FormalParameterSequence)) {
             reporter.reportError("too many actual parameters", "", ast.position);
 
         } else {
-            ast.AP.visit(this, ((FormalParameterList) fps).param);
-            ast.APS.visit(this, ((FormalParameterList) fps).paramSeq);
+            ast.AP.visit(this, ((MultipleFormalParameterSequence) fps).FP);
+            ast.APS.visit(this, ((MultipleFormalParameterSequence) fps).FPS);
         }
 
         return null;
@@ -777,6 +760,14 @@ public final class Checker implements Visitor {
     @Override
     public Object visitSingleFormalParameterSequence(SingleFormalParameterSequence ast, Object o) {
         ast.FP.visit(this, null);
+        return null;
+    }
+
+    @Override
+    public Object visitMultipleFormalParameterSequence(MultipleFormalParameterSequence ast, Object o) {
+        ast.FP.visit(this, null);
+        ast.FPS.visit(this, null);
+
         return null;
     }
 
@@ -874,25 +865,16 @@ public final class Checker implements Visitor {
     @Override
     public Object visitCompoundStmt(CompoundStmt ast, Object o) {
 
-        indTable.openScope();
-
         ast.segment.visit(this, null);
         ast.compoundEnd.visit(this, null);
-
-        indTable.closeScope();
 
         return null;
     }
 
     @Override
     public Object visitForLoopStmt(ForLoopStmt ast, Object o) {
-
         ast.forHead.visit(this, null);
-
-        indTable.openScope();
         ast.segment.visit(this, null);
-        indTable.closeScope();
-
         ast.forEnd.visit(this, null);
 
         return null;
@@ -1065,12 +1047,7 @@ public final class Checker implements Visitor {
     public Object visitCaseList(CaseList ast, Object o) {
 
         ast.caseHead.visit(this, o);
-
-        indTable.openScope();
-
         ast.segment.visit(this, null);
-
-        indTable.closeScope();
 
         return null;
     }
@@ -1090,13 +1067,7 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitEscapeCase(EscapeCase ast, Object o) {
-
-        indTable.openScope();
-
         ast.segment.visit(this, null);
-
-        indTable.closeScope();
-
         return null;
     }
 
@@ -1301,8 +1272,8 @@ public final class Checker implements Visitor {
         StdEnvironment.unequalDecl = declareStdBinaryOp("<>", StdEnvironment.anyType, StdEnvironment.anyType, StdEnvironment.booleanType);
 
         StdEnvironment.substrDecl = declareStdFunc("SUBSTR",
-                new FormalParameterList(dummyPos, new FormalParameterByValue(dummyPos, dummyI, StdEnvironment.charType),
-                        new FormalParameterList(dummyPos, new FormalParameterByValue(dummyPos, dummyI, StdEnvironment.charType),
+                new MultipleFormalParameterSequence(dummyPos, new FormalParameterByValue(dummyPos, dummyI, StdEnvironment.charType),
+                        new MultipleFormalParameterSequence(dummyPos, new FormalParameterByValue(dummyPos, dummyI, StdEnvironment.charType),
                         new SingleFormalParameterSequence(dummyPos, new FormalParameterByValue(dummyPos, dummyI, StdEnvironment.charType)))), StdEnvironment.charType);
 
         StdEnvironment.lengthDecl = declareStdFunc("LENGTH", new SingleFormalParameterSequence(dummyPos,

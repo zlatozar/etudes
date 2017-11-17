@@ -582,7 +582,7 @@ public class Parser {
             FormalParameterSequence param2 = parseFormalParameters();
             finish(srcPos);
 
-            formalParameterSequence = new FormalParameterList(srcPos, param, param2);
+            formalParameterSequence = new MultipleFormalParameterSequence(srcPos, param, param2);
 
         } else {
             finish(srcPos);
