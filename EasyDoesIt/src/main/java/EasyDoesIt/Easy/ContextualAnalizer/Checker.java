@@ -49,8 +49,6 @@ public final class Checker implements Visitor {
 
     // not tested
     public Object visitDotVname(DotVname ast, Object o) {
-        System.out.println("DotVname");
-
         ast.type = null;
 
         TypeDenoter vType = (TypeDenoter) ast.V.visit(this, null);
@@ -102,7 +100,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitSimpleVname(SimpleVname ast, Object o) {
-        System.out.println("              SimpleVname");
 
         ast.variable = false;
         ast.type = StdEnvironment.errorType;
@@ -134,7 +131,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitSubscriptVname(SubscriptVname ast, Object o) {
-        System.out.println("SubscriptVname");
 
         TypeDenoter vType = (TypeDenoter) ast.V.visit(this, null);
         ast.variable = ast.V.variable;
@@ -173,13 +169,11 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitConstantExpression(ConstantExpression ast, Object o) {
-        System.out.println("ConstantExpression");
         return null;
     }
 
     @Override
     public Object visitBinaryExpression(BinaryExpression ast, Object o) {
-        System.out.println("BinaryExpression");
 
         TypeDenoter e1Type = (TypeDenoter) ast.E1.visit(this, null);
         TypeDenoter e2Type = (TypeDenoter) ast.E2.visit(this, null);
@@ -234,13 +228,11 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitCharacterLiteral(CharacterLiteral ast, Object o) {
-        System.out.println("CharacterLiteral");
         return StdEnvironment.charType;
     }
 
     @Override
     public Object visitIntegerLiteral(IntegerLiteral ast, Object o) {
-        System.out.println("              IntegerLiteral");
         return StdEnvironment.integerType;
     }
 
@@ -251,7 +243,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitUnaryExpression(UnaryExpression ast, Object o) {
-        System.out.println("UnaryExpression");
 
         TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
 
@@ -279,20 +270,17 @@ public final class Checker implements Visitor {
     @Override
     public Object visitIntegerExpression(IntegerExpression ast, Object o) {
         ast.type = StdEnvironment.integerType;
-
         return ast.type;
     }
 
     @Override
     public Object visitRealExpression(RealExpression ast, Object o) {
         ast.type = StdEnvironment.realType;
-
         return ast.type;
     }
 
     @Override
     public Object visitFunctionCall(FunctionCall ast, Object o) {
-        System.out.println("FunctionCall");
 
         Definition binding = (Definition) ast.I.visit(this, null);
 
@@ -311,9 +299,7 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitCharacterExpression(CharacterExpression ast, Object o) {
-        System.out.println("CharacterExpression");
         ast.type = StdEnvironment.charType;
-
         return ast.type;
     }
 
@@ -322,15 +308,12 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitProgram(Program ast, Object o) {
-        System.out.println("Program");
-
         ast.program.visit(this, null);
         return null;
     }
 
     @Override
     public Object visitProgramBody(ProgramBody ast, Object o) {
-        System.out.println("ProgramBody");
 
         indTable.openScope();
 
@@ -343,8 +326,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitCommand(Segment ast, Object o) {
-        System.out.println("   Command");
-
         ast.definition.visit(this, null);
         ast.statement.visit(this, null);
 
@@ -353,7 +334,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitConstDefinition(ConstDefinition ast, Object o) {
-        System.out.println("ConstDefinition");
         return null;
     }
 
@@ -380,7 +360,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitTypeDefinition(TypeDefinition ast, Object o) {
-        System.out.println("TypeDefinition");
 
         ast.T = (TypeDenoter) ast.T.visit(this, null);
         indTable.enter(ast.I.spelling, ast);
@@ -394,7 +373,7 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitIdentifierTypeDenoter(IdentifierTypeDenoter ast, Object o) {
-        System.out.println("         IdentifierType");
+
         Definition binding = (Definition) ast.identifier.visit(this, null);
 
         if (binding == null) {
@@ -413,7 +392,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitArrayTypeDenoter(ArrayTypeDenoter ast, Object o) {
-        System.out.println("      ArrayType");
 
         ast.type =  (TypeDenoter) ast.type.visit(this, null);
         TypeDenoter boundsType  = (TypeDenoter) ast.arrayBounds.visit(this, null);
@@ -427,7 +405,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitSingleArrayBounds(SingleArrayBounds ast, Object o) {
-        System.out.println("           SingleArrayBounds");
 
         TypeDenoter binding = (TypeDenoter) ast.expression.visit(this, null);
         ast.elemCount = 1;
@@ -437,7 +414,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitSegmentedArrayBounds(SegmentedArrayBounds ast, Object o) {
-        System.out.println("           SegmentedArrayBounds");
 
         TypeDenoter fromBinding = (TypeDenoter) ast.from.visit(this, null);
         TypeDenoter toBinding = (TypeDenoter) ast.to.visit(this, null);
@@ -450,22 +426,20 @@ public final class Checker implements Visitor {
             reporter.reportError("Array bound type must be integer", "", ast.to.position);
         }
 
-        // fromBiding < toBinding
+        // should check if 'fromBiding < toBinding'
 
         return toBinding;
     }
 
     @Override
     public Object visitStructuredTypeDenoter(StructuredTypeDenoter ast, Object o) {
-        System.out.println("      StructureType");
-        ast.fieldTypeDenoterDenoter = (FieldTypeDenoter) ast.fieldTypeDenoterDenoter.visit(this, null);
 
+        ast.fieldTypeDenoterDenoter = (FieldTypeDenoter) ast.fieldTypeDenoterDenoter.visit(this, null);
         return ast;
     }
 
     @Override
     public Object visitMultipleFieldTypeDenoter(MultipleFieldTypeDenoter ast, Object o) {
-        System.out.println("MultipleFieldTypeDenoter");
 
         ast.typeDenoter = (TypeDenoter) ast.typeDenoter.visit(this, null);
         ast.fieldTypeDenoter.visit(this, null);
@@ -475,7 +449,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitSingleFieldTypeDenoter(SingleFieldTypeDenoter ast, Object o) {
-        System.out.println("SingleFieldTypeDenoter");
 
         ast.typeDenoter = (TypeDenoter) ast.typeDenoter.visit(this, null);
         return ast;
@@ -483,7 +456,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitDeclaration(Declaration ast, Object o) {
-        System.out.println("   Declaration");
 
         ast.typeDenoter = (TypeDenoter) ast.typeDenoter.visit(this, null);
         ast.declaredNames.visit(this, ast.typeDenoter);
@@ -493,7 +465,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitSingleDeclaredName(SingleDeclaredName ast, Object o) {
-        System.out.println("         SingleDeclaredName");
 
         ast.identifier.visit(this, null);
         indTable.enter(ast.identifier.spelling, (Definition) o);
@@ -503,7 +474,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitMultipleDeclaredNames(MultipleDeclaredNames ast, Object o) {
-        System.out.println("   MultipleDeclaredNames");
 
         ast.declaredNamesSeq.visit(this, o);
         ast.declaredNames.visit(this, o);
@@ -513,22 +483,18 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitEmptyDeclaredName(EmptyDeclaredName ast, Object o) {
-        System.out.println("EmptyDeclaredName");
         return null;
     }
 
     @Override
     public Object visitInternalProcedure(InternalProcedure ast, Object o) {
-        System.out.println("InternalProcedure");
 
         ast.blockCode.visit(this, null);
-
         return null;
     }
 
     @Override
     public Object visitProcedureDefinition(ProcedureDefinition ast, Object o) {
-        System.out.println("ProcedureDefinition");
 
         String procName = (String) ast.procHead.visit(this, ast);
 
@@ -546,7 +512,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitProcedureHead(ProcedureHead ast, Object o) {
-        System.out.println("ProcedureHead");
 
         ast.identifier.visit(this, o);
         ast.FPS.visit(this, o);
@@ -556,7 +521,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitFormalParameterList(FormalParameterList ast, Object o) {
-        System.out.println("FormalParameterList");
 
         ast.paramSeq.visit(this, null);
         ast.param.visit(this, null);
@@ -566,7 +530,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitCallActualParameter(CallActualParameter ast, Object o) {
-        System.out.println("CallActualParameter");
 
         TypeDenoter apType = (TypeDenoter) ast.expression.visit(this, null);
 
@@ -586,7 +549,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitProcedureEnd(ProcedureEnd ast, Object o) {
-        System.out.println("ProcedureEnd");
 
         ast.procName.visit(this, null);
 
@@ -602,7 +564,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitFormalParameterByValue(FormalParameterByValue ast, Object o) {
-        System.out.println("ParameterByValue");
 
         // eliminate type identifiers
         ast.typeDenoter = (TypeDenoter) ast.typeDenoter.visit(this, null);
@@ -620,7 +581,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitFormalParameterByName(FormalParameterByName ast, Object o) {
-        System.out.println("ParameterByName");
 
         ast.typeDenoter = (TypeDenoter) ast.typeDenoter.visit(this, null);
         ast.identifier.visit(this, ast.typeDenoter);
@@ -636,7 +596,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitFunctionDefinition(FunctionDefinition ast, Object o) {
-        System.out.println("FunctionDefinition");
 
         String procName = (String) ast.funcHead.visit(this, ast);
 
@@ -648,7 +607,7 @@ public final class Checker implements Visitor {
 
         indTable.openScope();
 
-        // TODO: Check return type with declared one
+        // TODO: Check return type with declared
         ast.segment.visit(this, null);
 
         ast.funcEnd.visit(this, procName);
@@ -660,7 +619,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitFunctionHead(FunctionHead ast, Object o) {
-        System.out.println("FunctionHead");
 
         ast.identifier.visit(this, o);
         ast.FPS.visit(this, o);
@@ -673,7 +631,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitFunctionEnd(FunctionEnd ast, Object o) {
-        System.out.println("FunctionEnd");
 
         ast.identifier.visit(this, null);
 
@@ -692,13 +649,11 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitEmptyStatement(EmptyStatement ast, Object o) {
-        System.out.println("EmptyStatement");
         return null;
     }
 
     @Override
     public Object visitNullStmt(NullStmt ast, Object o) {
-        System.out.println("NullStmt");
         return null;
     }
 
@@ -713,7 +668,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitVariableList(VariableList ast, Object o) {
-        System.out.println("      VariableList");
         ast.vnameSeq.visit(this, null);
         ast.vname.visit(this, null);
 
@@ -722,8 +676,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitAssignmentStmt(AssignmentStmt ast, Object o) {
-        System.out.println("      AssignmentStmt");
-
         ast.variableList.visit(this, null);
         ast.expression.visit(this, null);
 
@@ -732,16 +684,12 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitProcedureCallStmt(ProcedureCallStmt ast, Object o) {
-        System.out.println("ProcedureCallStmt");
-
         ast.prcRef.visit(this, null);
-
         return null;
     }
 
     @Override
     public Object visitCall(Call ast, Object o) {
-        System.out.println("Call");
 
         Definition binding = (Definition) ast.identifier.visit(this, null);
 
@@ -758,7 +706,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitCallWithParams(CallWithParams ast, Object o) {
-        System.out.println("CallWithParams");
 
         Definition binding = (Definition) ast.identifier.visit(this, null);
 
@@ -777,7 +724,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitSingleActualParameterSequence(SingleActualParameterSequence ast, Object o) {
-        System.out.println("SingleActualParameterSequence");
 
         // use passed FormalParameterSequence because it should be compared to ActualParameterSequence
         FormalParameterSequence fps = (FormalParameterSequence) o;
@@ -794,7 +740,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitMultipleActualParameterSequence(MultipleActualParameterSequence ast, Object o) {
-        System.out.println("MultipleActualParameterSequence");
 
         // use passed FormalParameterSequence
         FormalParameterSequence fps = (FormalParameterSequence) o;
@@ -812,29 +757,22 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitEmptyActualParameterSequence(EmptyActualParameterSequence ast, Object o) {
-        System.out.println("EmptyActualParameterSequence");
         return null;
     }
 
     @Override
     public Object visitSingleFormalParameterSequence(SingleFormalParameterSequence ast, Object o) {
-        System.out.println("SingleFormalParameterSequence");
-
         ast.FP.visit(this, null);
-
         return null;
     }
 
     @Override
     public Object visitEmptyFormalParameterSequence(EmptyFormalParameterSequence ast, Object o) {
-        System.out.println("EmptyFormalParameterSequence");
         return null;
     }
 
     @Override
     public Object visitExpressionList(ExpressionList ast, Object o) {
-        System.out.println("ExpressionList");
-
         ast.exprSeq.visit(this, null);
         ast.expr.visit(this, null);
 
@@ -843,13 +781,11 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitReturn(Return ast, Object o) {
-        System.out.println("Return");
         return null;
     }
 
     @Override
     public Object visitReturnWithExpression(ReturnWithExpression ast, Object o) {
-        System.out.println("ReturnWithExpression");
 
 //        if (o == null) {
 //            reporter.reportError("RETURN should be in function", "", ast.expression.position);
@@ -858,18 +794,16 @@ public final class Checker implements Visitor {
         // TODO: should be the same as function return type
         TypeDenoter rType = (TypeDenoter) ast.expression.visit(this, null);
 
-        return null;
+        return rType;
     }
 
     @Override
     public Object visitExitStmt(ExitStmt ast, Object o) {
-        System.out.println("ExitStmt");
         return null;
     }
 
     @Override
     public Object visitIfStmt(IfStmt ast, Object o) {
-        System.out.println("IfStmt");
 
         ast.conditionalClause.visit(this, null);
         ast.trueBranch.visit(this, null);
@@ -879,7 +813,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitIfElseStmt(IfElseStmt ast, Object o) {
-        System.out.println("IfElseStmt");
 
         ast.conditionalClause.visit(this, null);
 
@@ -891,7 +824,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitConditionalClause(ConditionalClause ast, Object o) {
-        System.out.println("ConditionalClause");
 
         TypeDenoter eType = (TypeDenoter) ast.expression.visit(this, null);
 
@@ -917,7 +849,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitFalseBranch(FalseBranch ast, Object o) {
-        System.out.println("FalseBranch");
 
         indTable.openScope();
 
@@ -930,19 +861,16 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitSimpleCompoundEnd(SimpleCompoundEnd ast, Object o) {
-        System.out.println("SimpleCompoundEnd");
         return null;
     }
 
     @Override
     public Object visitCompoundEndWithName(CompoundEndWithName ast, Object o) {
-        ast.name.visit(this, null);
         return null;
     }
 
     @Override
     public Object visitCompoundStmt(CompoundStmt ast, Object o) {
-        System.out.println("      CompoundStmt");
 
         indTable.openScope();
 
@@ -956,7 +884,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitForLoopStmt(ForLoopStmt ast, Object o) {
-        System.out.println("ForLoopStmt");
 
         ast.forHead.visit(this, null);
 
@@ -971,7 +898,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitForHead(ForHead ast, Object o) {
-        System.out.println("ForHead");
 
         TypeDenoter varType = (TypeDenoter) ast.var.visit(this, null);
         ast.loopControl.visit(this, varType);
@@ -981,7 +907,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitWhile(While ast, Object o) {
-        System.out.println("While");
 
         TypeDenoter binding = (TypeDenoter) ast.expression.visit(this, null);
 
@@ -994,7 +919,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitStepperWhile(StepperWhile ast, Object o) {
-        System.out.println("StepperWhile");
 
         ast.stepExpression.visit(this, o);
         ast.aWhileExpression.visit(this, null);
@@ -1004,7 +928,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitStepper(Stepper ast, Object o) {
-        System.out.println("Stepper");
 
         TypeDenoter loopExpression = (TypeDenoter) o;
         TypeDenoter binding = (TypeDenoter) ast.stepExpression.visit(this, null);
@@ -1018,7 +941,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitStep(Step ast, Object o) {
-        System.out.println("Step");
 
         TypeDenoter loopType = (TypeDenoter) o;
         TypeDenoter binding = (TypeDenoter) ast.step.visit(this, null);
@@ -1032,7 +954,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitExpressionStep(ExpressionStep ast, Object o) {
-        System.out.println("ExpressionStep");
 
         TypeDenoter binding = (TypeDenoter) ast.expression.visit(this, null);
         ast.step.visit(this, binding);
@@ -1042,19 +963,17 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitLimit(Limit ast, Object o) {
-        System.out.println("Limit");
-
         TypeDenoter binding = (TypeDenoter) ast.limit.visit(this, null);
-
         return binding;
     }
 
     @Override
     public Object visitExpressionStepLimit(ExpressionStepLimit ast, Object o) {
-        System.out.println("ExpressionStepLimit");
 
         TypeDenoter forClauseType = (TypeDenoter) ast.expression.visit(this, null);
+
         ast.limit.visit(this, null);
+
         TypeDenoter stepType = (TypeDenoter) ast.step.visit(this, forClauseType);
 
         return stepType;
@@ -1062,7 +981,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitExpressionLimit(ExpressionLimit ast, Object o) {
-        System.out.println("ExpressionLimit");
 
         TypeDenoter exprType = (TypeDenoter) ast.expression.visit(this, null);
         TypeDenoter limitType = (TypeDenoter) ast.limit.visit(this, null);
@@ -1076,24 +994,20 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitSimpleForEnd(SimpleForEnd ast, Object o) {
-        System.out.println("SimpleForEnd");
         return null;
     }
 
     @Override
     public Object visitForEndWithName(ForEndWithName ast, Object o) {
-        System.out.println("ForEndWithName");
-
         ast.identifier.visit(this, null);
-
         return null;
     }
 
     @Override
     public Object visitSelectionStmt(SelectionStmt ast, Object o) {
-        System.out.println("SelectionStmt");
 
         TypeDenoter binding = (TypeDenoter) ast.selectionHead.visit(this, null);
+
         ast.selectionBody.visit(this, binding);
         ast.selectionEnd.visit(this, null);
 
@@ -1102,26 +1016,18 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitSelectionHead(SelectionHead ast, Object o) {
-        System.out.println("SelectionHead");
-
         TypeDenoter selectType = (TypeDenoter) ast.expression.visit(this, null);
-
         return selectType;
     }
 
     @Override
     public Object visitSelectBody(SelectBody ast, Object o) {
-        System.out.println("SelectBody");
-
         ast.caseList.visit(this, o);
-
         return null;
     }
 
     @Override
     public Object visitSelectBodyWithEscape(SelectBodyWithEscape ast, Object o) {
-        System.out.println("SelectBodyWithEscape");
-
         ast.caseList.visit(this, o);
         ast.escapeCase.visit(this, null);
 
@@ -1130,23 +1036,17 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitSelectionEnd(SelectEnd ast, Object o) {
-        System.out.println("SelectEnd");
         return null;
     }
 
     @Override
     public Object visitSelectEndWithName(SelectEndWithName ast, Object o) {
-        System.out.println("SelectEndWithName");
-
         ast.identifier.visit(this, null);
-
         return null;
     }
 
     @Override
     public Object visitCaseSeq(CaseSeq ast, Object o) {
-        System.out.println("CaseSeq");
-
         ast.caseSeq.visit(this, o);
         ast.aCase.visit(this, o);
 
@@ -1155,16 +1055,12 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitCaseHead(CaseHead ast, Object o) {
-        System.out.println("CaseHead");
-
         ast.selector.visit(this, o);
-
         return null;
     }
 
     @Override
     public Object visitCaseList(CaseList ast, Object o) {
-        System.out.println("CaseList");
 
         ast.caseHead.visit(this, o);
 
@@ -1179,7 +1075,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitSelector(Selector ast, Object o) {
-        System.out.println("Selector");
 
         TypeDenoter selHeadType = (TypeDenoter) o;
         TypeDenoter caseType = (TypeDenoter) ast.expression.visit(this, null);
@@ -1193,7 +1088,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitEscapeCase(EscapeCase ast, Object o) {
-        System.out.println("EscapeCase");
 
         indTable.openScope();
 
@@ -1206,47 +1100,36 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitRepeat(Repeat ast, Object o) {
-        System.out.println("Repeat");
-
         ast.identifier.visit(this, null);
-
         return null;
     }
 
     @Override
     public Object visitRepent(Repent ast, Object o) {
-        System.out.println("Repent");
-
         ast.identifier.visit(this, null);
-
         return null;
     }
 
     @Override
     public Object visitInput(Input ast, Object o) {
-        System.out.println("         Input");
         ast.inputList.visit(this, null);
-
         return null;
     }
 
     @Override
     public Object visitInputList(InputList ast, Object o) {
-        System.out.println("           InputList");
         ast.varList.visit(this, null);
         return null;
     }
 
     @Override
     public Object visitOutput(Output ast, Object o) {
-        System.out.println("         Output");
         ast.outputList.visit(this, null);
         return null;
     }
 
     @Override
     public Object visitOutputList(OutputList ast, Object o) {
-        System.out.println("            OutputList");
 
         TypeDenoter binding = (TypeDenoter) ast.expr.visit(this, null);
 
