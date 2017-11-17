@@ -46,13 +46,13 @@ public interface Visitor {
     Object visitEmptyDefinition(EmptyDefinition ast, Object o);
 
     Object visitTypeDefinition(TypeDefinition ast, Object o);
-    Object visitIdentifierType(IdentifierType ast, Object o);
-    Object visitArrayType(ArrayType ast, Object o);
+    Object visitIdentifierTypeDenoter(IdentifierTypeDenoter ast, Object o);
+    Object visitArrayTypeDenoter(ArrayTypeDenoter ast, Object o);
     Object visitSingleArrayBounds(SingleArrayBounds ast, Object o);
     Object visitSegmentedArrayBounds(SegmentedArrayBounds ast, Object o);
-    Object visitStructureType(StructureType ast, Object o);
-    Object visitFieldList(FieldList ast, Object o);
-    Object visitFieldDenoter(FieldDenoter ast, Object o);
+    Object visitStructuredTypeDenoter(StructuredTypeDenoter ast, Object o);
+    Object visitMultipleFieldTypeDenoter(MultipleFieldTypeDenoter ast, Object o);
+    Object visitSingleFieldTypeDenoter(SingleFieldTypeDenoter ast, Object o);
 
     Object visitDeclaration(Declaration ast, Object o);
     Object visitSingleDeclaredName(SingleDeclaredName ast, Object o);

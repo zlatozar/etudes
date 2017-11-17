@@ -257,7 +257,7 @@ public class Parser {
         TypeDenoter arrayType = parseTypeDenoter();
 
         finish(srcPos);
-        return new ArrayType(srcPos, arrayBounds, arrayType);
+        return new ArrayTypeDenoter(srcPos, arrayBounds, arrayType);
     }
 
     ArrayBounds parseArrayBounds() throws SyntaxError {
@@ -295,38 +295,38 @@ public class Parser {
 
         accept(Token.STRUCTURE);
 
-        Field fieldDenoterList = parseFieldList();
+        FieldTypeDenoter fieldTypeDenoterDenoterList = parseFieldList();
 
         accept(Token.END);
         accept(Token.STRUCTURE);
 
         finish(srcPos);
 
-        return new StructureType(srcPos, fieldDenoterList);
+        return new StructuredTypeDenoter(srcPos, fieldTypeDenoterDenoterList);
     }
 
-    Field parseFieldList() throws SyntaxError {
+    FieldTypeDenoter parseFieldList() throws SyntaxError {
 
-        Field fieldDenoter;
+        FieldTypeDenoter fieldTypeDenoterDenoter;
 
         SourcePosition srcPos = new SourcePosition();
         start(srcPos);
 
-        fieldDenoter = parseField();
+        fieldTypeDenoterDenoter = parseField();
 
         while (currentToken.kind == Token.COMMA) {
             acceptIt();
 
-            FieldDenoter fieldDenoter2 = parseField();
+            SingleFieldTypeDenoter fieldDenoter2 = parseField();
             finish(srcPos);
 
-            fieldDenoter = new FieldList(srcPos, fieldDenoter, fieldDenoter2);
+            fieldTypeDenoterDenoter = new MultipleFieldTypeDenoter(srcPos, fieldDenoter2.I, fieldDenoter2.typeDenoter, fieldTypeDenoterDenoter);
         }
 
-        return fieldDenoter;
+        return fieldTypeDenoterDenoter;
     }
 
-    FieldDenoter parseField() throws SyntaxError {
+    SingleFieldTypeDenoter parseField() throws SyntaxError {
         SourcePosition srcPos = new SourcePosition();
         start(srcPos);
 
@@ -336,7 +336,7 @@ public class Parser {
         accept(Token.IS);
         TypeDenoter typeDenoter = parseTypeDenoter();
 
-        return new FieldDenoter(srcPos, identifier, typeDenoter);
+        return new SingleFieldTypeDenoter(srcPos, identifier, typeDenoter);
     }
 
     TypeDenoter parseIdentifierTypeDenoter() throws SyntaxError {
@@ -346,7 +346,7 @@ public class Parser {
         Identifier identifier = parseIdentifier();
         finish(srcPos);
 
-        return new IdentifierType(srcPos, identifier);
+        return new IdentifierTypeDenoter(srcPos, identifier);
     }
 
 //_____________________________________________________________________________

@@ -2,9 +2,9 @@ package EasyDoesIt.Easy.AbstractSyntaxTrees;
 
 import EasyDoesIt.Easy.SyntacticAnalizer.SourcePosition;
 
-public abstract class Field extends AST {
+public abstract class FieldTypeDenoter extends AST {
 
-    public Field(SourcePosition srcPos) {
+    public FieldTypeDenoter(SourcePosition srcPos) {
         super(srcPos);
     }
 

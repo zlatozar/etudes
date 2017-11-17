@@ -4,7 +4,6 @@ import EasyDoesIt.Easy.AbstractSyntaxTrees.*;
 import EasyDoesIt.Easy.ErrorReporter;
 import EasyDoesIt.Easy.StdEnvironment;
 import EasyDoesIt.Easy.SyntacticAnalizer.SourcePosition;
-import sun.reflect.generics.tree.FieldTypeSignature;
 
 public final class Checker implements Visitor {
 
@@ -48,11 +47,58 @@ public final class Checker implements Visitor {
         return binding;
     }
 
+    // not tested
     public Object visitDotVname(DotVname ast, Object o) {
         System.out.println("DotVname");
 
-        throw new IllegalArgumentException("not implemented");
+        ast.type = null;
+
+        TypeDenoter vType = (TypeDenoter) ast.V.visit(this, null);
+
+        ast.variable = ast.V.variable;
+
+        if (!(vType instanceof StructuredTypeDenoter)) {
+            reporter.reportError("record expected here", "", ast.V.position);
+
+        } else {
+            ast.type = checkFieldIdentifier(((StructuredTypeDenoter) vType).fieldTypeDenoterDenoter, ast.I);
+
+            if (ast.type == StdEnvironment.errorType) {
+                reporter.reportError("no field \"%\" in this struct type", ast.I.spelling, ast.I.position);
+            }
+        }
+
+        return ast.type;
     }
+
+    // note tested
+    private static TypeDenoter checkFieldIdentifier(FieldTypeDenoter fieldTypeDenoter, Identifier I) {
+
+        if (fieldTypeDenoter instanceof MultipleFieldTypeDenoter) {
+
+            MultipleFieldTypeDenoter ft = (MultipleFieldTypeDenoter) fieldTypeDenoter;
+
+            if (ft.I.spelling.compareTo(I.spelling) == 0) {
+                I.decl = fieldTypeDenoter;
+                return ft.typeDenoter;
+
+            } else {
+                return checkFieldIdentifier(ft.fieldTypeDenoter, I);
+            }
+
+        } else if (fieldTypeDenoter instanceof SingleFieldTypeDenoter) {
+
+            SingleFieldTypeDenoter ft = (SingleFieldTypeDenoter) fieldTypeDenoter;
+
+            if (ft.I.spelling.compareTo(I.spelling) == 0) {
+                I.decl = fieldTypeDenoter;
+                return ft.typeDenoter;
+            }
+        }
+
+        return StdEnvironment.errorType;
+    }
+
 
     @Override
     public Object visitSimpleVname(SimpleVname ast, Object o) {
@@ -78,8 +124,8 @@ public final class Checker implements Visitor {
             ast.type = ((ConstDefinition) binding).E.type;
             ast.variable = false;
 
-        } else if (binding instanceof ArrayType) {
-            ast.type = ((ArrayType) binding);
+        } else if (binding instanceof ArrayTypeDenoter) {
+            ast.type = ((ArrayTypeDenoter) binding);
             ast.variable = false;
         }
 
@@ -97,7 +143,7 @@ public final class Checker implements Visitor {
 
         if (vType != StdEnvironment.errorType) {
 
-            if (!(vType instanceof ArrayType)) {
+            if (!(vType instanceof ArrayTypeDenoter)) {
                 reporter.reportError("array expected here", "", ast.V.position);
 
             } else {
@@ -106,7 +152,7 @@ public final class Checker implements Visitor {
                     reporter.reportError("Integer expression expected here", "", ast.E.position);
                 }
 
-                ast.type = ((ArrayType) vType).type;
+                ast.type = ((ArrayTypeDenoter) vType).type;
             }
         }
 
@@ -334,6 +380,8 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitTypeDefinition(TypeDefinition ast, Object o) {
+        System.out.println("TypeDefinition");
+
         ast.T = (TypeDenoter) ast.T.visit(this, null);
         indTable.enter(ast.I.spelling, ast);
 
@@ -345,7 +393,7 @@ public final class Checker implements Visitor {
     }
 
     @Override
-    public Object visitIdentifierType(IdentifierType ast, Object o) {
+    public Object visitIdentifierTypeDenoter(IdentifierTypeDenoter ast, Object o) {
         System.out.println("         IdentifierType");
         Definition binding = (Definition) ast.identifier.visit(this, null);
 
@@ -364,7 +412,7 @@ public final class Checker implements Visitor {
     }
 
     @Override
-    public Object visitArrayType(ArrayType ast, Object o) {
+    public Object visitArrayTypeDenoter(ArrayTypeDenoter ast, Object o) {
         System.out.println("      ArrayType");
 
         ast.type =  (TypeDenoter) ast.type.visit(this, null);
@@ -408,29 +456,29 @@ public final class Checker implements Visitor {
     }
 
     @Override
-    public Object visitStructureType(StructureType ast, Object o) {
+    public Object visitStructuredTypeDenoter(StructuredTypeDenoter ast, Object o) {
         System.out.println("      StructureType");
-        ast.fieldDenoter = (Field) ast.fieldDenoter.visit(this, null);
+        ast.fieldTypeDenoterDenoter = (FieldTypeDenoter) ast.fieldTypeDenoterDenoter.visit(this, null);
 
         return ast;
     }
 
     @Override
-    public Object visitFieldList(FieldList ast, Object o) {
+    public Object visitMultipleFieldTypeDenoter(MultipleFieldTypeDenoter ast, Object o) {
+        System.out.println("MultipleFieldTypeDenoter");
 
-        ast.fieldSeq.visit(this, null);
-        ast.field.visit(this, null);
+        ast.typeDenoter = (TypeDenoter) ast.typeDenoter.visit(this, null);
+        ast.fieldTypeDenoter.visit(this, null);
 
-        return null;
+        return ast;
     }
 
     @Override
-    public Object visitFieldDenoter(FieldDenoter ast, Object o) {
+    public Object visitSingleFieldTypeDenoter(SingleFieldTypeDenoter ast, Object o) {
+        System.out.println("SingleFieldTypeDenoter");
 
-        TypeDenoter typeDenoter = (TypeDenoter) ast.typeDenoter.visit(this, null);
-        indTable.enter(ast.I.spelling, typeDenoter);
-
-        return null;
+        ast.typeDenoter = (TypeDenoter) ast.typeDenoter.visit(this, null);
+        return ast;
     }
 
     @Override

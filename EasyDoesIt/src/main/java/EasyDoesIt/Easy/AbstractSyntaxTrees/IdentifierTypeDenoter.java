@@ -2,18 +2,18 @@ package EasyDoesIt.Easy.AbstractSyntaxTrees;
 
 import EasyDoesIt.Easy.SyntacticAnalizer.SourcePosition;
 
-public class IdentifierType extends TypeDenoter {
+public class IdentifierTypeDenoter extends TypeDenoter {
 
     public Identifier identifier;
 
-    public IdentifierType(SourcePosition srcPos, Identifier identifier) {
+    public IdentifierTypeDenoter(SourcePosition srcPos, Identifier identifier) {
         super(srcPos);
         this.identifier = identifier;
     }
 
     @Override
     public Object visit(Visitor v, Object o) {
-        return v.visitIdentifierType(this, o);
+        return v.visitIdentifierTypeDenoter(this, o);
     }
 
     @Override
@@ -21,8 +21,8 @@ public class IdentifierType extends TypeDenoter {
         if (obj != null && obj instanceof ErrorTypeDenoter) {
             return true;
 
-        } else if (obj != null && obj instanceof IdentifierType) {
-            return this.identifier.equals(((IdentifierType) obj).identifier);
+        } else if (obj != null && obj instanceof IdentifierTypeDenoter) {
+            return this.identifier.equals(((IdentifierTypeDenoter) obj).identifier);
 
         } else {
             return false;
