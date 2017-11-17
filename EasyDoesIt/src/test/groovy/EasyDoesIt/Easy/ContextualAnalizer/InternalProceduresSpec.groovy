@@ -78,9 +78,9 @@ class InternalProceduresSpec extends ASTSpec {
                 '   ;' +
                 'END FUNCTION abs;' +
 
-                'PROCEDURE abs(x REAL, y INTEGER, z STRING):' +
+                'PROCEDURE abs2(x REAL, y INTEGER, z STRING):' +
                 '   ;' +
-                'END PROCEDURE abs;')
+                'END PROCEDURE abs2;')
 
         when: 'Parser finish'
         AST theAST = parser.parseProgram();

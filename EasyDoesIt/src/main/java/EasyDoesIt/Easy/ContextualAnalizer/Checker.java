@@ -326,8 +326,13 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitCommand(Segment ast, Object o) {
+
+        indTable.openScope();
+
         ast.definition.visit(this, null);
         ast.statement.visit(this, null);
+
+        indTable.closeScope();
 
         return null;
     }
@@ -490,6 +495,7 @@ public final class Checker implements Visitor {
     public Object visitInternalProcedure(InternalProcedure ast, Object o) {
 
         ast.blockCode.visit(this, null);
+
         return null;
     }
 
@@ -499,6 +505,10 @@ public final class Checker implements Visitor {
         String procName = (String) ast.procHead.visit(this, ast);
 
         indTable.enter(procName, ast);
+
+        if (ast.duplicated) {
+            reporter.reportError("procedure \"%\" already declared", ast.procHead.identifier.spelling, ast.position);
+        }
 
         indTable.openScope();
 
@@ -609,7 +619,6 @@ public final class Checker implements Visitor {
 
         // TODO: Check return type with declared
         ast.segment.visit(this, null);
-
         ast.funcEnd.visit(this, procName);
 
         indTable.closeScope();
@@ -659,7 +668,6 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitStatementSeq(StatementSeq ast, Object o) {
-
         ast.stmtSeq.visit(this, null);
         ast.stmt.visit(this, null);
 
@@ -837,25 +845,13 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitTrueBranch(TrueBranch ast, Object o) {
-
-        indTable.openScope();
-
         ast.segment.visit(this, null);
-
-        indTable.closeScope();
-
         return null;
     }
 
     @Override
     public Object visitFalseBranch(FalseBranch ast, Object o) {
-
-        indTable.openScope();
-
         ast.segment.visit(this, null);
-
-        indTable.closeScope();
-
         return null;
     }
 
