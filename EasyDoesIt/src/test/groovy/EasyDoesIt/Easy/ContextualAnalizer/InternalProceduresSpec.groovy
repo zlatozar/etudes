@@ -75,7 +75,7 @@ class InternalProceduresSpec extends ASTSpec {
         given: 'Parser both'
         Parser parser = getParserFor(
                 'FUNCTION abs(x REAL NAME) REAL:' +
-                '   ;' +
+                '   SET x := 0;' +
                 'END FUNCTION abs;' +
 
                 'PROCEDURE abs2(x REAL, y INTEGER, z STRING):' +

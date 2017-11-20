@@ -88,4 +88,32 @@ public final class IdentificationTable {
 
         return attr;
     }
+
+    // when debug
+    public void display() {
+
+        IdEntry entry = this.latest;
+        int level = this.level;
+
+        String offset = "   ";
+        System.out.println("--- " + level + " ---");
+
+        while (true) {
+
+            if (entry == null) {
+                break;
+
+            } else {
+                System.out.println(offset + entry.id + " : " + entry.typeInfo);
+                entry = entry.previous;
+
+                if (entry != null && entry.level != level) {
+                    level = entry.level;
+                    offset = offset + "     ";
+                    System.out.println("--- " + entry.level + " ---");
+                }
+            }
+        }
+
+    }
 }

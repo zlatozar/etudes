@@ -314,25 +314,14 @@ public final class Checker implements Visitor {
 
     @Override
     public Object visitProgramBody(ProgramBody ast, Object o) {
-
-        indTable.openScope();
-
         ast.prgBody.visit(this, null);
-
-        indTable.closeScope();
-
         return null;
     }
 
     @Override
     public Object visitSegment(Segment ast, Object o) {
-
-        indTable.openScope();
-
         ast.definition.visit(this, null);
         ast.statement.visit(this, null);
-
-        indTable.closeScope();
 
         return null;
     }
@@ -504,12 +493,6 @@ public final class Checker implements Visitor {
 
         String procName = (String) ast.procHead.visit(this, ast);
 
-        indTable.enter(procName, ast);
-
-        if (ast.duplicated) {
-            reporter.reportError("identifier \"%\" already declared", ast.procHead.identifier.spelling, ast.position);
-        }
-
         ast.segment.visit(this, null);
         ast.procEnd.visit(this, procName);
 
@@ -519,7 +502,18 @@ public final class Checker implements Visitor {
     @Override
     public Object visitProcedureHead(ProcedureHead ast, Object o) {
 
+        ProcedureDefinition procedureDefinition = (ProcedureDefinition) o;
+
         ast.identifier.visit(this, o);
+
+        indTable.enter(ast.identifier.spelling, procedureDefinition);
+
+        if (procedureDefinition.duplicated) {
+            reporter.reportError("identifier \"%\" already declared", ast.identifier.spelling, ast.position);
+        }
+
+        indTable.openScope();
+
         ast.FPS.visit(this, o);
 
         return ast.identifier.spelling;
@@ -548,6 +542,7 @@ public final class Checker implements Visitor {
     public Object visitProcedureEnd(ProcedureEnd ast, Object o) {
 
         ast.procName.visit(this, null);
+        indTable.closeScope();
 
         String procNameHead = (String) o;
         String procNameEnd = ast.procName.spelling;
@@ -596,13 +591,7 @@ public final class Checker implements Visitor {
 
         String procName = (String) ast.funcHead.visit(this, ast);
 
-        indTable.enter(procName, ast);
-
-        if (ast.duplicated) {
-           reporter.reportError("identifier \"%\" already declared", ast.funcHead.identifier.spelling, ast.position);
-        }
-
-        // TODO: Check return type with declared
+        // TODO: Check return type with the declared
         ast.segment.visit(this, null);
         ast.funcEnd.visit(this, procName);
 
@@ -612,7 +601,18 @@ public final class Checker implements Visitor {
     @Override
     public Object visitFunctionHead(FunctionHead ast, Object o) {
 
+        FunctionDefinition functionDefinition = (FunctionDefinition) o;
+
         ast.identifier.visit(this, o);
+
+        indTable.enter(ast.identifier.spelling, functionDefinition);
+
+        if (functionDefinition.duplicated) {
+            reporter.reportError("identifier \"%\" already declared", ast.identifier.spelling, ast.position);
+        }
+
+        indTable.openScope();
+
         ast.FPS.visit(this, o);
 
         // eliminate type identifiers
@@ -625,6 +625,7 @@ public final class Checker implements Visitor {
     public Object visitFunctionEnd(FunctionEnd ast, Object o) {
 
         ast.identifier.visit(this, null);
+        indTable.closeScope();
 
         String funcNameHead = (String) o;
         String funcNameEnd = ast.identifier.spelling;

@@ -4,9 +4,9 @@ import EasyDoesIt.Easy.SyntacticAnalizer.SourcePosition;
 
 public class ErrorReporter {
 
-    int numErrors;
+    public int numErrors;
 
-    ErrorReporter() {
+    public ErrorReporter() {
         numErrors = 0;
     }
 

@@ -1,6 +1,7 @@
 package EasyDoesIt.Easy;
 
 import EasyDoesIt.Easy.AbstractSyntaxTrees.Program;
+import EasyDoesIt.Easy.ContextualAnalizer.Checker;
 import EasyDoesIt.Easy.SyntacticAnalizer.Parser;
 import EasyDoesIt.Easy.SyntacticAnalizer.Scanner;
 import EasyDoesIt.Easy.SyntacticAnalizer.SourceFile;
@@ -10,22 +11,23 @@ import EasyDoesIt.Easy.SyntacticAnalizer.SourceFile;
  */
 public class Compiler {
 
-    static String objectName = "obj.esy";
+    // Easy Abstract Machine
+    private static String objectName = "obj.eam";
 
     private static Scanner scanner;
     private static Parser parser;
+    private static Checker checker;
+
     private static ErrorReporter reporter;
 
-    /**
-     * The AST representing the source program.
-     */
+    // The AST representing the source program
     private static Program theAST;
 
-    static boolean compileProgram(String sourceName, String objectName, boolean showingAST, boolean showingTable) {
+    public static boolean compileProgram(String sourceName, boolean showingAST, boolean showingTable) {
 
-        System.out.println("********** Easy Compiler (Java Version 0.1) **********");
+        System.out.println("\n********** Easy Compiler (Java Version 0.1) **********\n");
 
-        System.out.println("Syntactic Analysis ...");
+        System.out.print("Syntactic Analysis ... ");
         SourceFile source = new SourceFile(sourceName);
 
         if (source == null) {
@@ -36,24 +38,32 @@ public class Compiler {
         scanner = new Scanner(source);
         reporter = new ErrorReporter();
         parser = new Parser(scanner, reporter);
+        checker = new Checker(reporter);
 
         theAST = parser.parseProgram();                     // 1st pass
 
-        return reporter.numErrors == 0;
-    }
+        if (reporter.numErrors == 0) {
+            System.out.println("pass");
 
-    public static void main(String[] args) {
-        boolean compiledOK;
+            System.out.print("Contextual Analysis ... ");
 
-        if (args.length != 1) {
-            System.out.println("Usage: esy filename");
-            System.exit(1);
+            checker.check(theAST);                          // 2nd pass
+
+            if (reporter.numErrors == 0) {                  // 3rd pass
+                System.out.println("pass");
+
+                System.out.println("Code Generation ...(not implemented yet)");
+                // ...
+            }
         }
 
-        String sourceName = args[0];
-        compiledOK = compileProgram(sourceName, objectName, false, false);
+        boolean successful = (reporter.numErrors == 0);
 
-        System.out.println("Is compilation pass? " + compiledOK);
+        if (!successful) {
+            System.out.println("Compilation was unsuccessful.");
+        }
+
+        return successful;
     }
 }
 
