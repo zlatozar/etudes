@@ -32,7 +32,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        MapColoring.demo.Main
+                                        MapColoring.CompilerSimulation.demo.Main
                                     </mainClass>
                                 </manifest>
                             </archive>

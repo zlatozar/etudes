@@ -4,18 +4,18 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
-        <groupId>books</groupId>
         <artifactId>etudes-for-programmers</artifactId>
+        <groupId>books</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>GameOfLife</artifactId>
+    <artifactId>ComputerSimulation</artifactId>
     <version>1.0</version>
 
-    <name>Etude 1: Game of Life</name>
-    <description>'Game of life' implementation</description>
+    <name>Etude 25: Computer Simulation</name>
+    <description>Simulation of a typical large computer</description>
 
     <build>
         <plugins>
@@ -32,7 +32,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        GameOfLife.CompilerSimulation.demo.Main
+                                        ComputerSimulation.CompilerSimulation.demo.Main
                                     </mainClass>
                                 </manifest>
                             </archive>
@@ -46,4 +46,6 @@
             </plugin>
         </plugins>
     </build>
+
+
 </project>

@@ -87,6 +87,7 @@
         <module>WinningIsTheOnlyThing</module>
 
         <!-- Compilers -->
+        <module>ComputerSimulation</module>
         <module>EasyDoesIt</module>
 
     </modules>

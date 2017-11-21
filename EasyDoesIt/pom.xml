@@ -14,7 +14,7 @@
     <artifactId>EasyDoesIt</artifactId>
     <version>1.0</version>
 
-    <name>Etude 26: A compiler for an algebraic language</name>
+    <name>Etude 27: A compiler for an algebraic language</name>
     <description>Compiler for Easy language</description>
 
     <build>
@@ -32,7 +32,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        EasyDoesIt.demo.Main
+                                        EasyDoesIt.CompilerSimulation.demo.Main
                                     </mainClass>
                                 </manifest>
                             </archive>

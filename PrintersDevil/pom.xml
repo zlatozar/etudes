@@ -32,7 +32,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        PrintersDevil.demo.Main
+                                        PrintersDevil.CompilerSimulation.demo.Main
                                     </mainClass>
                                 </manifest>
                             </archive>
