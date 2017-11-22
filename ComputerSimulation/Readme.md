@@ -42,7 +42,7 @@ will always be numbered from zero on the left.
 ![EC-1 ascii](images/ascii.png "ascii")
 
 Two other registers are available. The ```Instruction Location Counter``` (_ILC_) always points to the next
-instruction to be executed in normal sequence. The ```Condition Code Register```` (_CCR_) is four bits
+instruction to be executed in normal sequence. The ```Condition Code Register``` (_CCR_) is four bits
 wide. The **CCR** is generally set as a side effect of instruction execution and may be tested by branch
 instructions. The four bits are named, from left to right, the _overflow bit_, the _greater than bit_, the
 _less than bit_, and the _equals bit_. When the **CCR** is set by an instruction, it is first cleared entirely to
