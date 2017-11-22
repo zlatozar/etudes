@@ -138,24 +138,35 @@ function desired and to supply parameters. The following constitute a bare minim
 with the R1 register designator selecting the function.
 
    ```R1 = 0``` Exit the running program and clean up after it.
+   
    ```R1 = 1``` Read an integer from the input stream and store it at the effective address of the
          SVC (the address must name a word).
+   
    ```R1 = 2``` Read a real number and store it at the effective address.
+   
    ```R1 = 3``` Read a character and store it at the effective address.
 
    ```R1 = 4``` Cause the input stream to space ahead to a new record.
+   
    ```R1 = 5``` Write the word at the effective address as an integer on the output stream.
+   
    ```R1 = 6``` Write the word at the effective address on the output stream as a real number.
+   
    ```R1 = 7``` Write the character at the effective address to the output stream.
+   
    ```R1 = 8``` Write an end of record on the output stream.
+   
    ```R1 = 9``` and ```R2 = 0``` End tracing instruction execution.
+   
    ```R1 = 9``` and ```R2 = 1``` Begin tracing instruction execution. Print a running record of each
          instruction executed.
+   
    ```R1 = A``` The effective address of the SVC must be a word address. The low half`word
          gives the low address and the high halfword the high address of a section of memory to
          dump. The dump should display memory between the limits in both hexadecimal and
          character-string format. You may find it useful to display instruction mnemonics also.
          The dump routine should notice and not print duplicated lines.
+   
    ```R1 = F``` This supervisor call will never be assigned for system use and can be used for any
          purpose by the simulator.
          
@@ -166,14 +177,21 @@ instruction. A summary of exceptions follows.
          
    **Illegal Instruction Address.** At the start of an instruction execution cycle, the ILC does
       not contain an even value.
+      
    **Unimplemented Instruction.** There is no operation defined for this operation code.
+   
    **Indirect Address.** The indirect address is not even.
+   
    **Word Addressing.** The address of a purported word operand to an instruction is not
       divisible by four.
+   
    **Real Format.** The result of some real-valued operation cannot be expressed within the
       format for normalized real numbers.
+   
    **Execute Address.** The effective address of an Execute instruction is not even.
+   
    **Zero Divisor.** The divisor in a division or remainder operation is zero.
+   
    **Wraparound Instruction.** A four-character instruction begins at _FFFE_.
       
 The response of the supervisor to an exception is left to the implementor but should include a
