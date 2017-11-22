@@ -12,6 +12,10 @@ LN,R1 *A,R2
 The code for the **CCR** effect is ```O``` (Overflow), ```L``` (Less than), ```G``` (Greater than),
 ```E``` (Equal) , and ```None``` (indicating that the **CCR** is unaffected).
 
+![Ops Codes summer](images/summery_of_ops_codes.png "ops_codes")
+
+Details:
+
   - [LR](#1-lr)
   - [L](#2-l)
   - [LI](#3-li)
@@ -503,7 +507,7 @@ p. 114 (7 ops codes)
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |Save Condition Character                   | CH       |   6B          | ```SACC, M1 A, R2```                  |   None         |
    
-If the logical and of the CCR and the 4 bit mask field Ml is nonzero, a character of all one
+If the logical and of the CCR and the 4 bit mask field M1 is nonzero, a character of all one
 bits is stored at the effective address; otherwise a character of all zero bits is stored.
 
 ### 40. CR
@@ -555,18 +559,18 @@ Register designator R2 names a register pair R2 and (R2+1) mod 16 (the second re
 will be called R2+1 throughout). The pair R2 and R2+1 should contain a string descriptor
 doubleword, with a character address A1 in bits 16 through 31 of register R2, a length L in
 bits 0 through 15 of register R2+1, and a character address A2 in bits 16 through 31 of
-register R2+1. To begin execution, Al, A2, and L are moved to internal registers, the CCR is
+register R2+1. To begin execution, A1, A2, and L are moved to internal registers, the CCR is
 set to zero, and the E bit of the CCR is set to one. A loop is started.
 
 - First, if L is zero, bits 0 through 15 of both registers are set to zero, bits 16 to 31 of R2
-  are set to the internal value of Al, bits 16 through 31 of R2+1 are set to the internal
+  are set to the internal value of A1, bits 16 through 31 of R2+1 are set to the internal
   value of A2, and the instruction terminates.
 
-- Second, the character of Al is compared as an 8-bit integer to the character at A2 and the
+- Second, the character of A1 is compared as an 8-bit integer to the character at A2 and the
   result used to set the appropriate bits of the CCR.
 
 - Third, if the E bit of the CCR is not one, bits 0 through 15 of register R2 are set to
-  zero, bits 16 through 31 of R2 to the internal value of Al, bits 0 through 15 of R2+1
+  zero, bits 16 through 31 of R2 to the internal value of A1, bits 0 through 15 of R2+1
   to the internal value of L, bits 16 through 31 of R2+1 to the internal value of A2, and
   the instruction terminates.
 
@@ -581,7 +585,7 @@ set to zero, and the E bit of the CCR is set to one. A loop is started.
 | Move Character String                  | RR       |   0F          |    ```MCS, M1 R2```               | None           |
 
 Registers R2 and (R2+1) mod 16 contain a string descriptor doubleword as described in
-Compare Character String. The L, Al, and A2 fields are loaded into internal registers. A
+Compare Character String. The L, A1, and A2 fields are loaded into internal registers. A
 loop is begun.
 
 - First, if L is zero, bits 0 through 15 of registers R2 and R2+1 are set to zero, bits 16

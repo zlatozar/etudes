@@ -1,3 +1,19 @@
+## Statement of the Theme
+
+Write a simulator for the EC-1 computer. Input for the simulator should be an absolute load file
+and the input stream for the simulated program. The basic output should be the output stream from the program.
+In addition to the simulator, write at least two programs for the EC-1 to test the simulator's correctness.
+Of course, you will have to hand-assemble these programs into absolute load file format.
+
+Besides the basic output, your simulator should be able to trace and dump the simulated program.
+The trace should show the instruction broken down, the effective address calculation, and the
+operands and results in both their natural and hexadecimal formats. A dump should include the
+memory printed (perhaps under option control) in hexadecimal, instruction mnemonics, integer,
+real, and character formats. Repetitious groups of data should be printed only once with a note of
+the repetition. Control of the trace and dump may go directly to the simulator, perhaps via a 
+console, or may be driven by supervisor calls during execution.
+
+
 ## EC-1 computer
 
 ```EC-1``` is simpler than many hardware computers, but this aspect allows more attention to be paid to the
@@ -23,7 +39,7 @@ instructions require a register designator to be treated as a character address,
 multiplying the designator by four. We note here that bits in a word, character, or what have you
 will always be numbered from zero on the left.
 
-![EC-1 ascii](ascii.png "ascii")
+![EC-1 ascii](images/ascii.png "ascii")
 
 Two other registers are available. The ```Instruction Location Counter``` (_ILC_) always points to the next
 instruction to be executed in normal sequence. The ```Condition Code Register```` (_CCR_) is four bits
@@ -42,7 +58,7 @@ is zero for positive values and one for negative values (this is a function of t
 notation). When shorter signed integers, such as the immediate operands discussed below, are combined
 with words, the shorter value has its sign bit propagated leftward to fill the missing bits.
 
-![EC-1 memory](memory.png "memory")
+![EC-1 memory](images/memory.png "memory")
 
 _Real numbers_ also occupy a word. Bit 0 is the sign bit, bits 1 through 7 constitute the _exponent_,
 and bits 8 through 31 the _fraction_. In a positive real number, the sign bit is zero, the exponent field
@@ -109,4 +125,56 @@ number. The indirect bit is ignored by immediate instructions.
 4. ```Character``` (```CH```). Character instructions operate the same way as register-and-storage
 instructions.
 
-![EC-1 format for hardware data items](format.png "data_format")
+![EC-1 format for hardware data items](images/format.png "data_format")
+
+
+## Exceptions and supervisor calls
+
+The input/output structure on modern computers is at least as complicated as the CPU. To avoid
+doubling the size of the problem, we assume that a **supervisor** monitors the progress of every user
+program. The supervisor can be invoked directly by the Supervisor Call instruction and indirectly
+by an exceptional occurrence. The Supervisor Call instruction uses its various fields to code the
+function desired and to supply parameters. The following constitute a bare minimum of functions
+with the R1 register designator selecting the function.
+
+   ```R1 = 0``` Exit the running program and clean up after it.
+   ```R1 = 1``` Read an integer from the input stream and store it at the effective address of the
+         SVC (the address must name a word).
+   ```R1 = 2``` Read a real number and store it at the effective address.
+   ```R1 = 3``` Read a character and store it at the effective address.
+
+   ```R1 = 4``` Cause the input stream to space ahead to a new record.
+   ```R1 = 5``` Write the word at the effective address as an integer on the output stream.
+   ```R1 = 6``` Write the word at the effective address on the output stream as a real number.
+   ```R1 = 7``` Write the character at the effective address to the output stream.
+   ```R1 = 8``` Write an end of record on the output stream.
+   ```R1 = 9``` and ```R2 = 0``` End tracing instruction execution.
+   ```R1 = 9``` and ```R2 = 1``` Begin tracing instruction execution. Print a running record of each
+         instruction executed.
+   ```R1 = A``` The effective address of the SVC must be a word address. The low half`word
+         gives the low address and the high halfword the high address of a section of memory to
+         dump. The dump should display memory between the limits in both hexadecimal and
+         character-string format. You may find it useful to display instruction mnemonics also.
+         The dump routine should notice and not print duplicated lines.
+   ```R1 = F``` This supervisor call will never be assigned for system use and can be used for any
+         purpose by the simulator.
+         
+It is assumed that integers and real numbers on the input/output streams are terminated by blanks.
+Exceptions occur when errors arise during the course of instruction execution. The program is 
+interrupted and the supervisor notified of the cause of the exception and the location of the offending
+instruction. A summary of exceptions follows.
+         
+   **Illegal Instruction Address.** At the start of an instruction execution cycle, the ILC does
+      not contain an even value.
+   **Unimplemented Instruction.** There is no operation defined for this operation code.
+   **Indirect Address.** The indirect address is not even.
+   **Word Addressing.** The address of a purported word operand to an instruction is not
+      divisible by four.
+   **Real Format.** The result of some real-valued operation cannot be expressed within the
+      format for normalized real numbers.
+   **Execute Address.** The effective address of an Execute instruction is not even.
+   **Zero Divisor.** The divisor in a division or remainder operation is zero.
+   **Wraparound Instruction.** A four-character instruction begins at _FFFE_.
+      
+The response of the supervisor to an exception is left to the implementor but should include a
+report to the user of the occurrence.   
