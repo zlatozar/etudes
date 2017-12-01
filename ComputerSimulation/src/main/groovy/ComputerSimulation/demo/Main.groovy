@@ -1,4 +1,4 @@
-package CompilerSimulation.demo
+package ComputerSimulation.demo
 
 class Main {
 

@@ -142,6 +142,8 @@ with the R1 register designator selecting the function.
    ```R1 = 1``` Read an integer from the input stream and store it at the effective address of the
          SVC (the address must name a word).
    
+NOTE: See SVC (supervisor call) instruction in instruction set description. 
+   
    ```R1 = 2``` Read a real number and store it at the effective address.
    
    ```R1 = 3``` Read a character and store it at the effective address.

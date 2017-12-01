@@ -32,7 +32,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        GameOfLife.CompilerSimulation.demo.Main
+                                        GameOfLife.ComputerSimulation.demo.Main
                                     </mainClass>
                                 </manifest>
                             </archive>

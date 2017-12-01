@@ -32,7 +32,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        EasyDoesIt.CompilerSimulation.demo.Main
+                                        EasyDoesIt.ComputerSimulation.demo.Main
                                     </mainClass>
                                 </manifest>
                             </archive>
