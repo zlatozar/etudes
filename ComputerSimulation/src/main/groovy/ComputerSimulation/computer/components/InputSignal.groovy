@@ -12,6 +12,7 @@ class InputSignal {
             it -> wiresWithSignals.put(it.getKey(), convert(it.getValue()))
         }
 
+        // try to send signal at once
         wiresWithSignals.entrySet().parallelStream().any{ it -> it.getKey().setSignal(it.getValue()) }
     }
 

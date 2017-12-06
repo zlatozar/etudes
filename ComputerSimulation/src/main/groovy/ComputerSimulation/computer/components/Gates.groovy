@@ -62,10 +62,7 @@ class Gates {
     }
 
     static Wire XOR(Wire... wires) {
-        Wire nandOut= NAND(wires)
-        Wire orOut = OR(wires)
-
-        return AND(nandOut, orOut)
+        return AND(NAND(wires), OR(wires))
     }
 
     static Wire NOT(Wire wire) {
