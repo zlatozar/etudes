@@ -3,9 +3,7 @@ package ComputerSimulation.computer.components
 import rx.Observable
 import rx.functions.FuncN
 
-import java.util.concurrent.TimeUnit
-
-class Gates implements DelaysDefinition {
+class Gates {
 
     static Wire AND(Wire... wires) {
 
@@ -26,7 +24,7 @@ class Gates implements DelaysDefinition {
             Boolean call(Object... args) {
                 return Arrays.asList(args).stream().reduce({ a, b -> a && b }).get()
             }
-        }).delay(AND_delay, TimeUnit.MILLISECONDS))
+        }))
 
         return out
     }
@@ -54,7 +52,7 @@ class Gates implements DelaysDefinition {
             Boolean call(Object... args) {
                 return Arrays.asList(args).stream().reduce({ a, b -> a || b }).get()
             }
-        }).delay(OR_delay, TimeUnit.MILLISECONDS))
+        }))
 
         return out
     }

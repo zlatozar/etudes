@@ -7,11 +7,13 @@ class Wire {
     private String name
     private Observable<Boolean> inputSeq
 
+    Wire() {}
+
     Wire(String name) {
         this.name = name
     }
 
-    synchronized Observable<Boolean> getSignal() {
+    Observable<Boolean> getSignal() {
         if (inputSeq == null) {
             throw new IllegalArgumentException("Set signal first. There is no signal in wire $name")
         }
@@ -19,11 +21,13 @@ class Wire {
         return inputSeq
     }
 
-    synchronized void setSignal(Observable<Boolean> inputSeq) {
+    void setSignal(Observable<Boolean> inputSeq) {
         if (name) {
             printSignals(inputSeq)
         }
-        this.inputSeq = inputSeq
+
+        // because we could have many getSignal
+        this.inputSeq = inputSeq.cache()
     }
 
     // Helper methods

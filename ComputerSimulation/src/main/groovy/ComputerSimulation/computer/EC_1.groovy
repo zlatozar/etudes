@@ -15,10 +15,11 @@ class EC_1 extends Gates {
         InputSignal.emit([ (A) : [0, 0, 1, 1], (B) : [0, 1, 0, 1]])
 
         // logic
+        println '\nSimple test result:'
         XOR(A, B).getSignal().subscribe({it -> print("$it ")})
     }
 
     public static void main(String[] args) {
-        EC_1.simpleTest()
+        simpleTest()
     }
 }

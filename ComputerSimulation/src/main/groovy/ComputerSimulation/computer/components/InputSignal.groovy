@@ -2,7 +2,7 @@ package ComputerSimulation.computer.components
 
 import rx.Observable
 
-class InputSignal implements DelaysDefinition {
+class InputSignal {
 
     static void emit(HashMap<Wire, List<Integer>> rowSignals) {
 
