@@ -22,7 +22,7 @@ class Circuits extends Gates {
         OR(c1, c2, cout)
     }
 
-    void or_test() {
+    void and_test() {
         Wire a = new Wire()
         Wire b = new Wire()
         Wire out = new Wire()
@@ -39,7 +39,7 @@ class Circuits extends Gates {
     public static void main(String[] args) {
         Circuits circuits = new Circuits()
 
-        circuits.or_test()
+        circuits.and_test()
     }
 
 }

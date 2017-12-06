@@ -8,7 +8,7 @@ class GatesSpec extends Specification {
 
     def "Half adder"() {
 
-        given: "Wires to connect half adder"
+        given: "Wires to attach half adder"
         Wire in1 = new Wire()
         Wire in2 = new Wire()
         Wire sum = new Wire()
