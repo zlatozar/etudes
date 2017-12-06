@@ -7,13 +7,11 @@ class Wire {
     private String name
     private Observable<Boolean> inputSeq
 
-    Wire() {}
-
     Wire(String name) {
         this.name = name
     }
 
-    Observable<Boolean> getSignal() {
+    synchronized Observable<Boolean> getSignal() {
         if (inputSeq == null) {
             throw new IllegalArgumentException("Set signal first. There is no signal in wire $name")
         }
@@ -21,7 +19,7 @@ class Wire {
         return inputSeq
     }
 
-    void setSignal(Observable<Boolean> inputSeq) {
+    synchronized void setSignal(Observable<Boolean> inputSeq) {
         if (name) {
             printSignals(inputSeq)
         }
@@ -40,4 +38,8 @@ class Wire {
         println(sb.toString())
     }
 
+    @Override
+    String toString() {
+        return name ? name : super.toString()
+    }
 }

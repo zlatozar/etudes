@@ -3,27 +3,22 @@ package ComputerSimulation.computer
 import ComputerSimulation.computer.components.Gates
 import ComputerSimulation.computer.components.InputSignal
 import ComputerSimulation.computer.components.Wire
-import rx.Observable
 
 class EC_1 extends Gates {
 
-    void AND_test(Observable<Boolean> in1, Observable<Boolean> in2) {
+    static void simpleTest() {
 
         Wire A = new Wire('A')
-        Wire B = new Wire()
+        Wire B = new Wire('B')
 
-        // pass signal
-        A.setSignal(in1)
-        B.setSignal(in2)
+        // truth table
+        InputSignal.emit([ (A) : [0, 0, 1, 1], (B) : [0, 1, 0, 1]])
 
         // logic
-        print("\nAND gate result: ")
-        AND(A, B).subscribe({it -> print("$it ")})
+        XOR(A, B).getSignal().subscribe({it -> print("$it ")})
     }
 
     public static void main(String[] args) {
-        EC_1 comp = new EC_1()
-
-        comp.AND_test(InputSignal.emit([1, 1, 0]), InputSignal.emit([1, 1, 0]))
+        EC_1.simpleTest()
     }
 }

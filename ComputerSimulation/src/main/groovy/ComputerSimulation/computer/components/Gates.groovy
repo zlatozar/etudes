@@ -5,9 +5,9 @@ import rx.functions.FuncN
 
 import java.util.concurrent.TimeUnit
 
-class Gates implements IgnoreDelays {
+class Gates implements DelaysDefinition {
 
-    static Observable<Boolean> AND(Wire... wires) {
+    static Wire AND(Wire... wires) {
 
         List<Observable<Boolean>> allWires = new ArrayList<>()
 
@@ -19,15 +19,23 @@ class Gates implements IgnoreDelays {
             it -> allWires.add(it.getSignal())
         }
 
-        return Observable.zip(allWires, new FuncN<Boolean>() {
+        Wire out = new Wire()
+
+        out.setSignal(Observable.zip(allWires, new FuncN<Boolean>() {
             @Override
             Boolean call(Object... args) {
                 return Arrays.asList(args).stream().reduce({ a, b -> a && b }).get()
             }
-        }).delay(AND_delay, TimeUnit.MILLISECONDS)
+        }).delay(AND_delay, TimeUnit.MILLISECONDS))
+
+        return out
     }
 
-    static Observable<Boolean> OR(Wire... wires) {
+    static Wire NAND(Wire... wires) {
+        return NOT(AND(wires))
+    }
+
+    static Wire OR(Wire... wires) {
 
         List<Observable<Boolean>> allWires = new ArrayList<>()
 
@@ -39,21 +47,38 @@ class Gates implements IgnoreDelays {
             it -> allWires.add(it.getSignal())
         }
 
-        return Observable.zip(allWires, new FuncN<Boolean>() {
+        Wire out = new Wire()
+
+        out.setSignal(Observable.zip(allWires, new FuncN<Boolean>() {
             @Override
             Boolean call(Object... args) {
                 return Arrays.asList(args).stream().reduce({ a, b -> a || b }).get()
             }
-        }).delay(OR_delay, TimeUnit.MILLISECONDS)
+        }).delay(OR_delay, TimeUnit.MILLISECONDS))
+
+        return out
     }
 
-    static Observable<Boolean> NOT(Wire wire) {
+    static Wire NOR(Wire... wires) {
+        return NOT(OR(wires))
+    }
 
+    static Wire XOR(Wire... wires) {
+        Wire nandOut= NAND(wires)
+        Wire orOut = OR(wires)
+
+        return AND(nandOut, orOut)
+    }
+
+    static Wire NOT(Wire wire) {
         if (wire == null) {
             throw new IllegalStateException("NOT gate requires an input")
         }
 
-        return wire.getSignal().map({it -> !it})
+        Wire out = new Wire()
+        out.setSignal(wire.getSignal().map({it -> !it}))
+
+        return out
     }
 
 }
