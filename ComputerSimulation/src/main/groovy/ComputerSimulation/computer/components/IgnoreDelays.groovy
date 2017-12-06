@@ -1,10 +1,10 @@
 package ComputerSimulation.computer.components
 
-trait IgnoreDelays {
+interface IgnoreDelays {
 
     // simplify simulation as ignore the delays
 
-    int NOT_delay = 0
-    int AND_delay = 0
-    int OR_delay = 0
+    static int NOT_delay = 0
+    static int AND_delay = 0
+    static int OR_delay = 0
 }
