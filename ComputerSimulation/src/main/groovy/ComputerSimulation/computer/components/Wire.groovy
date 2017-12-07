@@ -2,14 +2,14 @@ package ComputerSimulation.computer.components
 
 import rx.Observable
 
-class Wire {
+final class Wire {
 
     private String name
     private Observable<Boolean> inputSeq
 
     Wire() {}
 
-    Wire(String name) {
+    Wire(final String name) {
         this.name = name
     }
 
@@ -21,9 +21,9 @@ class Wire {
         return inputSeq
     }
 
-    void setSignal(Observable<Boolean> inputSeq) {
+    void setSignal(final Observable<Boolean> inputSeq) {
         if (name) {
-            printSignals(inputSeq)
+            printSignals(name, inputSeq)
         }
 
         // because we could have many getSignal
@@ -32,8 +32,8 @@ class Wire {
 
     // Helper methods
 
-    private void printSignals(Observable<Boolean> inputSeq) {
-        StringBuilder sb = new StringBuilder()
+    private static void printSignals(final String name, final Observable<Boolean> inputSeq) {
+        final StringBuilder sb = new StringBuilder()
 
         sb.append("Wire: $name - [")
         inputSeq.subscribe({ it -> it ? sb.append('1 ') : sb.append('0 ') })
