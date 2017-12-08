@@ -1,24 +1,38 @@
 package ComputerSimulation.computer.components
 
+import groovy.transform.CompileStatic
 import io.reactivex.Observable
+import io.reactivex.ObservableEmitter
+import io.reactivex.ObservableOnSubscribe
+import io.reactivex.annotations.NonNull
 
+@CompileStatic
 final class Wire {
 
+    private static final Boolean DEFAULT_SIGNAL = false
+
     private String name
-    private Observable<Boolean> inputSeq
+    private Observable<Boolean> inputSeq = Observable.empty()
 
     Wire() {}
 
+    // Named wire indicates signal trace
     Wire(final String name) {
         this.name = name
     }
 
     Observable<Boolean> getSignal() {
-        if (inputSeq == null) {
-            throw new IllegalArgumentException("Set signal first. There is no signal in wire $name")
-        }
 
-        return inputSeq
+        return inputSeq.switchIfEmpty(Observable.create(new ObservableOnSubscribe<Boolean>() {
+
+            @Override
+            void subscribe(@NonNull ObservableEmitter<Boolean> observableEmitter) throws Exception {
+
+                while (!observableEmitter.isDisposed()) {
+                    observableEmitter.onNext(DEFAULT_SIGNAL)
+                }
+            }
+        }))
     }
 
     void setSignal(final Observable<Boolean> inputSeq) {
