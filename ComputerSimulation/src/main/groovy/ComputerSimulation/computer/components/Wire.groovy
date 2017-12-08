@@ -1,6 +1,6 @@
 package ComputerSimulation.computer.components
 
-import rx.Observable
+import io.reactivex.Observable
 
 final class Wire {
 

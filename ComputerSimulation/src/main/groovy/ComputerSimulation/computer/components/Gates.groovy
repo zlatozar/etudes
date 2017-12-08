@@ -1,9 +1,27 @@
 package ComputerSimulation.computer.components
 
-import rx.Observable
-import rx.functions.FuncN
+import io.reactivex.Observable
+import io.reactivex.annotations.NonNull
+import io.reactivex.functions.Function
 
 class Gates {
+
+    static final Wire DUMMY() {
+        final Wire dummy = new Wire()
+        dummy.setSignal(Observable.just(false))
+
+        return dummy
+    }
+
+    static final Wire SOLDER(final Wire input) {
+        final Wire dummy = new Wire()
+        dummy.setSignal(Observable.just(false))
+
+        final Wire out = new Wire()
+        out.setSignal(Observable.merge(dummy.getSignal(), input.getSignal()))
+
+        return out
+    }
 
     static final Wire AND(final Wire in1, final Wire in2) {
 
@@ -31,9 +49,10 @@ class Gates {
 
         final Wire out = new Wire()
 
-        out.setSignal(Observable.zip(allWires, new FuncN<Boolean>() {
+        out.setSignal(Observable.zip(allWires, new Function<List<Observable<Boolean>>, Boolean>() {
+
             @Override
-            Boolean call(Object... args) {
+            Boolean apply(@NonNull List<Observable<Boolean>> args) throws Exception {
                 return Arrays.asList(args).inject { a, b -> a && b }
             }
         }))
@@ -63,10 +82,11 @@ class Gates {
 
         final Wire out = new Wire()
 
-        out.setSignal(Observable.zip(allWires, new FuncN<Boolean>() {
+        out.setSignal(Observable.zip(allWires, new Function<List<Observable<Boolean>>, Boolean>() {
+
             @Override
-            Boolean call(Object... args) {
-                return Arrays.asList(args).inject { a, b -> a || b }
+            Boolean apply(@NonNull List<Observable<Boolean>> args) throws Exception {
+                return Arrays.asList(args).inject { a, b -> a  b }
             }
         }))
 

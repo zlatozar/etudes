@@ -1,6 +1,7 @@
 package ComputerSimulation.computer.components
 
-import rx.Observable
+import io.reactivex.Flowable
+import io.reactivex.Observable
 
 final class InputSignal {
 
@@ -24,6 +25,6 @@ final class InputSignal {
             throw new IllegalStateException('Signals missing')
         }
 
-        return Observable.from(signalSequence.collect( {it == 0 ? false : true} ))
+        return Observable.fromIterable(signalSequence.collect( {it == 0 ? false : true} ))
     }
 }
