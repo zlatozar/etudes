@@ -15,8 +15,8 @@ class GatesSpec extends Specification {
         Wire carry = new Wire()
 
         circuits.halfAdder(in1, in2, sum, carry)
-        circuits.probe("sum", sum)
-        circuits.probe("carry", carry)
+        println("sum=$sum")
+        println("carry=$carry")
 
         when: "Signals are set"
 
