@@ -21,13 +21,13 @@ class GatesSpec extends Specification {
         when: "Signals are set"
 
         in1.setSignal(true)
-        circuits.run()
+        circuits.propagateSignal()
 
         in2.setSignal(true)
-        circuits.run()
+        circuits.propagateSignal()
 
         in1.setSignal(false)
-        circuits.run()
+        circuits.propagateSignal()
 
         then: "Result should be available"
     }

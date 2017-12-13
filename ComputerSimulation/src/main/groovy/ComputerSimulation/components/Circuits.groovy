@@ -1,5 +1,8 @@
 package ComputerSimulation.components
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class Circuits extends Gates {
 
     void halfAdder(Wire a, Wire b, Wire s, Wire c) {
@@ -22,24 +25,104 @@ class Circuits extends Gates {
         OR(c1, c2, cout)
     }
 
-    void and_test() {
-        Wire a = new Wire()
-        Wire b = new Wire()
-        Wire out = new Wire()
+    void flip_flop_NAND(Wire set, Wire reset, Wire Q, Wire Q_prim) {
 
-        AND(a, b, out)
-        probe("out", out)
+        if (!reset.getSignal() && !set.getSignal()) {
+            throw new IllegalArgumentException("Flip-Flop invalid state")
+        }
+
+        NAND(set, Q_prim, Q)
+        NAND(reset, Q, Q_prim)
+    }
+
+    void flip_flop_NOR(Wire reset, Wire set, Wire Q, Wire Q_prim) {
+
+        if (reset.getSignal() && set.getSignal()) {
+            throw new IllegalArgumentException("Flip-Flop invalid state")
+        }
+
+        NOR(reset, Q_prim, Q)
+        NOR(set, Q, Q_prim)
+    }
+
+    void simple_test() {
+
+        Wire SET = new Wire()
+        Wire RESET = new Wire()
+
+        Wire Q = new Wire()
+        Wire Q_prim = new Wire()
 
         // Simulation
 
-        a.setSignal(true)
-        run()
+        SET.setSignal(false)
+        RESET.setSignal(false)
+
+        println("\nSET=$SET, RESET=$RESET (init)\n")
+
+        flip_flop_NOR(RESET, SET, Q, Q_prim)
+        propagateSignal()
+
+        println("Store: $Q")
+        println("Reset=$Q_prim")
+
+        SET.setSignal(false)
+        RESET.setSignal(true)
+        println("\nSET=$SET, RESET=$RESET (reset state)\n")
+
+        flip_flop_NOR(RESET, SET, Q, Q_prim)
+        propagateSignal()
+
+        println("Store: $Q")
+        println("Reset=$Q_prim")
+
+        SET.setSignal(true)
+        RESET.setSignal(false)
+        println("\nSET=$SET, RESET=$RESET\n")
+
+        flip_flop_NOR(RESET, SET, Q, Q_prim)
+        propagateSignal()
+
+        println("Store: $Q")
+        println("Reset=$Q_prim")
+
+        SET.setSignal(false)
+        RESET.setSignal(false)
+
+        println("\nSET=$SET, RESET=$RESET (again)\n")
+
+        flip_flop_NOR(RESET, SET, Q, Q_prim)
+        propagateSignal()
+
+        println("Store: $Q")
+        println("Reset=$Q_prim")
+
+        SET.setSignal(true)
+        RESET.setSignal(false)
+
+        println("\nSET=$SET, RESET=$RESET (no effect)\n")
+
+        flip_flop_NOR(RESET, SET, Q, Q_prim)
+        propagateSignal()
+
+        println("Store: $Q")
+        println("Reset=$Q_prim")
+
+        SET.setSignal(true)
+        RESET.setSignal(true)
+
+        println("\nSET=$SET, RESET=$RESET (invalid state)\n")
+
+        flip_flop_NOR(RESET, SET, Q, Q_prim)
+        propagateSignal()
+
     }
 
+    // simple test run
     public static void main(String[] args) {
         Circuits circuits = new Circuits()
 
-        circuits.and_test()
+        circuits.simple_test()
     }
 
 }

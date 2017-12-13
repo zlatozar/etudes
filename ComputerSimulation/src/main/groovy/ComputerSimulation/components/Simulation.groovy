@@ -1,13 +1,27 @@
 package ComputerSimulation.components
 
-abstract class Simulation {
+import groovy.transform.CompileStatic
 
-    private static List<Event> agenda = new ArrayList<>()
+@CompileStatic
+class Simulation {
 
-    private int curtime = 0
-    protected int currentTime = curtime
+    private static List<Event> agenda = new LinkedList<>()
 
-    void insert(Event item) {
+    // incremented by gates delay
+    protected int currentTime = 0
+
+    void afterDelay(int delay, Closure action) {
+        Event item = new Event(currentTime + delay, action)
+        insert(item)
+    }
+
+    void propagateSignal() {
+        loop()
+    }
+
+    // Helper functions
+
+    private static void insert(Event item) {
 
         boolean added = false
 
@@ -16,9 +30,9 @@ abstract class Simulation {
             return
         }
 
-        // insert in the right place:
+        // insert in the right place: shorter in time - before
         for (int i = 0; i < agenda.size(); i++) {
-            if (agenda[i].time >= item.time) {
+            if (agenda[i].getTime() >= item.getTime()) {
 
                 agenda.add(i, item)
 
@@ -27,27 +41,10 @@ abstract class Simulation {
             }
         }
 
+        // so this is bigger than everything else - add it last
         if (!added) {
             agenda.add(item)
         }
-    }
-
-    void afterDelay(int delay, Closure action) {
-        Event item = new Event(currentTime + delay, action)
-        insert(item)
-    }
-
-    /**
-     * Executes the event loop after installing the initial message.
-     * That signals the start of simulation.
-     */
-    void run() {
-
-        afterDelay(0) {
-            println("*** Simulation started, time=$currentTime ***")
-        }
-
-        loop()
     }
 
     /**
@@ -56,16 +53,15 @@ abstract class Simulation {
      */
     private void loop() {
 
-        if (agenda.isEmpty()) {
-            return
+        if (!agenda.isEmpty()) {
 
-        } else {
             Event next = agenda.remove(0)
 
-            currentTime = next.time
-            next.action()
+            currentTime = next.getTime()
+            next.getAction().call()
 
             loop()
         }
     }
+
 }

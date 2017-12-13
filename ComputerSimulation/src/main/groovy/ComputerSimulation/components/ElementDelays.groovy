@@ -1,8 +1,8 @@
 package ComputerSimulation.components
 
-trait IgnoreDelays {
+trait ElementDelays {
 
-    // simplify simulation as ignore the delays
+    // simplify simulation as ignoring delays
 
     int NOT_delay = 0
     int AND_delay = 0

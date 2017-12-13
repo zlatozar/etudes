@@ -2,12 +2,19 @@ package ComputerSimulation.components
 
 class Event {
 
-    int time
-    Closure action
+    private final int time
+    private final Closure action
 
     Event(int time, Closure action) {
         this.time = time
         this.action = action
     }
 
+    int getTime() {
+        return time
+    }
+
+    Closure getAction() {
+        return action
+    }
 }
