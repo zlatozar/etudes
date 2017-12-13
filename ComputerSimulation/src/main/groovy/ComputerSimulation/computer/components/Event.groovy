@@ -1,4 +1,4 @@
-package ComputerSimulation.components
+package ComputerSimulation.computer.components
 
 class Event {
 

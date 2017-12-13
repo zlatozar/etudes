@@ -1,134 +1,132 @@
 package ComputerSimulation.computer.components
 
-import io.reactivex.Observable
-import io.reactivex.annotations.NonNull
-import io.reactivex.functions.Function
+import groovy.transform.CompileStatic
 
-class Gates {
+@CompileStatic
+abstract class Gates extends Simulation implements ElementDelays {
 
-    static final Wire DUMMY() {
-        final Wire dummy = new Wire()
-        dummy.setSignal(Observable.just(false))
+    // AND and AND based
 
-        return dummy
-    }
+    Wire AND(Wire in1, Wire in2) {
+        Wire out = new Wire()
 
-    static final Wire SOLDER(final Wire input) {
-        final Wire dummy = new Wire()
-        dummy.setSignal(Observable.just(false))
+        def andAction = {
+            boolean in1Sig = in1.getSignal()
+            boolean in2Sig = in2.getSignal()
 
-        final Wire out = new Wire()
-        out.setSignal(Observable.merge(dummy.getSignal(), input.getSignal()))
-
-        return out
-    }
-
-    static final Wire AND(final Wire in1, final Wire in2) {
-
-        final Wire out = new Wire()
-        out.setSignal(Observable.zip(in1.getSignal(), in2.getSignal(), { a, b -> a && b }))
-
-        return out
-    }
-
-    static final void AND(final Wire in1, final Wire in2, final Wire out) {
-        out.setSignal(Observable.zip(in1.getSignal(), in2.getSignal(), { a, b -> a && b }))
-    }
-
-    static final Wire mAND(final Wire... wires) {
-
-        final List<Observable<Boolean>> allWires = new ArrayList<>()
-
-        if (wires.size() < 2) {
-            throw new IllegalStateException("mAND gate requires 2 inputs at least")
-        }
-
-        wires.each {
-            it -> allWires.add(((Wire) it).getSignal())
-        }
-
-        final Wire out = new Wire()
-
-        out.setSignal(Observable.zip(allWires, new Function<List<Observable<Boolean>>, Boolean>() {
-
-            @Override
-            Boolean apply(@NonNull List<Observable<Boolean>> args) throws Exception {
-                return Arrays.asList(args).inject { a, b -> a && b }
+            afterDelay(AND_delay) {
+                out.setSignal(in1Sig & in2Sig)
             }
-        }))
+        }
+
+        in1.addAction andAction
+        in2.addAction andAction
+
+        propagateSignal()
 
         return out
     }
 
-    static final Wire OR(final Wire in1, final Wire in2) {
+    void AND(Wire in1, Wire in2, Wire out) {
 
-        final Wire out = new Wire()
-        out.setSignal(Observable.zip(in1.getSignal(), in2.getSignal(), { a, b -> a || b }))
+        def andAction = {
+            boolean in1Sig = in1.getSignal()
+            boolean in2Sig = in2.getSignal()
 
-        return out
-    }
-
-    static final Wire mOR(final Wire... wires) {
-
-        final List<Observable<Boolean>> allWires = new ArrayList<>()
-
-        if (wires.size() < 2) {
-            throw new IllegalStateException("mOR gate requires 2 inputs at least")
-        }
-
-        wires.each {
-            it -> allWires.add(((Wire) it).getSignal())
-        }
-
-        final Wire out = new Wire()
-
-        out.setSignal(Observable.zip(allWires, new Function<List<Observable<Boolean>>, Boolean>() {
-
-            @Override
-            Boolean apply(@NonNull List<Observable<Boolean>> args) throws Exception {
-                return Arrays.asList(args).inject { a, b -> a  b }
+            afterDelay(AND_delay) {
+                out.setSignal(in1Sig & in2Sig)
             }
-        }))
+        }
 
-        return out
+        in1.addAction andAction
+        in2.addAction andAction
     }
 
-    static final Wire NOT(final Wire input) {
-
-        final Wire out = new Wire()
-        out.setSignal(input.getSignal().map({it -> !it}))
-
-        return out
-    }
-
-    static final void NOT(final Wire input, final Wire out) {
-        out.setSignal(input.getSignal().map({it -> !it}))
-    }
-
-    // Additional
-
-    static final Wire NAND(final Wire in1, final Wire in2) {
+    Wire NAND(Wire in1, Wire in2) {
         return NOT(AND(in1, in2))
     }
 
-    static final void NAND(final Wire in1, final Wire in2, final Wire out) {
-        out.setSignal(NOT(AND(in1, in2)).getSignal())
+    void NAND(Wire in1, Wire in2, Wire out) {
+        Wire andOut = AND(in1, in2)
+        NOT(andOut, out)
     }
 
-    static final Wire mNAND(final Wire... wires) {
-        return NOT(mAND(wires))
+    // OR and OR based
+
+    Wire OR(Wire in1, Wire in2) {
+        Wire out = new Wire()
+
+        def orAction = {
+            boolean in1Sig = in1.getSignal()
+            boolean in2Sig = in2.getSignal()
+
+            afterDelay(OR_delay) {
+                out.setSignal(in1Sig | in2Sig)
+            }
+        }
+
+        in1.addAction orAction
+        in2.addAction orAction
+
+        propagateSignal()
+
+        return out
     }
 
-    static final Wire NOR(final Wire in1, final Wire in2) {
+    void OR(Wire in1, Wire in2, Wire out) {
+
+        def orAction = {
+            boolean in1Sig = in1.getSignal()
+            boolean in2Sig = in2.getSignal()
+
+            afterDelay(OR_delay) {
+                out.setSignal(in1Sig | in2Sig)
+            }
+        }
+
+        in1.addAction orAction
+        in2.addAction orAction
+    }
+
+    Wire NOR(Wire in1, Wire in2) {
         return NOT(OR(in1, in2))
     }
 
-    static final Wire mNOR(final Wire... wires) {
-        return NOT(mOR(wires))
+    void NOR(Wire in1, Wire in2, Wire out) {
+        Wire orOut = OR(in1, in2)
+        NOT(orOut, out)
     }
 
-    static final Wire XOR(final Wire in1, final Wire in2) {
-        return AND(NAND(in1, in2), OR(in2, in1))
+    Wire NOT(Wire input) {
+
+        Wire out = new Wire()
+
+        def notAction = {
+            boolean inputSig = input.getSignal()
+
+            afterDelay(NOT_delay) {
+                out.setSignal(!inputSig)
+            }
+        }
+
+        input.addAction notAction
+
+        propagateSignal()
+
+        return out
+    }
+
+    void NOT(Wire input, Wire out) {
+
+        def notAction = {
+            boolean inputSig = input.getSignal()
+
+            afterDelay(NOT_delay) {
+                out.setSignal(!inputSig)
+            }
+        }
+
+        input.addAction notAction
     }
 
 }

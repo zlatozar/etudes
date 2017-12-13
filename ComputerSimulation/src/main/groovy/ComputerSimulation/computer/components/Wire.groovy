@@ -1,63 +1,60 @@
 package ComputerSimulation.computer.components
 
 import groovy.transform.CompileStatic
-import io.reactivex.Observable
-import io.reactivex.ObservableEmitter
-import io.reactivex.ObservableOnSubscribe
-import io.reactivex.annotations.NonNull
 
 @CompileStatic
-final class Wire {
+class Wire {
 
-    private static final Boolean DEFAULT_SIGNAL = false
+    private boolean signal = false
 
-    private String name
-    private Observable<Boolean> inputSeq = Observable.empty()
+    private List<Closure> actions = new LinkedList<>()
 
-    Wire() {}
-
-    // Named wire indicates signal trace
-    Wire(final String name) {
-        this.name = name
+    /**
+     * @return Returns the current value of the signal
+     * transported by the wire
+     */
+    boolean getSignal() {
+        return signal
     }
 
-    Observable<Boolean> getSignal() {
+    /**
+     * Modifies the value of the signal transported by the wire
+     *
+     * When we connect wire we set signal so all actions that are
+     * in wire should be executed.
+     * @param sig
+     */
+    void setSignal(boolean sig) {
 
-        return inputSeq.switchIfEmpty(Observable.create(new ObservableOnSubscribe<Boolean>() {
+        // on change only
+        if (sig != signal) {
+            signal = sig
 
-            @Override
-            void subscribe(@NonNull ObservableEmitter<Boolean> observableEmitter) throws Exception {
-
-                while (!observableEmitter.isDisposed()) {
-                    observableEmitter.onNext(DEFAULT_SIGNAL)
-                }
+            actions.each {
+                it.call()
             }
-        }))
-    }
-
-    void setSignal(final Observable<Boolean> inputSeq) {
-        if (name) {
-            printSignals(name, inputSeq)
         }
-
-        // because we could have many getSignal
-        this.inputSeq = inputSeq.cache()
     }
 
-    // Helper methods
+    /**
+     * Attaches the specified procedure to the actions of the wire.
+     * All the attached actions are executed at the each change of
+     * the transported signal.
+     *
+     * Sets the signal in output wire and store action. In this way
+     * when new signal is set wire will 'react'
+     *
+     * @param action
+     */
+    void addAction(Closure action) {
 
-    private static void printSignals(final String name, final Observable<Boolean> inputSeq) {
-        final StringBuilder sb = new StringBuilder()
-
-        sb.append("Wire: $name - [")
-        inputSeq.subscribe({ it -> it ? sb.append('1 ') : sb.append('0 ') })
-        sb.append(']')
-
-        println(sb.toString())
+        // prefix the actions with the new one
+        actions.add(0, action)
+        action.call()
     }
 
     @Override
     String toString() {
-        return name ? name : super.toString()
+        return signal
     }
 }
