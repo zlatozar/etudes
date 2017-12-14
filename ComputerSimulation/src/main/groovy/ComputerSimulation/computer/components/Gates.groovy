@@ -3,7 +3,7 @@ package ComputerSimulation.computer.components
 import groovy.transform.CompileStatic
 
 @CompileStatic
-abstract class Gates extends Simulation implements ElementDelays {
+abstract class Gates extends Simulation implements Delays {
 
     // AND and AND based
 
@@ -19,8 +19,8 @@ abstract class Gates extends Simulation implements ElementDelays {
             }
         }
 
-        in1.addAction andAction
-        in2.addAction andAction
+        in1.addAction(andAction)
+        in2.addAction(andAction)
 
         propagateSignal()
 
@@ -38,8 +38,8 @@ abstract class Gates extends Simulation implements ElementDelays {
             }
         }
 
-        in1.addAction andAction
-        in2.addAction andAction
+        in1.addAction(andAction)
+        in2.addAction(andAction)
     }
 
     Wire NAND(Wire in1, Wire in2) {
@@ -65,8 +65,8 @@ abstract class Gates extends Simulation implements ElementDelays {
             }
         }
 
-        in1.addAction orAction
-        in2.addAction orAction
+        in1.addAction(orAction)
+        in2.addAction(orAction)
 
         propagateSignal()
 
@@ -84,8 +84,8 @@ abstract class Gates extends Simulation implements ElementDelays {
             }
         }
 
-        in1.addAction orAction
-        in2.addAction orAction
+        in1.addAction(orAction)
+        in2.addAction(orAction)
     }
 
     Wire NOR(Wire in1, Wire in2) {
@@ -109,7 +109,7 @@ abstract class Gates extends Simulation implements ElementDelays {
             }
         }
 
-        input.addAction notAction
+        input.addAction(notAction)
 
         propagateSignal()
 
@@ -126,7 +126,7 @@ abstract class Gates extends Simulation implements ElementDelays {
             }
         }
 
-        input.addAction notAction
+        input.addAction(notAction)
     }
 
 }

@@ -1,5 +1,8 @@
 package ComputerSimulation.computer.components
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class Event {
 
     private final int time

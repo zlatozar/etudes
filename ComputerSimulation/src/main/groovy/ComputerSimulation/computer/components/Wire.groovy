@@ -7,7 +7,15 @@ class Wire {
 
     private boolean signal = false
 
-    private List<Closure> actions = new LinkedList<>()
+    private final List<Closure> actions = new LinkedList<>()
+
+    private String name = ''
+
+    Wire() {}
+
+    Wire(String name) {
+        this.name = name
+    }
 
     /**
      * @return Returns the current value of the signal
@@ -55,6 +63,19 @@ class Wire {
 
     @Override
     String toString() {
-        return signal
+        StringBuilder sb = new StringBuilder()
+        sb.append('Wire ')
+        sb.append(name)
+        sb.append('(')
+        sb.append(signal)
+
+        if (actions) {
+            sb.append(', actions:')
+            sb.append(actions.size())
+        }
+
+        sb.append(')')
+
+        return sb.toString()
     }
 }

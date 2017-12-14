@@ -1,6 +1,9 @@
 package ComputerSimulation.computer.components
 
-trait ElementDelays {
+trait Delays {
+
+    // tick every second
+    int CLOCK = 1000
 
     // simplify simulation as ignoring delays
 
