@@ -14,6 +14,10 @@ class Wire {
 
     Wire() {}
 
+    Wire(boolean sig) {
+        setSignal(sig)
+    }
+
     Wire(String name) {
         this.name = name
     }
