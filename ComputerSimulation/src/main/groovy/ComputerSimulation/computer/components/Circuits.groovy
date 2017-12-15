@@ -1,15 +1,18 @@
 package ComputerSimulation.computer.components
 
+/**
+ * Digital components based on defined gates
+ */
 class Circuits extends Gates {
 
     void halfAdder(Wire a, Wire b, Wire s, Wire c) {
         Wire d = new Wire()
         Wire e = new Wire()
 
-        OR(a, b, d)
-        AND(a, b, c)
-        NOT(c, e)
-        AND(d, e, s)
+        oOR(a, b, d)
+        oAND(a, b, c)
+        oNOT(c, e)
+        oAND(d, e, s)
     }
 
     void fullAdder(Wire a, Wire b, Wire cin, Wire sum, Wire cout) {
@@ -19,29 +22,29 @@ class Circuits extends Gates {
 
         halfAdder(a, cin, s, c1)
         halfAdder(b, s, sum, c2)
-        OR(c1, c2, cout)
+        oOR(c1, c2, cout)
     }
 
-    void flip_flop_NAND(Wire set, Wire reset, Wire Q, Wire Q_prim) {
+    void flipFlopPositive(Wire set, Wire reset, Wire Q, Wire Q_prim) {
 
         if (!set.getSignal()) {
             if (!reset.getSignal()) {
-                throw new IllegalArgumentException("Forbidden input. Flip-Flop is in invalid state")
+                throw new IllegalArgumentException("Forbidden input. Positive flip-flop is in invalid state (two 1's are passed)")
             }
         }
 
-        NAND(set, Q_prim, Q)
-        NAND(reset, Q, Q_prim)
+        oNAND(set, Q_prim, Q)
+        oNAND(reset, Q, Q_prim)
     }
 
-    void flip_flop_NOR(Wire reset, Wire set, Wire Q, Wire Q_prim) {
+    void flipFlopNegative(Wire reset, Wire set, Wire Q, Wire Q_prim) {
 
         if (reset.getSignal() && set.getSignal()) {
-            throw new IllegalArgumentException("Forbidden input. Flip-Flop is in invalid state")
+            throw new IllegalArgumentException("Forbidden input. Negative flip-Flop is in invalid state (two 0's are passed)")
         }
 
-        NOR(reset, Q_prim, Q)
-        NOR(set, Q, Q_prim)
+        oNOR(reset, Q_prim, Q)
+        oNOR(set, Q, Q_prim)
     }
 
 }

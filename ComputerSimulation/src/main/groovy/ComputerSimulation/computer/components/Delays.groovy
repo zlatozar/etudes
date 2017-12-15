@@ -2,7 +2,7 @@ package ComputerSimulation.computer.components
 
 trait Delays {
 
-    // tick every second
+    // tick every second to illustrate simulation
     int CLOCK = 1000
 
     // simplify simulation as ignoring delays

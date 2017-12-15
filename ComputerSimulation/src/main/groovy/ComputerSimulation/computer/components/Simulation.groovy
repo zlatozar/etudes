@@ -15,8 +15,20 @@ class Simulation {
         insert(item)
     }
 
+    /**
+     * Start execution plan based on the agenda.
+     * NOTE: Should be called every time when signal is set.
+     */
     void propagateSignal() {
         loop()
+    }
+
+    /**
+     * Clear agenda to prepare digital logic scheme for the next
+     * clock tick (next portion of data)
+     */
+    static void clearSignal() {
+        agenda.clear()
     }
 
     // Helper functions
@@ -41,7 +53,7 @@ class Simulation {
             }
         }
 
-        // so this is bigger than everything else - add it last
+        // event is bigger than everything else - add it at the end
         if (!added) {
             agenda.add(item)
         }

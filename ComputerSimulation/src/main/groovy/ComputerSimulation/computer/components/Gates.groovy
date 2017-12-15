@@ -1,8 +1,5 @@
 package ComputerSimulation.computer.components
 
-import groovy.transform.CompileStatic
-
-@CompileStatic
 abstract class Gates extends Simulation implements Delays {
 
     // AND and AND based
@@ -27,7 +24,22 @@ abstract class Gates extends Simulation implements Delays {
         return out
     }
 
-    void AND(Wire in1, Wire in2, Wire out) {
+    Wire mAND(List<Wire> input) {
+        Wire out = new Wire()
+
+        def andAction = {
+            afterDelay(AND_delay) {
+                out.setSignal(input.inject { Wire in1, Wire in2 -> in1.getSignal() & in2.getSignal() })
+            }
+        }
+
+        input.stream().parallel().any({ Wire it -> it.addAction(andAction) })
+        propagateSignal()
+
+        return out
+    }
+
+    void oAND(Wire in1, Wire in2, Wire out) {
 
         def andAction = {
             boolean in1Sig = in1.getSignal()
@@ -40,15 +52,17 @@ abstract class Gates extends Simulation implements Delays {
 
         in1.addAction(andAction)
         in2.addAction(andAction)
+
+        propagateSignal()
     }
 
     Wire NAND(Wire in1, Wire in2) {
         return NOT(AND(in1, in2))
     }
 
-    void NAND(Wire in1, Wire in2, Wire out) {
+    void oNAND(Wire in1, Wire in2, Wire out) {
         Wire andOut = AND(in1, in2)
-        NOT(andOut, out)
+        oNOT(andOut, out)
     }
 
     // OR and OR based
@@ -73,7 +87,22 @@ abstract class Gates extends Simulation implements Delays {
         return out
     }
 
-    void OR(Wire in1, Wire in2, Wire out) {
+    Wire mOR(List<Wire> input) {
+        Wire out = new Wire()
+
+        def andAction = {
+            afterDelay(AND_delay) {
+                out.setSignal(input.inject { Wire in1, Wire in2 -> in1.getSignal() | in2.getSignal() })
+            }
+        }
+
+        input.stream().parallel().any({ Wire it -> it.addAction(andAction) })
+        propagateSignal()
+
+        return out
+    }
+
+    void oOR(Wire in1, Wire in2, Wire out) {
 
         def orAction = {
             boolean in1Sig = in1.getSignal()
@@ -86,15 +115,17 @@ abstract class Gates extends Simulation implements Delays {
 
         in1.addAction(orAction)
         in2.addAction(orAction)
+
+        propagateSignal()
     }
 
     Wire NOR(Wire in1, Wire in2) {
         return NOT(OR(in1, in2))
     }
 
-    void NOR(Wire in1, Wire in2, Wire out) {
+    void oNOR(Wire in1, Wire in2, Wire out) {
         Wire orOut = OR(in1, in2)
-        NOT(orOut, out)
+        oNOT(orOut, out)
     }
 
     Wire NOT(Wire input) {
@@ -116,7 +147,7 @@ abstract class Gates extends Simulation implements Delays {
         return out
     }
 
-    void NOT(Wire input, Wire out) {
+    void oNOT(Wire input, Wire out) {
 
         def notAction = {
             boolean inputSig = input.getSignal()
@@ -127,6 +158,8 @@ abstract class Gates extends Simulation implements Delays {
         }
 
         input.addAction(notAction)
+
+        propagateSignal()
     }
 
 }

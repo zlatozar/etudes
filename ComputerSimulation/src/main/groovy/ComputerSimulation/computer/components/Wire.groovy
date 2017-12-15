@@ -5,6 +5,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class Wire {
 
+    // default signal
     private boolean signal = false
 
     private final List<Closure> actions = new LinkedList<>()
