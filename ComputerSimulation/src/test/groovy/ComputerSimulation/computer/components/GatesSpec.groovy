@@ -5,7 +5,7 @@ import spock.lang.Unroll
 
 class GatesSpec extends Specification {
 
-    Circuits circuits = new Circuits()
+    private Circuits circuits = new Circuits()
 
     @Unroll
     def "AND: #a and #b is '#c'"() {

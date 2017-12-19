@@ -8,27 +8,24 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class Circuits extends Gates {
 
-    void halfAdder(Wire a, Wire b, Wire s, Wire c) {
-        Wire d = new Wire()
-        Wire e = new Wire()
-
-        oOR(a, b, d)
-        oAND(a, b, c)
-        oNOT(c, e)
-        oAND(d, e, s)
+    /**
+     * Half Adder
+     */
+    Map<String, Wire> HA(Wire in1, Wire in2){
+        return ['S' : XOR(in1, in2), 'C' : AND(in1, in2)]
     }
 
-    void fullAdder(Wire a, Wire b, Wire cin, Wire sum, Wire cout) {
-        Wire s = new Wire()
-        Wire c1 = new Wire()
-        Wire c2 = new Wire()
+    /**
+     * Full Adder using Half Adder
+     */
+    Map<String, Wire> FA(Wire in1, Wire in2, Wire cin) {
+        Map<String, Wire> firstHA = HA(in1, in2)
+        Map<String, Wire> secondHA = HA(firstHA.S, cin)
 
-        halfAdder(a, cin, s, c1)
-        halfAdder(b, s, sum, c2)
-        oOR(c1, c2, cout)
+        return ['S' : secondHA.S, 'C' : OR(firstHA.C, secondHA.C)]
     }
 
-    void flipFlopPositive(Wire set, Wire reset, Wire Q, Wire Q_prim) {
+    void FlFpPos(Wire set, Wire reset, Wire Q, Wire Q_prim) {
 
         if (!set.getSignal()) {
             if (!reset.getSignal()) {
@@ -40,7 +37,7 @@ class Circuits extends Gates {
         oNAND(reset, Q, Q_prim)
     }
 
-    void flipFlopNegative(Wire reset, Wire set, Wire Q, Wire Q_prim) {
+    void FlFpNeg(Wire reset, Wire set, Wire Q, Wire Q_prim) {
 
         if (reset.getSignal() && set.getSignal()) {
             throw new IllegalArgumentException("Forbidden input. Negative flip-Flop is in invalid state (two 0's are passed)")
