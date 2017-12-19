@@ -1,8 +1,11 @@
 package ComputerSimulation.computer.components
 
+import groovy.transform.CompileStatic
+
 /**
  * Digital components based on defined gates
  */
+@CompileStatic
 class Circuits extends Gates {
 
     void halfAdder(Wire a, Wire b, Wire s, Wire c) {

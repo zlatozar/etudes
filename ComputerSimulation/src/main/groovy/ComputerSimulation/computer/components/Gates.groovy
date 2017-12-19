@@ -1,5 +1,8 @@
 package ComputerSimulation.computer.components
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 abstract class Gates extends Simulation implements Delays {
 
     // AND and AND based
@@ -29,7 +32,7 @@ abstract class Gates extends Simulation implements Delays {
 
         def andAction = {
             afterDelay(AND_delay) {
-                out.setSignal(input.inject { Wire in1, Wire in2 -> in1.getSignal() & in2.getSignal() })
+                out.setSignal(input.collect {wire -> wire.getSignal()}.inject({ in1, in2 -> in1 & in2 }))
             }
         }
 
@@ -58,6 +61,10 @@ abstract class Gates extends Simulation implements Delays {
 
     Wire NAND(Wire in1, Wire in2) {
         return NOT(AND(in1, in2))
+    }
+
+    Wire mNAND(List<Wire> input) {
+        return NOT(mAND(input))
     }
 
     void oNAND(Wire in1, Wire in2, Wire out) {
@@ -92,7 +99,7 @@ abstract class Gates extends Simulation implements Delays {
 
         def andAction = {
             afterDelay(AND_delay) {
-                out.setSignal(input.inject { Wire in1, Wire in2 -> in1.getSignal() | in2.getSignal() })
+                out.setSignal(input.collect({wire -> wire.getSignal()}).inject { in1, in2 -> in1 | in2 })
             }
         }
 
@@ -123,9 +130,33 @@ abstract class Gates extends Simulation implements Delays {
         return NOT(OR(in1, in2))
     }
 
+    Wire mNOR(List<Wire> input) {
+        return NOT(mOR(input))
+    }
+
     void oNOR(Wire in1, Wire in2, Wire out) {
         Wire orOut = OR(in1, in2)
         oNOT(orOut, out)
+    }
+
+    Wire XOR(Wire in1, Wire in2) {
+        Wire nand1_out = new Wire()
+
+        oNAND(in1, in2, nand1_out)
+        Wire nand1_1 = NAND(in1, nand1_out)
+        Wire nand1_2 = NAND(nand1_out, in2)
+
+        return NAND(nand1_1, nand1_2)
+    }
+
+    void oXOR(Wire in1, Wire in2, Wire out) {
+        Wire nand1_out = new Wire()
+
+        oNAND(in1, in2, nand1_out)
+        Wire nand1_1 = NAND(in1, nand1_out)
+        Wire nand1_2 = NAND(nand1_out, in2)
+
+        oNAND(nand1_1, nand1_2, out)
     }
 
     Wire NOT(Wire input) {
