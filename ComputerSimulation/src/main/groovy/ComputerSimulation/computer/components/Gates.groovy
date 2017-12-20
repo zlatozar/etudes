@@ -149,6 +149,10 @@ abstract class Gates extends Simulation implements Delays {
         return NAND(nand1_1, nand1_2)
     }
 
+    Wire mXOR(List<Wire> input) {
+        return input.inject { in1, in2 -> XOR(in1, in2) }
+    }
+
     void oXOR(Wire in1, Wire in2, Wire out) {
         final Wire nand1_out = new Wire()
 
@@ -159,6 +163,21 @@ abstract class Gates extends Simulation implements Delays {
 
         oNAND(nand1_1, nand1_2, out)
     }
+
+    Wire XNOR(Wire in1, Wire in2) {
+        return NOT(XOR(in1, in2))
+    }
+
+    Wire mXNOR(List<Wire> input) {
+        return NOT(mXOR(input))
+    }
+
+    void oXNOR(Wire in1, Wire in2, Wire out) {
+        Wire xor = XOR(in1, in2)
+        oNOT(xor, out)
+    }
+
+    // NOT
 
     Wire NOT(Wire input) {
         final Wire out = new Wire()

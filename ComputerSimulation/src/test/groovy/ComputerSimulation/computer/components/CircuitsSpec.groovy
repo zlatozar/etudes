@@ -4,7 +4,6 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
-
 class CircuitsSpec extends Specification {
 
     private Circuits circuits = new Circuits()

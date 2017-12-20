@@ -30,11 +30,7 @@ class Circuits extends Gates {
      */
     void FlFpNAND(Wire set, Wire reset, Wire Q, Wire Q_prim) {
 
-        if (!set.getSignal()) {
-            if (!reset.getSignal()) {
-                throw new IllegalArgumentException("Forbidden input. Positive flip-flop is in invalid state (two 0's are passed)")
-            }
-        }
+        stopIfAllEqualTo(0, [set, reset], 'FlFpNAND is in invalid state.')
 
         oNAND(set, Q_prim, Q)
         oNAND(reset, Q, Q_prim)
@@ -45,12 +41,39 @@ class Circuits extends Gates {
      */
     void FlFpNOR(Wire set, Wire reset, Wire Q, Wire Q_prim) {
 
-        if (reset.getSignal() && set.getSignal()) {
-            throw new IllegalArgumentException("Forbidden input. Negative flip-Flop is in invalid state (two 1's are passed)")
-        }
+        stopIfAllEqualTo(1, [set, reset], 'FlFpNOR is in invalid state.')
 
         oNOR(reset, Q_prim, Q)
         oNOR(set, Q, Q_prim)
+    }
+
+    // Helper methods
+
+    /**
+     * Checks if the signal is the same on all wires
+     * and if this signal is the same as the forbidden one
+     *
+     * @param bit forbidden value
+     * @param wires all wires
+     * @param message message to be printed in case of error
+     */
+    private static void stopIfAllEqualTo(int bit, List<Wire> wires, String message) {
+
+        if (wires.isEmpty()) {
+            throw new IllegalArgumentException('There is no wires')
+        }
+
+        boolean bitValue = bit >= 1
+
+        // all are equal
+        if (wires.collect({wire -> wire.getSignal()}).inject { in1, in2 ->  in1 == in2 }) {
+
+            // then check first one if is equal to the bit
+            if (wires[0].getSignal() == bitValue) {
+                println("Forbidden input: $wires")
+                throw new IllegalArgumentException(message)
+            }
+        }
     }
 
 }
