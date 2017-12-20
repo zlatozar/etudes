@@ -11,8 +11,8 @@ class Circuits extends Gates {
     /**
      * Half Adder
      */
-    Map<String, Wire> HA(Wire in1, Wire in2){
-        return ['S' : XOR(in1, in2), 'C' : AND(in1, in2)]
+    Map<String, Wire> HA(Wire in1, Wire in2) {
+        return ['S': XOR(in1, in2), 'C': AND(in1, in2)]
     }
 
     /**
@@ -22,15 +22,15 @@ class Circuits extends Gates {
         Map<String, Wire> firstHA = HA(in1, in2)
         Map<String, Wire> secondHA = HA(firstHA.S, cin)
 
-        return ['S' : secondHA.S, 'C' : OR(firstHA.C, secondHA.C)]
+        return ['S': secondHA.S, 'C': OR(firstHA.C, secondHA.C)]
     }
 
     /**
      * Set and reset signal can't be zeros at the same time
      */
-    void FlFpNAND(Wire set, Wire reset, Wire Q, Wire Q_prim) {
+    void oFLIP_FLOP_11(Wire set, Wire reset, Wire Q, Wire Q_prim) {
 
-        stopIfAllEqualTo(0, [set, reset], 'FlFpNAND is in invalid state.')
+        stopIfAllEqualTo(0, [set, reset], 'oFLIP_FLOP_11 is in invalid state.')
 
         oNAND(set, Q_prim, Q)
         oNAND(reset, Q, Q_prim)
@@ -39,12 +39,28 @@ class Circuits extends Gates {
     /**
      * Set and reset signal can't be ones at the same time
      */
-    void FlFpNOR(Wire set, Wire reset, Wire Q, Wire Q_prim) {
+    void oFLIP_FLOP_00(Wire set, Wire reset, Wire Q, Wire Q_prim) {
 
-        stopIfAllEqualTo(1, [set, reset], 'FlFpNOR is in invalid state.')
+        stopIfAllEqualTo(1, [set, reset], 'oFLIP_FLOP_00 is in invalid state.')
 
         oNOR(reset, Q_prim, Q)
         oNOR(set, Q, Q_prim)
+    }
+
+    /**
+     * Check if signal on a given wires is the same
+     *
+     * @return if signal is the same
+     */
+    Wire COMPARATOR(List<Wire> in1, List<Wire> in2) {
+
+        return mAND(
+                [in1, in2].transpose().collect({
+                    pairOfWires ->
+                        XNOR(
+                                ((List<Wire>) pairOfWires)[0],
+                                ((List<Wire>) pairOfWires)[1])
+                }))
     }
 
     // Helper methods
@@ -66,7 +82,7 @@ class Circuits extends Gates {
         boolean bitValue = bit >= 1
 
         // all are equal
-        if (wires.collect({wire -> wire.getSignal()}).inject { in1, in2 ->  in1 == in2 }) {
+        if (wires.collect({ wire -> wire.getSignal() }).inject { in1, in2 -> in1 == in2 }) {
 
             // then check first one if is equal to the bit
             if (wires[0].getSignal() == bitValue) {

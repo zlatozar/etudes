@@ -18,7 +18,7 @@ class FlFpNANDSpec extends Specification {
     def "FlFpNAND: #s and #r is S='#q', R='#not_q'"() {
 
         expect:
-        circuits.FlFpNAND(new Wire(s), new Wire(r), Q, Q_prim)
+        circuits.oFLIP_FLOP_11(new Wire(s), new Wire(r), Q, Q_prim)
 
         Q.getSignal() == q
         Q_prim.getSignal() == not_q

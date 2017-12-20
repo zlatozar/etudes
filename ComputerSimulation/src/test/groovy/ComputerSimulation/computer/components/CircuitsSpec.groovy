@@ -51,13 +51,14 @@ class CircuitsSpec extends Specification {
     }
 
     @Unroll
-    def "FlFpNAND: #s and #r is S='#q', R='#not_q'"() {
+    def "oFLIP_FLOP_11: #s and #r is S='#q', R='#not_q'"() {
 
         expect:
-        circuits.FlFpNAND(new Wire(s), new Wire(r), Q, Q_prim)
+        circuits.oFLIP_FLOP_11(new Wire(s), new Wire(r), Q, Q_prim)
 
         Q.getSignal() == q
         Q_prim.getSignal() == not_q
+        q == !not_q
 
         where:
         s     | r     | q      | not_q
@@ -71,13 +72,14 @@ class CircuitsSpec extends Specification {
     }
 
     @Unroll
-    def "FlFpNOR: #s and #r is S='#q', R='#not_q'"() {
+    def "oFLIP_FLOP_00: #s and #r is S='#q', R='#not_q'"() {
 
         expect:
-        circuits.FlFpNOR(new Wire(s), new Wire(r), Q, Q_prim)
+        circuits.oFLIP_FLOP_00(new Wire(s), new Wire(r), Q, Q_prim)
 
         Q.getSignal() == q
         Q_prim.getSignal() == not_q
+        q == !not_q
 
         where:
         s     | r     | q      | not_q
@@ -88,6 +90,21 @@ class CircuitsSpec extends Specification {
         false | false | false  | true    // After s=0 and r=1 (no change)
 
 //      true  | true  | false  | false   // invalid
+    }
+
+    @Unroll
+    def "COMPARATOR: #a and #b is equal='#result'"() {
+
+        expect:
+        circuits.COMPARATOR(a, b).getSignal() == result
+
+        where:
+        a                                  | b                                 | result
+        [new Wire(true), new Wire(false)]  | [new Wire(true), new Wire(false)] | true
+        [new Wire(false), new Wire(false)] | [new Wire(true), new Wire(false)] | false
+        [new Wire(false), new Wire(true)]  | [new Wire(true), new Wire(false)] | false
+        [new Wire(true), new Wire(false)]  | [new Wire(false), new Wire(false)]| false
+        [new Wire(false), new Wire(false)] | [new Wire(false), new Wire(false)]| true
     }
 
 }

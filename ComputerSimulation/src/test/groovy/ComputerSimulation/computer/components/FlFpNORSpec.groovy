@@ -18,7 +18,7 @@ class FlFpNORSpec extends Specification {
     def "FlFpNOR: #s and #r is S='#q', R='#not_q'"() {
 
         expect:
-        circuits.FlFpNOR(new Wire(s), new Wire(r), Q, Q_prim)
+        circuits.oFLIP_FLOP_00(new Wire(s), new Wire(r), Q, Q_prim)
 
         Q.getSignal() == q
         Q_prim.getSignal() == not_q
