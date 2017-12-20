@@ -25,11 +25,14 @@ class Circuits extends Gates {
         return ['S' : secondHA.S, 'C' : OR(firstHA.C, secondHA.C)]
     }
 
-    void FlFpPos(Wire set, Wire reset, Wire Q, Wire Q_prim) {
+    /**
+     * Set and reset signal can't be zeros at the same time
+     */
+    void FlFpNAND(Wire set, Wire reset, Wire Q, Wire Q_prim) {
 
         if (!set.getSignal()) {
             if (!reset.getSignal()) {
-                throw new IllegalArgumentException("Forbidden input. Positive flip-flop is in invalid state (two 1's are passed)")
+                throw new IllegalArgumentException("Forbidden input. Positive flip-flop is in invalid state (two 0's are passed)")
             }
         }
 
@@ -37,10 +40,13 @@ class Circuits extends Gates {
         oNAND(reset, Q, Q_prim)
     }
 
-    void FlFpNeg(Wire reset, Wire set, Wire Q, Wire Q_prim) {
+    /**
+     * Set and reset signal can't be ones at the same time
+     */
+    void FlFpNOR(Wire set, Wire reset, Wire Q, Wire Q_prim) {
 
         if (reset.getSignal() && set.getSignal()) {
-            throw new IllegalArgumentException("Forbidden input. Negative flip-Flop is in invalid state (two 0's are passed)")
+            throw new IllegalArgumentException("Forbidden input. Negative flip-Flop is in invalid state (two 1's are passed)")
         }
 
         oNOR(reset, Q_prim, Q)
