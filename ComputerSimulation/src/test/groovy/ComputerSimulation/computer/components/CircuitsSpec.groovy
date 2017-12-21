@@ -107,4 +107,19 @@ class CircuitsSpec extends Specification {
         [new Wire(false), new Wire(false)] | [new Wire(false), new Wire(false)]| true
     }
 
+    @Unroll
+    def "INVERTER: #a and #ctrl is equal='#result'"() {
+
+        expect:
+        circuits.INVERTER(a, ctrl).collect({ Wire wire -> wire.getSignal() }) == result
+
+        where:
+        a                                  | ctrl            | result
+        [new Wire(true), new Wire(false)]  | new Wire(true)  | [false, true]
+        [new Wire(false), new Wire(false)] | new Wire(true)  | [true, true]
+        [new Wire(false), new Wire(true)]  | new Wire(true)  | [true, false]
+        [new Wire(true), new Wire(false)]  | new Wire(false) | [true, false]
+        [new Wire(false), new Wire(false)] | new Wire(false) | [false, false]
+    }
+
 }

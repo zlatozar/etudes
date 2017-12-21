@@ -63,6 +63,57 @@ class Circuits extends Gates {
                 }))
     }
 
+    /**
+     * Invert the signal in every wire in the given input if signal
+     * in a control wire is positive
+     *
+     * @param input bytes that possible will be inverted
+     * @param ctrl defines if input signal should be inverted
+     * @return inverted or not signal
+     */
+    List<Wire> INVERTER(List<Wire> input, Wire ctrl) {
+        return input.stream().parallel().collect({
+            Wire wire -> XOR(wire, ctrl)
+        })
+    }
+
+    void CLK(Wire input, int count=-1) {
+        boolean sig = false
+
+        def setSignal = {
+            input.setSignal(sig)
+
+            sleep(CLOCK)
+            sig = !sig
+            return
+        }
+
+        executeCLK(count, setSignal)
+    }
+
+    void CLK(List<Wire> input, int count=-1) {
+        boolean sig = false
+
+        def setSignal = {
+            input.stream().parallel().any {
+                wire ->
+                    ((Wire) wire).setSignal(sig)
+            }
+
+            sleep(CLOCK)
+            sig = !sig
+            return
+        }
+
+        executeCLK(count, setSignal)
+    }
+
+    public static void main(String[] args) {
+        Circuits circuits = new Circuits()
+
+        circuits.CLK(new Wire(false))
+    }
+
     // Helper methods
 
     /**
@@ -92,4 +143,18 @@ class Circuits extends Gates {
         }
     }
 
+    private static void executeCLK(int count, Closure<Void> setSignal) {
+
+        if (count == -1) {
+            while (true) {
+                setSignal.call()
+            }
+
+        } else {
+
+            for (int i = 0; i < count; i++) {
+                setSignal.call()
+            }
+        }
+    }
 }
