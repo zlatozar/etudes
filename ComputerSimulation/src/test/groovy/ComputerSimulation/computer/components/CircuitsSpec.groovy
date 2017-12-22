@@ -99,12 +99,12 @@ class CircuitsSpec extends Specification {
         circuits.COMPARATOR(a, b).getSignal() == result
 
         where:
-        a                                  | b                                 | result
-        [new Wire(true), new Wire(false)]  | [new Wire(true), new Wire(false)] | true
-        [new Wire(false), new Wire(false)] | [new Wire(true), new Wire(false)] | false
-        [new Wire(false), new Wire(true)]  | [new Wire(true), new Wire(false)] | false
-        [new Wire(true), new Wire(false)]  | [new Wire(false), new Wire(false)]| false
-        [new Wire(false), new Wire(false)] | [new Wire(false), new Wire(false)]| true
+        a                       | b                                 | result
+        toWires([true, false])  | toWires([true, false]) | true
+        toWires([false, false]) | toWires([true, false]) | false
+        toWires([false, true])  | toWires([true, false]) | false
+        toWires([true, false])  | toWires([false, false])| false
+        toWires([false, false]) | toWires([false, false])| true
     }
 
     @Unroll
@@ -114,12 +114,92 @@ class CircuitsSpec extends Specification {
         circuits.INVERTER(a, ctrl).collect({ Wire wire -> wire.getSignal() }) == result
 
         where:
-        a                                  | ctrl            | result
-        [new Wire(true), new Wire(false)]  | new Wire(true)  | [false, true]
-        [new Wire(false), new Wire(false)] | new Wire(true)  | [true, true]
-        [new Wire(false), new Wire(true)]  | new Wire(true)  | [true, false]
-        [new Wire(true), new Wire(false)]  | new Wire(false) | [true, false]
-        [new Wire(false), new Wire(false)] | new Wire(false) | [false, false]
+        a                       | ctrl            | result
+        toWires([true, false])  | new Wire(true)  | [false, true]
+        toWires([false, false]) | new Wire(true)  | [true, true]
+        toWires([false, true])  | new Wire(true)  | [true, false]
+        toWires([true, false])  | new Wire(false) | [true, false]
+        toWires([false, false]) | new Wire(false) | [false, false]
     }
 
+    @Unroll
+    def "MUX_16to1: #selector selects '#result'"() {
+
+        expect:
+        circuits.MUX_16to1(word, selector).getSignal() == result
+
+        where:
+        word                                 | selector                              | result
+        toWires([false, true, false, false,
+                 false, false, true, true,
+                 false, false, false, false,
+                 false, false, true, false]) | toWires([false, false, false, false]) | false
+        toWires([false, true, false, false,
+                 false, false, true, true,
+                 false, false, false, false,
+                 false, false, true, false]) | toWires([false, false, false, true])  | true
+        toWires([false, true, false, false,
+                 false, false, true, true,
+                 false, false, false, false,
+                 false, false, true, false]) | toWires([false, false, true, false])  | false
+        toWires([false, true, false, false,
+                 false, false, true, true,
+                 false, false, false, false,
+                 false, false, true, false]) | toWires([false, false, true, true])   | false
+        toWires([false, true, false, false,
+                 false, false, true, true,
+                 false, false, false, false,
+                 false, false, true, false]) | toWires([false, true, false, false])  | false
+        toWires([false, true, false, false,
+                 false, false, true, true,
+                 false, false, false, false,
+                 false, false, true, false]) | toWires([false, true, false, true])   | false
+        toWires([false, true, false, false,
+                 false, false, true, true,
+                 false, false, false, false,
+                 false, false, true, false]) | toWires([false, true, true, false])   | true
+        toWires([false, true, false, false,
+                 false, false, true, true,
+                 false, false, false, false,
+                 false, false, true, false]) | toWires([false, true, true, true])    | true
+
+        toWires([false, true, false, false,
+                 false, false, true, true,
+                 false, false, false, false,
+                 false, false, true, false]) | toWires([true, false, false, false])  | false
+        toWires([false, true, false, false,
+                 false, false, true, true,
+                 false, false, false, false,
+                 false, false, true, false]) | toWires([true, false, false, true])   | false
+        toWires([false, true, false, false,
+                 false, false, true, true,
+                 false, false, false, false,
+                 false, false, true, false]) | toWires([true, false, true, false])   | false
+        toWires([false, true, false, false,
+                 false, false, true, true,
+                 false, false, false, false,
+                 false, false, true, false]) | toWires([true, false, true, true])    | false
+        toWires([false, true, false, false,
+                 false, false, true, true,
+                 false, false, false, false,
+                 false, false, true, false]) | toWires([true, true, false, false])   | false
+        toWires([false, true, false, false,
+                 false, false, true, true,
+                 false, false, false, false,
+                 false, false, true, false]) | toWires([true, true, false, true])    | false
+        toWires([false, true, false, false,
+                 false, false, true, true,
+                 false, false, false, false,
+                 false, false, true, false]) | toWires([true, true, true, false])    | true
+        toWires([false, true, false, false,
+                 false, false, true, true,
+                 false, false, false, false,
+                 false, false, true, false]) | toWires([true, true, true, true])     | false
+    }
+
+    // Helper methods
+
+    private static List<Wire> toWires(List<Boolean> signals) {
+        return signals.collect({ signal -> new Wire(signal)})
+    }
 }

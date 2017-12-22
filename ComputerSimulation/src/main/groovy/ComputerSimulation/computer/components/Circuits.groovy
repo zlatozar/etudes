@@ -16,7 +16,7 @@ class Circuits extends Gates {
     }
 
     /**
-     * Full Adder using Half Adder
+     * Full Adder using two Half Adders
      */
     Map<String, Wire> FA(Wire in1, Wire in2, Wire cin) {
         Map<String, Wire> firstHA = HA(in1, in2)
@@ -48,14 +48,16 @@ class Circuits extends Gates {
     }
 
     /**
-     * Check if signal on a given wires is the same
-     *
-     * @return if signal is the same
+     * Check if given words are equal
      */
-    Wire COMPARATOR(List<Wire> in1, List<Wire> in2) {
+    Wire COMPARATOR(List<Wire> word1, List<Wire> word2) {
+
+        if (word1.size() != word2.size()) {
+            throw new IllegalArgumentException("Compared words differ in size")
+        }
 
         return mAND(
-                [in1, in2].transpose().collect({
+                [word1, word2].transpose().collect({
                     pairOfWires ->
                         XNOR(
                                 ((List<Wire>) pairOfWires)[0],
@@ -64,17 +66,47 @@ class Circuits extends Gates {
     }
 
     /**
-     * Invert the signal in every wire in the given input if signal
+     * Invert the signal in every bit in the given word if signal
      * in a control wire is positive
      *
-     * @param input bytes that possible will be inverted
-     * @param ctrl defines if input signal should be inverted
+     * @param word bytes that possible will be inverted
+     * @param ctrl defines if word signal should be inverted
      * @return inverted or not signal
      */
-    List<Wire> INVERTER(List<Wire> input, Wire ctrl) {
-        return input.stream().parallel().collect({
+    List<Wire> INVERTER(List<Wire> word, Wire ctrl) {
+        return word.stream().parallel().collect({
             Wire wire -> XOR(wire, ctrl)
         })
+    }
+
+    Wire MUX_16to1(List<Wire> word, List<Wire> selector) {
+        wordSizeCheck(word, 16)
+        wordSizeCheck(selector, 4)
+
+        Wire A = selector[0] // MSB
+        Wire B = selector[1]
+        Wire C = selector[2]
+        Wire D = selector[3] // LSB
+
+        return mOR([
+                mAND([NOT(A), NOT(B), NOT(C), NOT(D), word[0]]),
+                mAND([NOT(A), NOT(B), NOT(C), D, word[1]]),
+                mAND([NOT(A), NOT(B), C, NOT(D), word[2]]),
+                mAND([NOT(A), NOT(B), C, D, word[3]]),
+                mAND([NOT(A), B, NOT(C), NOT(D), word[4]]),
+                mAND([NOT(A), B, NOT(C), D, word[5]]),
+                mAND([NOT(A), B, C, NOT(D), word[6]]),
+                mAND([NOT(A), B, C, D, word[7]]),
+
+                mAND([A, NOT(B), NOT(C), NOT(D), word[8]]),
+                mAND([A, NOT(B), NOT(C), D, word[9]]),
+                mAND([A, NOT(B), C, NOT(D), word[10]]),
+                mAND([A, NOT(B), C, D, word[11]]),
+                mAND([A, B, NOT(C), NOT(D), word[12]]),
+                mAND([A, B, NOT(C), D, word[13]]),
+                mAND([A, B, C, NOT(D), word[14]]),
+                mAND([A, B, C, D, word[15]])
+        ])
     }
 
     void CLK(Wire input, int count=-1) {
@@ -91,11 +123,11 @@ class Circuits extends Gates {
         executeCLK(count, setSignal)
     }
 
-    void CLK(List<Wire> input, int count=-1) {
+    void CLK(List<Wire> bus, int count=-1) {
         boolean sig = false
 
         def setSignal = {
-            input.stream().parallel().any {
+            bus.stream().parallel().any {
                 wire ->
                     ((Wire) wire).setSignal(sig)
             }
@@ -106,12 +138,6 @@ class Circuits extends Gates {
         }
 
         executeCLK(count, setSignal)
-    }
-
-    public static void main(String[] args) {
-        Circuits circuits = new Circuits()
-
-        circuits.CLK(new Wire(false))
     }
 
     // Helper methods
@@ -155,6 +181,12 @@ class Circuits extends Gates {
             for (int i = 0; i < count; i++) {
                 setSignal.call()
             }
+        }
+    }
+
+    private static void wordSizeCheck(List<Wire> word, int size) {
+        if (word.size() != size) {
+            throw new IllegalArgumentException("Word size should be $size bits")
         }
     }
 }
