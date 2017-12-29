@@ -2,13 +2,15 @@ package ComputerSimulation.computer.components
 
 import groovy.transform.CompileStatic
 
+import java.util.concurrent.CopyOnWriteArrayList
+
 @CompileStatic
 class Wire {
 
     // default signal
     private boolean signal = false
 
-    private final List<Closure> actions = new LinkedList<>()
+    private final List<Closure> actions = new CopyOnWriteArrayList<>()
 
     private String name = ''
 
@@ -46,6 +48,8 @@ class Wire {
             actions.each {
                 it.call()
             }
+
+            actions.clear()
         }
     }
 
