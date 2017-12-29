@@ -8,12 +8,6 @@ class CircuitsSpec extends Specification {
 
     private Circuits circuits = new Circuits()
 
-    @Shared
-    private static Wire Q = new Wire()
-
-    @Shared
-    private static Wire Q_prim = new Wire()
-
     @Unroll
     def "HA: #a and #b is S='#sum', C='#carry'"() {
 
@@ -74,65 +68,6 @@ class CircuitsSpec extends Specification {
         a                                                             | b                                                             | sub             | result
         intsToWires([0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0]) | intsToWires([0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1]) | new Wire(false) | [0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
         intsToWires([0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0]) | intsToWires([0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1]) | new Wire(true)  | [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1]
-    }
-
-    @Unroll
-    def "oNAND_Latch: #s and #r is Q='#q', notQ='#not_q'"() {
-
-        expect:
-        circuits.oNAND_Latch(new Wire(s), new Wire(r), Q, Q_prim)
-
-        Q.getSignal() == q
-        Q_prim.getSignal() == not_q
-        q == !not_q
-
-        where:
-        s     | r     | q      | not_q
-        true  | false | true   | false   // Latch SET (Q is transparent to the S signal)
-        true  | true  | true   | false   // After s=1 and r=0 (Q is the same)
-
-        false | true  | false  | true    // Latch RESET (Q is transparent to the R signal)
-        true  | true  | false  | true    // After s=0 and r=1 (Q is the same)
-
-//      false | false | true   | true    // race
-    }
-
-    @Unroll
-    def "oNOR_Latch: #s and #r is Q='#q', notQ='#not_q'"() {
-
-        expect:
-        circuits.oNOR_Latch(new Wire(s), new Wire(r), Q, Q_prim)
-
-        Q.getSignal() == q
-        Q_prim.getSignal() == not_q
-        q == !not_q
-
-        where:
-        s     | r     | q      | not_q
-        true  | false | true   | false   // Latch SET (transparent to the S signal)
-        false | false | true   | false   // After s=1 and r=0 (no change)
-
-        false | true  | false  | true    // Latch RESET (transparent to the R signal)
-        false | false | false  | true    // After s=0 and r=1 (no change)
-
-//      true  | true  | false  | false   // invalid
-    }
-
-    @Unroll
-    def "oD_Latch: #d and #clk is Q='#q'"() {
-
-        expect:
-        circuits.oD_Latch(new Wire(d), new Wire(clk), Q, Q_prim)
-        Q.getSignal() == q
-
-        where:
-        d     | clk   | q
-        true  | true  | true   // set
-        false | false | true   // hold
-        true  | false | true   // hold
-        false | true  | false  // reset
-
-        true  | true  | true   // set (again)
     }
 
     @Unroll

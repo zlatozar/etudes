@@ -120,7 +120,8 @@ class Circuits extends Gates {
     }
 
     /**
-     * Set and reset signal can't be zeros at the same time
+     * Set and reset signal can't be zeros at the same time.
+     * RS-latch implemented with NAND elements
      */
     protected void oNAND_Latch(Wire set, Wire reset, Wire Q, Wire Q_prim) {
 
@@ -131,7 +132,32 @@ class Circuits extends Gates {
     }
 
     /**
-     * Set and reset signal can't be ones at the same time
+     * D latch with no illegal inputs. Level clocked.
+     */
+    void oD_Latch(Wire d, Wire clk, Wire Q, Wire Q_prim) {
+        oNAND_Latch(NAND(NOT(d), clk), NAND(d, clk), Q, Q_prim)
+    }
+
+    /**
+     * JK latch is edge clocked.
+     *
+     * The circuit is inactive when clock is low, high, on
+     * its negative edge. Likewise, the circuit is inactive
+     * when j and k are both low. Output changes occur only
+     * on the rising age of the clock. The output either reset, sets
+     * or toggles.
+     */
+    void oJK_Latch(Wire j, Wire k, Wire clk, Wire Q, Wire Q_prim) {
+
+        Wire reset = mNAND([Q_prim, j, clk])
+        Wire set = mNAND([Q, k, clk])
+
+        oNAND_Latch(set, reset, Q, Q_prim)
+    }
+
+    /**
+     * Set and reset signal can't be ones at the same time.
+     * RS-latch implemented with NOR elements.
      */
     protected void oNOR_Latch(Wire set, Wire reset, Wire Q, Wire Q_prim) {
 
@@ -139,13 +165,6 @@ class Circuits extends Gates {
 
         oNOR(reset, Q_prim, Q)
         oNOR(set, Q, Q_prim)
-    }
-
-    /**
-     * D latch with no illegal inputs
-     */
-    protected void oD_Latch(Wire d, Wire clk, Wire Q, Wire Q_prim) {
-        oNAND_Latch(NAND(NOT(d), clk), NAND(d, clk), Q, Q_prim)
     }
 
     /**
@@ -173,7 +192,7 @@ class Circuits extends Gates {
      * @param word bytes that possible will be inverted
      * @param ctrl defines if word signal should be inverted
      * @return inverted or not signal
-     */
+       */
     List<Wire> INVERTER(List<Wire> word, Wire ctrl) {
         return word.stream().parallel().collect({
             Wire wire -> XOR(wire, ctrl)
