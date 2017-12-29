@@ -97,13 +97,13 @@ abstract class Gates extends Simulation implements Delays {
     Wire mOR(List<Wire> input) {
         final Wire out = new Wire()
 
-        def andAction = {
-            afterDelay(AND_delay) {
+        def orAction = {
+            afterDelay(OR_delay) {
                 out.setSignal(input.collect({wire -> wire.getSignal()}).inject { in1, in2 -> in1 | in2 })
             }
         }
 
-        input.stream().parallel().any({ Wire it -> it.addAction(andAction) })
+        input.stream().parallel().any({ Wire it -> it.addAction(orAction) })
         propagateSignal()
 
         return out
@@ -212,10 +212,11 @@ abstract class Gates extends Simulation implements Delays {
 
     // BRANCH
 
+    /**
+     * Create reference to the origin
+     */
     Wire BRANCH(Wire input) {
-        final Wire branch = new Wire()
-        branch.setSignal(input.getSignal())
-
+        final Wire branch = input
         return branch
     }
 }
