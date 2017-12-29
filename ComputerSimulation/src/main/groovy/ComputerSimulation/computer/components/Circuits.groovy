@@ -120,22 +120,22 @@ class Circuits extends Gates {
     }
 
     /**
-     * NAND implementation. Set and reset signal can't be zeros at the same time
+     * Set and reset signal can't be zeros at the same time
      */
-    protected void oSR_Latch_11(Wire set, Wire reset, Wire Q, Wire Q_prim) {
+    protected void oNAND_Latch(Wire set, Wire reset, Wire Q, Wire Q_prim) {
 
-        stopIfAllEqualTo(0, [set, reset], 'Race condition. oSR_Latch_11 is in invalid state.')
+        stopIfAllEqualTo(0, [set, reset], 'Race condition. oNAND_Latch is in invalid state.')
 
-        oNAND(set, Q_prim, Q)
-        oNAND(reset, Q, Q_prim)
+        oNAND(reset, Q_prim, Q)
+        oNAND(set, Q, Q_prim)
     }
 
     /**
-     * NOR implementation. Set and reset signal can't be ones at the same time
+     * Set and reset signal can't be ones at the same time
      */
-    protected void oSR_Latch_00(Wire set, Wire reset, Wire Q, Wire Q_prim) {
+    protected void oNOR_Latch(Wire set, Wire reset, Wire Q, Wire Q_prim) {
 
-        stopIfAllEqualTo(1, [set, reset], 'Race condition. oSR_Latch_00 is in invalid state.')
+        stopIfAllEqualTo(1, [set, reset], 'Race condition. oNOR_Latch is in invalid state.')
 
         oNOR(reset, Q_prim, Q)
         oNOR(set, Q, Q_prim)
@@ -145,7 +145,7 @@ class Circuits extends Gates {
      * D latch with no illegal inputs
      */
     protected void oD_Latch(Wire d, Wire clk, Wire Q, Wire Q_prim) {
-        oSR_Latch_11(NAND(d, clk), NAND(NOT(d), clk), Q, Q_prim)
+        oNAND_Latch(NAND(NOT(d), clk), NAND(d, clk), Q, Q_prim)
     }
 
     /**

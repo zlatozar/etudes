@@ -16,7 +16,7 @@ class Simulation {
     }
 
     /**
-     * Start execution plan based on the agenda.
+     * Start simulation as running execution plan based on the agenda.
      * NOTE: Should be called every time when signal is set.
      */
     void propagateSignal() {

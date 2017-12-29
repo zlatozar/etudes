@@ -19,6 +19,7 @@ abstract class Gates extends Simulation implements Delays {
             }
         }
 
+        // every time when signal is changed in wires this action should be executed
         in1.addAction(andAction)
         in2.addAction(andAction)
 
@@ -219,4 +220,5 @@ abstract class Gates extends Simulation implements Delays {
         final Wire branch = input
         return branch
     }
+
 }

@@ -77,10 +77,10 @@ class CircuitsSpec extends Specification {
     }
 
     @Unroll
-    def "oSR_Latch_11: #s and #r is S='#q', R='#not_q'"() {
+    def "oNAND_Latch: #s and #r is Q='#q', notQ='#not_q'"() {
 
         expect:
-        circuits.oSR_Latch_11(new Wire(s), new Wire(r), Q, Q_prim)
+        circuits.oNAND_Latch(new Wire(s), new Wire(r), Q, Q_prim)
 
         Q.getSignal() == q
         Q_prim.getSignal() == not_q
@@ -88,20 +88,20 @@ class CircuitsSpec extends Specification {
 
         where:
         s     | r     | q      | not_q
-        true  | false | false  | true    // Latch SET
-        true  | true  | false  | true    // After s=1 and r=0 (no change)
+        true  | false | true   | false   // Latch SET (Q is transparent to the S signal)
+        true  | true  | true   | false   // After s=1 and r=0 (Q is the same)
 
-        false | true  | true   | false   // Latch RESET
-        true  | true  | true   | false   // After s=0 and r=1 (no change)
+        false | true  | false  | true    // Latch RESET (Q is transparent to the R signal)
+        true  | true  | false  | true    // After s=0 and r=1 (Q is the same)
 
-//      false | false | true   | true    // invalid
+//      false | false | true   | true    // race
     }
 
     @Unroll
-    def "oSR_Latch_00: #s and #r is S='#q', R='#not_q'"() {
+    def "oNOR_Latch: #s and #r is Q='#q', notQ='#not_q'"() {
 
         expect:
-        circuits.oSR_Latch_00(new Wire(s), new Wire(r), Q, Q_prim)
+        circuits.oNOR_Latch(new Wire(s), new Wire(r), Q, Q_prim)
 
         Q.getSignal() == q
         Q_prim.getSignal() == not_q
@@ -109,10 +109,10 @@ class CircuitsSpec extends Specification {
 
         where:
         s     | r     | q      | not_q
-        true  | false | true   | false   // Latch SET
+        true  | false | true   | false   // Latch SET (transparent to the S signal)
         false | false | true   | false   // After s=1 and r=0 (no change)
 
-        false | true  | false  | true    // Latch RESET
+        false | true  | false  | true    // Latch RESET (transparent to the R signal)
         false | false | false  | true    // After s=0 and r=1 (no change)
 
 //      true  | true  | false  | false   // invalid
