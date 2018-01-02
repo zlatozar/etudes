@@ -25,12 +25,20 @@ class NandLatchSpec extends Specification {
         q == !not_q
 
         where:
-        s     | r     | q      | not_q
-        true  | false | true   | false   // Latch SET (Q is transparent to the S signal)
-        true  | true  | true   | false   // After s=1 and r=0 (Q is the same)
+        r     | s         | q      | not_q
+        false | true      | true   | false   // Latch SET s=1
+        false | true      | true   | false
 
-        false | true  | false  | true    // Latch RESET (Q is transparent to the R signal)
-        true  | true  | false  | true    // After s=0 and r=1 (Q is the same)
+        true  | true      | true   | false   // hold
+        true  | true      | true   | false
+
+        true  | false     | false  | true    // Latch RESET
+        true  | false     | false  | true
+
+        true  | true      | false  | true    // hold
+        true  | true      | false  | true
+
+        false | true      | true   | false   // Latch SET s=1 (again)
 
 //      false | false | true   | true    // race
     }

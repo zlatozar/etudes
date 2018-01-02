@@ -71,6 +71,28 @@ class CircuitsSpec extends Specification {
     }
 
     @Unroll
+    def "dLatchComponent: #d and #clk is set='#setOut', reset='#resetOut'"() {
+
+        expect:
+        Wire set = new Wire()
+        Wire reset = new Wire()
+
+        def component = circuits.dLatchComponent(set, reset)
+        component(new Wire(d), new Wire(clk))
+
+        set.getSignal() == setOut
+        reset.getSignal() == resetOut
+
+        where:
+        d     | clk   | resetOut | setOut
+        false | false | true     | true
+        false | true  | true     | false
+
+        true  | false | true     | true
+        true  | true  | false    | true
+    }
+
+    @Unroll
     def "COMPARATOR: #a and #b is equal='#result'"() {
 
         expect:

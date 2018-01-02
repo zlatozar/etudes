@@ -134,25 +134,37 @@ class Circuits extends Gates {
     /**
      * D latch with no illegal inputs. Level clocked.
      */
-    void oD_Latch(Wire d, Wire clk, Wire Q, Wire Q_prim) {
-        oNAND_Latch(NAND(NOT(d), clk), NAND(d, clk), Q, Q_prim)
+    Closure<String> oD_Latch(Wire Q, Wire Q_prim) {
+        Wire set = new Wire()
+        Wire reset = new Wire()
+
+        Closure<String> dLatchComponent = dLatchComponent(set, reset)
+
+        Closure<String> closure = { Wire d, Wire clk ->
+            dLatchComponent(d, clk)
+            oNAND_Latch(set, reset, Q, Q_prim)
+            return 'oD_Latch'
+        }
+
+        return closure
     }
 
     /**
-     * JK latch is edge clocked.
-     *
-     * The circuit is inactive when clock is low, high, on
-     * its negative edge. Likewise, the circuit is inactive
-     * when j and k are both low. Output changes occur only
-     * on the rising age of the clock. The output either reset, sets
-     * or toggles.
+     * Create component that is needed for D Latch build
+     * @param set output used for D Latch set
+     * @param reset output used for D Latch reset
      */
-    void oJK_Latch(Wire j, Wire k, Wire clk, Wire Q, Wire Q_prim) {
+    protected Closure<String> dLatchComponent(Wire set, Wire reset) {
+        Wire notSet = new Wire()
 
-        Wire reset = mNAND([Q_prim, j, clk])
-        Wire set = mNAND([Q, k, clk])
+        Closure<String> closure = { Wire d, Wire clk ->
+            oNAND(d, clk, reset)
+            oNOT(d, notSet)
+            oNAND(notSet, clk, set)
+            return 'dLatchComponent'
+        }
 
-        oNAND_Latch(set, reset, Q, Q_prim)
+        return closure
     }
 
     /**
