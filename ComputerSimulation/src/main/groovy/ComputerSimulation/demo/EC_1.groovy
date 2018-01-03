@@ -1,4 +1,4 @@
-package ComputerSimulation.computer
+package ComputerSimulation.demo
 
 import ComputerSimulation.computer.components.Circuits
 import ComputerSimulation.computer.components.Wire
