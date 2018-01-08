@@ -247,7 +247,7 @@ the CCR is set. A _word-addressing exception_ may occur.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |      Load Negative             |   RS     |    21         |       ```LN, R1 A, R2```            |     OGLE        |
 
-This instruction operates in the same way as Load Negative Register except that the 
+This instruction operates in the same way as ```Load Negative Register``` except that the 
 effective address is calculated by the ```register-and-storage``` addressing algorithm.
 
 ### 7. LNI
@@ -285,7 +285,7 @@ to zero to set the CCR. A _word-addressing exception_ may occur.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |       Store            |   RS     |     22         |      ```ST, R1 A, R2```              |    GLE        |
   
-This instruction operates in the same way as the Store Register instruction with the effective
+This instruction operates in the same way as the ```Store Register``` instruction with the effective
 address calculated by the ```register-and-storage``` addressing algorithm.
 
 p. 112 (14 ops codes)
@@ -315,7 +315,7 @@ set by comparing the value moved into register R1 with zero. A _word-addressing 
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |       Swap            |    RS    |     23        |     ```SWAP, R1 A, R2```              |     GLE       |
     
-This instruction operates in the same way as the Swap Register instruction with the 
+This instruction operates in the same way as the ```Swap Register``` instruction with the 
 effective address calculated by the ```register-and-storage``` algorithm.
 
 ### 14. SWAPC
@@ -390,7 +390,7 @@ This instruction operates in the same way as ```AND``` with logical ```OR``` rep
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |     ```OR``` Immediate              | IM       |    45         |   ```ORI, R1 I```                 |    GLE        |
 
-This instruction operates in the same way as ```And Immediate``` with logical ```AND``` replaced by logical ```or```.
+This instruction operates in the same way as ```And Immediate``` with logical ```AND``` replaced by logical ```OR```.
 
 ### 22. ORC
 
@@ -705,7 +705,7 @@ A _word-addressing exception_ may occur.
 |Add Register                   |  RR      |  10           |     ```AR, R1 R2```              |   OGLE         |
    
 The word in R1 is added to the word at the effective address and the result is placed in R1.
-The sum is compared to zero to set the CCR. If _overflow occurs_, only the O bit of the CCR
+The sum is compared to zero to set the CCR. If _overflow occurs_, only the **O** bit of the CCR
 is set. A _word-addressing exception_ may occur.
 
 ### 52. A
@@ -726,7 +726,7 @@ calculated by the ```register-and-storage``` addressing algorithm.
     
 The 20-bit two's complement immediate operand I is added to the value in register R1 and
 the sum stored in R1. The sum is compared to zero to set the CCR. If _overflow occurs_, only
-the O bit of the CCR is set.
+the **O** bit of the CCR is set.
 
 ### 54. AC
 
@@ -737,7 +737,7 @@ the O bit of the CCR is set.
    
 The character at the effective address is extended 24 bits to the left with zeros and added to
 the value in register R1 with the result loaded into R1. The sum is compared to zero to set
-the CCR. If _overflow occurs_, only the O bit of the CCR is set.
+the CCR. If _overflow occurs_, only the **O** bit of the CCR is set.
 
 ### 55. SR
 
@@ -747,7 +747,7 @@ the CCR. If _overflow occurs_, only the O bit of the CCR is set.
     
 The word at the effective address (the subtrahend) is subtracted from the value in register
 R1 (the minuend) and the difference is stored in R1. The difference is compared to zero to
-set the CCR. If overflow occurs, only the O bit of the CCR is set. A _word-addressing exception_ may occur.
+set the CCR. If _overflow occurs_, only the **O** bit of the CCR is set. A _word-addressing exception_ may occur.
 
 ### 56. S
 
@@ -767,7 +767,7 @@ calculated by the ```register-and-storage``` addressing algorithm.
     
 The 20-bit two's complement integer immediate operand I (the subtrahend) is subtracted
 from the value in register R1 (the minuend) and the result stored in register R1. The difference
-is compared to zero to set the CCR. If _overflow occurs_, only the O bit of the CCR is set.
+is compared to zero to set the CCR. If _overflow occurs_, only the **O** bit of the CCR is set.
 
 p. 116 (12 ops codes)
 
@@ -780,7 +780,7 @@ p. 116 (12 ops codes)
 The character at the effective address (the subtrahend), treated as a positive integer by
 extension 24 bits leftward with zeros, is subtracted from the value in register R1 (the
 minuend) and the result stored in R1. The difference is compared to zero to set the CCR.
-If _overflow occurs_, only the O bit of the CCR is set.
+If _overflow occurs_, only the **O** bit of the CCR is set.
 
 ### 59. RSR
 
@@ -849,7 +849,7 @@ address is calculated by the ```register-and-storage``` addressing algorithm.
     
 The low 32 bits of the product of the value in register R1 and the 20-bit immediate value I
 are stored in register R1. The product in register R1 is compared to zero to set the CCR.
-If _overflow occurs_, only the O bit of the CCR is set.
+If _overflow occurs_, only the **O** bit of the CCR is set.
 
 ### 66. MC
 
@@ -1154,7 +1154,7 @@ p. 119 (13 ops codes)
     
 The value in register R1 (the dividend) is divided by the real number at the effective address
 (the divisor) and the quotient is stored in register R1. The quotient is compared with zero
-to set the CCR. Word-addressing, real format, and _zero divisor exceptions_ may occur.
+to set the CCR. _Word-addressing, real format_, and _zero divisor exceptions_ may occur.
 
 ### 96. FD
 
