@@ -34,6 +34,10 @@ class WordFormats {
         return displayGenericReal(binNum, exponentSize)
     }
 
+    int displayInteger(List<String> binNum) {
+        return Integer.parseInt(binNum.join(), 2)
+    }
+
     static List<String> createWord(String word) {
 
         final List<String> binaryWords = new ArrayList<>()

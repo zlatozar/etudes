@@ -2,6 +2,10 @@ package ComputerSimulation.computer
 
 import spock.lang.Specification
 
+/**
+ * http://sandbox.mc.edu/~bennet/cs110/flt/dtof.html
+ * http://sandbox.mc.edu/~bennet/cs110/flt/ftod.html
+ */
 class WordFormatsSpec extends Specification {
 
     private final WordFormats wordFormats = new WordFormats(3, 24, 4)
@@ -77,5 +81,17 @@ class WordFormatsSpec extends Specification {
 
         then: 'Float number should be created'
         assert immediateReal == -11.5
+    }
+
+    def 'Convert positive binary to integer'() {
+
+        given: 'A binary number that could not be displayed as integer'
+        List<String> binInteger = ['0', '0', '0', '0', '0', '1', '1', '1']
+
+        when: 'Converter is called'
+        int integer = wordFormats.displayInteger(binInteger)
+
+        then: 'Integer number should be created'
+        assert integer == 7
     }
 }
