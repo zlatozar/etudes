@@ -1101,7 +1101,7 @@ subtrahend reversed.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-| Reverse Real Subtract                  |  RS      |    3A16         |  ```RFS, R1 A, R2```                 | GLE           |
+| Reverse Real Subtract                  |  RS      |    3A         |  ```RFS, R1 A, R2```                 | GLE           |
     
 This instruction is the same as ```Real Subtract``` with the roles of the minuend and subtrahend
 reversed.
@@ -1340,7 +1340,7 @@ from one shifted out.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|   Shift Real                |  RS      |   7F16          | ``` SHIFTR, R1 A, R2```                  |   GLE         |
+|   Shift Real                |  RS      |   7F          | ``` SHIFTR, R1 A, R2```                  |   GLE         |
    
 The effective address is interpreted as a 16-bit two's complement shift count. The fraction
 part of the absolute value of the real number in register R1 is shifted left or right in 4-bit
