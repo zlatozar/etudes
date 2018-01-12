@@ -993,7 +993,7 @@ occurs and register R1 is unchanged.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|  Reverse Remainder Register                 | RR       |   07          |     ```RREMR, R1 R2```              |    GE        |
+|  Reverse Remainder Register                 | RR       |   17          |     ```RREMR, R1 R2```              |    GE        |
     
 This instruction operates the same way as ```Remainder Register``` except that the roles of
 dividend and divisor are reversed.
