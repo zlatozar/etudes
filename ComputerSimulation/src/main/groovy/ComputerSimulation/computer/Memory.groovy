@@ -37,10 +37,7 @@ class Memory {
 
     private void init() {
         for (int i = 0; i < NUMBER_OF_ADDRESSES; i++) {
-            MEMORY.put(pointer.get(), ['0', '0', '0', '0', '0', '0', '0', '0',
-                                       '0', '0', '0', '0', '0', '0', '0', '0',
-                                       '0', '0', '0', '0', '0', '0', '0', '0',
-                                       '0', '0', '0', '0', '0', '0', '0', '0'])
+            MEMORY.put(pointer.get(), EMPTY_WORD)
             pointer.next()
         }
     }

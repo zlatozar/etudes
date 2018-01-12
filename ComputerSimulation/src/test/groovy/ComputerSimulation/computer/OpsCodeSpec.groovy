@@ -5,6 +5,8 @@ import spock.lang.Unroll
 
 class OpsCodeSpec extends Specification {
 
+    private static final int NUM_OF_OPS_CODES = 114
+
     @Unroll
     def "Ops code #ops_enum"() {
 
@@ -144,7 +146,7 @@ class OpsCodeSpec extends Specification {
         0x01 | OpsCode.isValid(code)
         0x21 | OpsCode.isValid(code)
         0x41 | OpsCode.isValid(code)
-        0x62 | OpsCode.isValid(code)
+        0x61 | OpsCode.isValid(code)
         0x02 | OpsCode.isValid(code)
         0x22 | OpsCode.isValid(code)
         0x62 | OpsCode.isValid(code)
@@ -215,7 +217,7 @@ class OpsCodeSpec extends Specification {
         0x36 | OpsCode.isValid(code)
         0x56 | OpsCode.isValid(code)
         0x76 | OpsCode.isValid(code)
-        0x07 | OpsCode.isValid(code)
+        0x17 | OpsCode.isValid(code)
         0x37 | OpsCode.isValid(code)
         0x57 | OpsCode.isValid(code)
         0x77 | OpsCode.isValid(code)
@@ -252,5 +254,27 @@ class OpsCodeSpec extends Specification {
         0x7E | OpsCode.isValid(code)
         0x7F | OpsCode.isValid(code)
    }
+
+    @Unroll
+    def "#code is #ops"() {
+
+        expect:
+        assert ops
+
+        where:
+        code | ops
+        0x61 | OpsCode.display(code)
+   }
+
+    def 'Number of ops code instruction'() {
+
+        given: 'Ops code definitions'
+
+        when: 'Instruction are counted'
+        def numberOfOpsCodes = OpsCode.getNumberOfOpsCodes()
+
+        then: 'Number should be equal to the number of ops code in the specification'
+        assert numberOfOpsCodes == NUM_OF_OPS_CODES
+    }
 
 }

@@ -25,7 +25,7 @@ class MemorySpec extends Specification {
 
         when: 'Memory instantiated'
 
-        then: 'All words should be empty'
+        then: 'Memory should be empty'
         while(memory.hasNext()) {
             assert memory.next() == Memory.EMPTY_WORD
         }

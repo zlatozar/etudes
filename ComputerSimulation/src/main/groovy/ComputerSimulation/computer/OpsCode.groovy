@@ -9,7 +9,7 @@ enum OpsCode {
     LNR(0x01),
     LN(0x21),
     LNI(0x41),
-    LNC(0x62),
+    LNC(0x61),
     STR(0x02),
     ST(0x22),
     STC(0x62),
@@ -80,7 +80,7 @@ enum OpsCode {
     REM(0x36),
     REMI(0x56),
     REMC(0x76),
-    RREMR(0x07),
+    RREMR(0x17),
     RREM(0x37),
     RREMI(0x57),
     RREMC(0x77),
@@ -117,20 +117,44 @@ enum OpsCode {
     SHIFTA(0x7E),
     SHIFTR(0x7F)
 
-    private int code
+    private int instruction
 
-    private OpsCode(int code) {
-        this.code = code
+    private OpsCode(int instruction) {
+        this.instruction = instruction
+    }
+
+    // Reverse-lookup map for getting a OpsCode from an instruction
+    private static final Map<Integer, OpsCode> lookup = new HashMap<Integer, OpsCode>();
+
+    static {
+        for (OpsCode opsCode : values()) {
+            if (lookup.containsKey(opsCode.instruction)) {
+                println(Integer.toHexString(opsCode.instruction))
+            }
+            lookup.put(opsCode.instruction, opsCode)
+        }
+    }
+
+    static boolean isValid(int instruction) {
+        return lookup.containsKey(instruction)
+    }
+
+    static String display(int instruction) {
+        if (!isValid(instruction)) {
+            throw new IllegalArgumentException("$instruction is not an EC-1 ops code")
+        }
+
+        return lookup.get(instruction)
     }
 
     // Helpers
 
-    static boolean isValid(int code) {
-        return OpsCode.values().collect({ it.code }).contains(code)
+    protected static int getNumberOfOpsCodes() {
+        return lookup.size()
     }
 
     @Override
     String toString() {
-        return "${super.toString()}(0x${Integer.toHexString(code)})"
+        return "${super.toString()}(0x${Integer.toHexString(instruction)})"
     }
 }
