@@ -62,10 +62,10 @@ with words, the shorter value has its sign bit propagated leftward to fill the m
 
 _Real numbers_ also occupy a word. Bit 0 is the sign bit, bits 1 through 7 constitute the _exponent_,
 and bits 8 through 31 the _fraction_. In a positive real number, the sign bit is zero, the exponent field
-contains an excess 40^16 exponent of 16, and the fraction contains a 24-bit normalized hexadecimal
+contains an excess(излишък) 40(hex) exponent of 16, and the fraction contains a 24-bit normalized hexadecimal
 fraction with an assumed hexadecimal point on its left.
 
-NOTE: Excess 40^16 notation means that the true exponent is found by subtracting 40^16 from the recorded exponent.
+NOTE: Excess 40(hex) notation means that the true exponent is found by subtracting 40(hex) from the recorded exponent.
  
 Normalization of the hexadecimal fraction requires that at least the leftmost hexadecimal digit be nonzero
 if any are. If the fraction becomes zero, the entire number is set to zero. Any final result of a real arithmetic

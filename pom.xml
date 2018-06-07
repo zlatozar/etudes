@@ -47,7 +47,7 @@
                 <version>3.0.0</version>
             </plugin>
 
-            <!-- Allows to mix Groovy and Java -->
+            <!-- Allows to mix Groovy and Java. Install 'GMavenPlus' plugin in your IDE. -->
             <plugin>
                 <groupId>org.codehaus.gmavenplus</groupId>
                 <artifactId>gmavenplus-plugin</artifactId>
