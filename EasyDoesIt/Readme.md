@@ -464,7 +464,7 @@ top: IF <while control> exists
      IF <step> exists
         THEN SET stepvalue := <step>;
         ELSE SET stepvalue := 1; FI;
-     SET <iteration target> : = <iteration target> + stepvalue;
+     SET <iteration target> := <iteration target> + stepvalue;
      GOTO top;
 end: .....
 ```    
@@ -711,6 +711,6 @@ with no arguments are called with the first form of the ```<function reference>`
                         |   MOD
 ```                        
 
-Operators also include ```:, ;, (, ), „ [, ], &, I, ||```, and :=, and do not include XOR, NOT, and MOD
+Operators also include ```:, ;, (, ), „ [, ], &, I, ||```, and `:=`, and do not include XOR, NOT, and MOD
 for separation purposes. Comments begin with ```/*```, continue with any string not including ```*/```, end
 with ```*/```, and may appear wherever a separator blank may appear. Comments act as separators.

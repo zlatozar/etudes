@@ -4,7 +4,7 @@ To the specification are applied:
 
 - left factorization: ```XY | XZ``` become ```X(Y|Z)```
 
-- elimination of left recursion: ```N ::= X | NY``` become ```N ::= X|(Y)*
+- elimination of left recursion: ```N ::= X | NY``` become ```N ::= X|(Y)*```
 
 - substitution of nonterminal symbols: 
   In ```N ::= X``` we may substitute X for any occurrence of N on the right-hand side of 

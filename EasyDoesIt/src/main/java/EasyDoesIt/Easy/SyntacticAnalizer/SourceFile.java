@@ -48,7 +48,7 @@ public class SourceFile {
     }
 
     /**
-     * Read given file that contains Triangle language code
+     * Read given file that contains Easy language code
      *
      * @return chars one by one from the source file
      * @see Scanner
