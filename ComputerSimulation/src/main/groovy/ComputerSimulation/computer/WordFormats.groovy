@@ -34,32 +34,37 @@ class WordFormats {
         return displayGenericReal(binNum, exponentSize)
     }
 
-    int displayInteger(List<String> binNum) {
+    static int displayInteger(List<String> binNum) {
         return Integer.parseInt(binNum.join(), 2)
     }
 
-    static List<String> createWord(String word) {
+    static List<List<String>> toMachineWords(String stringLiteral) {
 
-        final List<String> binaryWords = new ArrayList<>()
+        final List<List<String>> binaryWords = new ArrayList<>()
 
         // Use standard ASCII
-        byte[] bytes = word.getBytes(StandardCharsets.US_ASCII)
+        byte[] bytes = stringLiteral.getBytes(StandardCharsets.US_ASCII)
 
         StringBuilder binary = new StringBuilder(MEMORY_WORD_SIZE)
         for (byte b : bytes) {
 
-            int val = b;
+            int val = b
 
             for (int i = 0; i < MEMORY_WORD_SIZE; i++) {
-                binary.append((val & 128) == 0 ? 0 : 1);
-                val <<= 1;
+                binary.append((val & 128) == 0 ? 0 : 1)
+                val <<= 1
+                binary.append(" ")
             }
 
-            binaryWords.add(binary.toString())
+            binaryWords.add(binary.toString().tokenize())
             binary = new StringBuilder(MEMORY_WORD_SIZE)
         }
 
         return binaryWords
+    }
+
+    static char toASCII(int code) {
+        return (char)code
     }
 
     // Helper methods

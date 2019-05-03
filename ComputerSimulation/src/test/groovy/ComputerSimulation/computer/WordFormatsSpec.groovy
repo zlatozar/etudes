@@ -94,4 +94,30 @@ class WordFormatsSpec extends Specification {
         then: 'Integer number should be created'
         assert integer == 7
     }
+
+    def 'Convert string literal to machine words'() {
+
+        given: 'A string literal is given. In ASCII: 97, 98 and 99'
+        String binInteger = "abc"
+
+        when: 'Converter is called'
+        List<List<String>> machineWord = WordFormats.toMachineWords(binInteger)
+
+        then: 'Array of machine words should be created'
+        assert wordFormats.displayInteger(machineWord.get(0)) == 97
+        assert wordFormats.displayInteger(machineWord.get(1)) == 98
+        assert wordFormats.displayInteger(machineWord.get(2)) == 99
+    }
+
+    def 'Convert ASCII code to string'() {
+
+        given: 'An ASCII code 97'
+        int a = 97
+
+        when: 'Converter is called'
+        char asciiSym = WordFormats.toASCII(a)
+
+        then: 'Symbol should be displayed'
+        assert asciiSym == 'a'
+    }
 }
