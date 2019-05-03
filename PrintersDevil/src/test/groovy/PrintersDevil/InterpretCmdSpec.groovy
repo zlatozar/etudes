@@ -12,12 +12,12 @@ class InterpretCmdSpec extends Specification {
     def '?papersize [height width] (default 40 72) (break: TRUE)'() {
 
         given: 'Correct ?papersize command'
-        String papersise = '?papersize 50 80 4'
+        String paperSize = '?papersize 50 80 4'
 
         when: 'It is interpreted'
         env.getPapersizeHeight() == 40
         env.getPapersizeWidth() == 72
-        interpretLine.process(papersise)
+        interpretLine.process(paperSize)
 
         then: 'Parameters should be set'
         assert env.getPapersizeHeight() == 50

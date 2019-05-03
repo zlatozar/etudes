@@ -13,7 +13,7 @@ class PageSpec extends Specification {
         env.setPapersize(8, PAGE_WIDTH)
         env.setParagraphMode(Constants.FILL_mode)
 
-        Formattor formattor = new Formattor(null, null, env)
+        Formatter formatter = new Formatter(env)
 
         when: 'Try to store it in a page as fill it'
 
@@ -28,10 +28,10 @@ class PageSpec extends Specification {
 
         then: 'Text should be the filled'
         for (String line : lines) {
-            formattor.startLineByLine(line)
+            formatter.startLineByLine(line)
         }
 
         Page page = new Page(env)
-        page.display(formattor.takeSnapshot())
+        page.display(formatter.takeSnapshot())
    }
 }

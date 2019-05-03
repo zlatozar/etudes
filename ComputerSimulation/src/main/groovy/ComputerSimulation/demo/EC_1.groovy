@@ -10,7 +10,7 @@ class EC_1 extends Circuits {
 
     // Entry point
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         EC_1 ec1 = new EC_1()
 
         ec1.emulate()

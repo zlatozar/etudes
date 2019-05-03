@@ -7,7 +7,7 @@ package PrintersDevil
  * are related to how line(paragraph) looks like. Rest command required immediate
  * reaction so actions is taken here.
  */
-class Formattor {
+class Formatter {
 
     private final Environment env
 
@@ -26,7 +26,7 @@ class Formattor {
     private int inheritedSpaces = 0
     private String inheritedLine = ''
 
-    Formattor(Environment env) {
+    Formatter(Environment env) {
 
         this.env = env
         this.interpretLine = new InterpretLine(env)

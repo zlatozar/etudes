@@ -1,7 +1,7 @@
 package PrintersDevil
 
 /**
- * Detects commands and pass them to {@link Formattor}
+ * Detects commands and pass them to {@link Formatter}
  */
 class InterpretLine {
 

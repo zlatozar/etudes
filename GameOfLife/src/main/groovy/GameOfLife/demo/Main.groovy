@@ -6,7 +6,7 @@ import GameOfLife.Simulate
 
 class Main {
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
 
         Grid grid = new Grid(20, 20).withGlider()
         Simulate simulate = new Simulate(grid)

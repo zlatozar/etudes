@@ -6,24 +6,24 @@ class FormatterSpec extends Specification {
 
     def 'Immediately commands processing'() {
 
-        given: 'Formattor instance'
+        given: 'Formatter instance'
         Environment env = new Environment()
-        Formattor formattor = new Formattor(null, null, env)
+        Formatter formatter = new Formatter(env)
 
         when: 'Start processing given line'
         String line = '?space 10'
 
         then: 'I should discover immediate commands'
-        formattor.writeInPage(line)
+        formatter.writeInPage(line)
     }
 
     def 'Command combination'() {
 
-        given: 'Formattor and environment'
+        given: 'Formatter and environment'
         Environment env = new Environment()
-        Formattor formattor = new Formattor(null, null, env)
+        Formatter formatter = new Formatter(env)
 
-        when: 'Command combination is given formattor should react'
+        when: 'Command combination is given formatter should react'
         String paperSize = '?papersize 5 42'
         String mode = '?mode fill'
         String line1= 'In the fill mode,  spaces    still have no effect,'
@@ -35,19 +35,19 @@ class FormatterSpec extends Specification {
 
         then: 'Page should be formatter like this'
         for(String line : pageContent) {
-            formattor.startLineByLine(line)
+            formatter.startLineByLine(line)
         }
 
-        println formattor.takeSnapshot()
+        println formatter.takeSnapshot()
     }
 
-    def 'Unfill more than one line'() {
+    def 'Un-fill more than one line'() {
 
-        given: 'Formattor and environment'
+        given: 'Formatter and environment'
         Environment env = new Environment()
-        Formattor formattor = new Formattor(null, null, env)
+        Formatter formatter = new Formatter(env)
 
-        when: 'Command combination is given formattor should react'
+        when: 'Command combination is given formatter should react'
         String paperSize = '?papersize 40 42'
         String mode = '?mode unfilled'
         String line1= 'This text   will be taken exactly  as'
@@ -58,10 +58,10 @@ class FormatterSpec extends Specification {
 
         then: 'Page should be formatter like this'
         for(String line : pageContent) {
-            formattor.startLineByLine(line)
+            formatter.startLineByLine(line)
         }
 
-        assert formattor.takeSnapshot() ==
+        assert formatter.takeSnapshot() ==
                 'This text   will be taken exactly  as\n' +
                 '   seen and it   better  not  run\n' +
                 'past      column    40.\n'
@@ -69,11 +69,11 @@ class FormatterSpec extends Specification {
 
     def 'Unfill more than one line with a given margin'() {
 
-        given: 'Formattor and environment'
+        given: 'Formatter and environment'
         Environment env = new Environment()
-        Formattor formattor = new Formattor(null, null, env)
+        Formatter formatter = new Formatter(env)
 
-        when: 'Command combination is given formattor should react'
+        when: 'Command combination is given formatter should react'
         String paperSize = '?papersize 40 42'
         String mode = '?mode unfilled'
         String margin = '?margin 3 43'
@@ -85,10 +85,10 @@ class FormatterSpec extends Specification {
 
         then: 'Page should be formatter like this'
         for (String line : pageContent) {
-            formattor.startLineByLine(line)
+            formatter.startLineByLine(line)
         }
 
-        assert formattor.takeSnapshot() ==
+        assert formatter.takeSnapshot() ==
                 '   This text   will be taken exactly  as\n' +
                 '      seen and it   better  not  run\n' +
                 '   past      column    40.\n'
@@ -102,7 +102,7 @@ class FormatterSpec extends Specification {
         env.setPapersize(40, 42)
         env.setParagraphMode(Constants.FILL_mode)
 
-        Formattor formattor = new Formattor(null, null, env)
+        Formatter formatter = new Formatter(env)
 
         when: 'Try to store it in a page as fill it'
 
@@ -117,10 +117,10 @@ class FormatterSpec extends Specification {
 
         then: 'Text should be the filled'
         for (String line : lines) {
-            formattor.startLineByLine(line)
+            formatter.startLineByLine(line)
         }
 
-        assert formattor.takeSnapshot() ==
+        assert formatter.takeSnapshot() ==
                 '   In the fill mode, spaces still have no\n' +
                 'effect, but now the words are all run \n' +
                 'close up and the right margin is raggedy.\n' +
@@ -138,7 +138,7 @@ class FormatterSpec extends Specification {
         env.setParagraphMode(Constants.FILL_mode)
         env.setMargin(3, 42)
 
-        Formattor formattor = new Formattor(null, null, env)
+        Formatter formatter = new Formatter(env)
 
         when: 'Try to store it in a page as fill it'
 
@@ -153,10 +153,10 @@ class FormatterSpec extends Specification {
 
         then: 'Text should be the filled'
         for (String line : lines) {
-            formattor.startLineByLine(line)
+            formatter.startLineByLine(line)
         }
 
-        assert formattor.takeSnapshot() ==
+        assert formatter.takeSnapshot() ==
                 '      In the fill mode, spaces still \n' +
                 '   have no effect, but now the words \n' +
                 '   are all run close up and the right \n' +
@@ -174,7 +174,7 @@ class FormatterSpec extends Specification {
         env.setPapersize(40, 42)
         env.setParagraphMode(Constants.JUSTIFY_mode)
 
-        Formattor formattor = new Formattor(null, null, env)
+        Formatter formatter = new Formatter(env)
 
         when: 'Try to store it in a page as justify it'
 
@@ -189,11 +189,10 @@ class FormatterSpec extends Specification {
 
         then: 'Text should be the filled'
         for (String line : lines) {
-            formattor.startLineByLine(line)
+            formatter.startLineByLine(line)
         }
 
-        println formattor.takeSnapshot()
+        println formatter.takeSnapshot()
     }
-
 
 }

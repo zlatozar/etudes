@@ -19,6 +19,7 @@ class Memory {
     private final PC pointer = new PC()
 
     Memory() {
+        println("Initialize EC-1 memory...")
         init()
     }
 

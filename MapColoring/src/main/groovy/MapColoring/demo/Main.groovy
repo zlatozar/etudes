@@ -7,7 +7,7 @@ import MapColoring.Paint
 
 class Main {
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         println('\n     - First we took America states map')
         def boundaries = new GeographicMaps.America().borders()
 

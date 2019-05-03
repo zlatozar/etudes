@@ -26,7 +26,7 @@ class TextLineSpec extends Specification {
         assert textLine.unfilled(unfilledLine)[0] == '   This text   will be taken exactly  as\n'
     }
 
-    def 'Unfill more than one line'() {
+    def 'Un-fill more than one line'() {
 
         given: '2 lines are wider than page length'
         Environment env = new Environment()

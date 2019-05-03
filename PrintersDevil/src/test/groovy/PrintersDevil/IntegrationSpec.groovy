@@ -8,16 +8,15 @@ class IntegrationSpec extends Specification {
 
     def 'Command combination'() {
 
-        given: 'Formattor and environment'
+        given: 'Formatter and environment'
         Environment env = new Environment()
-        Formattor formattor = new Formattor(null, null, env)
+        Formatter formatter = new Formatter(env)
 
-        when: 'Command combination is given formattor should react'
+        when: 'Command combination is given formatter should react'
         new File(COMMANDS_FILE_NAME).eachLine({
             line ->
-                formattor.startLineByLine(line)
+                formatter.startLineByLine(line)
         })
-
 
         then: 'Page should be formatter like this'
         println "Done"
