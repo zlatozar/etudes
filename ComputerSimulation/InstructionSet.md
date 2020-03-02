@@ -1,23 +1,27 @@
 ## Instruction formats
 
+`ILC` - Instruction Location Counter (a.k.a Program Counter)
+`CCR` - Condition Code Register. Store the "consequences" of the instruction execution.
+
 Instructions occur in **short** two-character format and **long** four-character format. All instructions
-must begin on even-character boundaries; failure of the ILC to contain an even address at the 
-beginning of an instruction execution cycle causes an _illegal instruction address exception_. The first 
+must begin on even-character boundaries; failure of the `ILC` to contain an even address at the
+beginning of an instruction execution cycle causes an _illegal instruction address exception_. The first
 character of every instruction contains the _indirect bit_ in bit 0 and the _operation code_ (the ```opcode```) in
 bits 1 through 7. Not all opcodes are meaningful and not all instructions make use of the indirect
 bit. An illegal opcode causes an _unimplemented instruction exception_. In most instructions, bits 8
-through 11 designate either a general register or a 4-bit literal value used as a mask, and bits 12
-through 15 designate a second general register.
+through 11 designate either a general register(`R1`) or a 4-bit literal value used as a mask(`M1`), and bits 12
+through 15 designate a second general register(`R2`).
 
 Basically, there are four kinds of instructions: ```register-to-register``` (the two-character instructions),
 ```register-and-storage```, ```immediate```, and ```character```. Each class has its own characteristic interpretation
 and addressing algorithm detailed here:
 
 1. ```Register-to-register``` (```RR```) . In all register-to-register instructions, bits 12 through
-15 designate a register used as one operand of the instruction. If the indirect bit is on, the operand is
-located at the address given by bits 16 through 31 of the register designated by bits 12 through 15 of the
-instruction. The value in bits 8 through 11 may designate either a register or a mask.
-Instructions **CCS** and **MCS** do not make use of the indirect bit.
+15 (`R2`) designate a register used as one operand of the instruction. If the _indirect bit_ is on, the operand is
+located at the address given by bits 16 through 31(`A`) of the register designated by bits 12 through 15 of the
+instruction (`R2` is used as pointer). The value in bits 8 through 11 may designate either a register(`R1`)
+or a mask(`M1`). Instructions **CCS**(Compare Character String) and **MCS**(Move Character String)
+do not make use of the indirect bit.
 
 2. ```Register-and-Storage``` (```RS```). Register-and-storage instructions usually use bits 8 through 11
 to designate a register or form a 4-bit mask to be used as one operand. The rest of the
@@ -26,21 +30,21 @@ instruction is used to form an _effective address_ with this algorithm:
    If the indirect bit is 0 and the _index register designator_ (bits 12 through 15) is 0,
    the effective address is given by the _address field_ (bits 16 through 31) of the
    instruction.
-   
+
    If the indirect bit is zero and the index register designator is nonzero, the address field
    is extended to the left with zeros and added (two's complement, of course) to the
    value in the index register. Bits 16 through 31 of the result form the affected address.
    The value in the index register is not changed.
-   
+
    If the indirect bit is nonzero and the index register designator is zero, the address field
    names a two-character _indirect field_ in memory. The contents of the indirect field
    form the effective address. If the indirect field does not begin on an even-character
    boundary, an _indirect address exception_ occurs.
-   
+
    If both the indirect bit and the index register designator are nonzero, the indirect
    field is added to the index register value and the rightmost 16 bits of the sum form
    the effective address. An indirect address exception may occur.
-   
+
 3. ```Immediate``` (```IM```). All immediate instructions use bits 8 through 11 to designate a target
 register and bits 12 through 31 to hold an _immediate operand_. The immediate operand
 may be a 20-bit two's complement integer, a 20-bit logical vector, or a short-format real
@@ -54,20 +58,23 @@ instructions.
 
 ## Instruction description (114 ops codes)
 
-In this section we describe each of the instructions. The first line of a description is a short 
+In this section we describe each of the instructions. The first line of a description is a short
 summary, giving the instruction name, its format (```RR```, ```RS```, ```IM```, ```CH```), its opcode in hexadecimal, its
 assembly language format, and the possible condition code bits affected. A word description
 follows the summary.
- 
+
 NOTE: In assembly language, the indirect bit is set by writing an asterisk before the address field, as in:
 ```
-LN,R1 *A,R2
+LN, R1 *A
 ```
+`*` - indirect designator
 
 ATTENTION: Registers are referenced by they number not in format ```R<number>``` e.g. ```FAR, 2 1```
 
 The code for the **CCR** effect is ```O``` (Overflow), ```L``` (Less than), ```G``` (Greater than),
 ```E``` (Equal) , and ```None``` (indicating that the **CCR** is unaffected).
+
+In the notation ```L, R1 [A,R2]``` means that second parameter could be address of register/index
 
 ![Ops Codes summer](images/summery_of_ops_codes.png "ops_codes")
 
@@ -208,7 +215,7 @@ NOTE: In a comparison to set the CCR, the final result is assumed to hold if the
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|       Load        |   RS   | 20   |   ```L, R1 A, R2```              |    GLE     |
+|       Load        |   RS   | 20   |   ```L, R1 [A,R2]```              |    GLE     |
 
 This instruction operates in the same way as the ```Load Register``` instruction except that the
 effective address is calculated by using the ```register-and-storage``` addressing algorithm.
@@ -226,13 +233,13 @@ the immediate operand I with its sign bit extended left 12 bits. No exceptions c
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|      Load Character             |  CH    |    60         |      ```LC, R1 A, R2```               |      GE      |
+|      Load Character             |  CH    |    60         |      ```LC, R1 [A,R2]```               |      GE      |
 
 Register R1 is cleared to zero, and the character at the effective address is loaded into bits
 24 through 31. The loaded value is compared to zero and either the G or E bit of the CCR set.
 
 ### 5. LNR
- 
+
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |    Load Negative Register               |   RR     |    01         |       ```LNR, R1 R2```     |     OGLE       |
@@ -245,9 +252,9 @@ the CCR is set. A _word-addressing exception_ may occur.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|      Load Negative             |   RS     |    21         |       ```LN, R1 A, R2```            |     OGLE        |
+|      Load Negative             |   RS     |    21         |       ```LN, R1 [A,R2]```            |     OGLE        |
 
-This instruction operates in the same way as ```Load Negative Register``` except that the 
+This instruction operates in the same way as ```Load Negative Register``` except that the
 effective address is calculated by the ```register-and-storage``` addressing algorithm.
 
 ### 7. LNI
@@ -255,8 +262,8 @@ effective address is calculated by the ```register-and-storage``` addressing alg
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |    Load Negative Immediate               |    IM    |     41        |    ```LNI, R1 I```   |      GLE      |
- 
-The value loaded into register R1 is the 32-bit two's complement of the 20-bit two's 
+
+The value loaded into register R1 is the 32-bit two's complement of the 20-bit two's
 complement value I. Overflow cannot occur. The CCR is set by comparing the loaded value with
 zero.
 
@@ -264,9 +271,9 @@ zero.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|       Load Negative Character            |    CH      |      61       |     ```LNC, R1 A, R2```   |    LE         |
- 
-The character at the effective address is extended leftward 24 bits with zeros and the 
+|       Load Negative Character            |    CH      |      61       |     ```LNC, R1 [A,R2]```   |    LE         |
+
+The character at the effective address is extended leftward 24 bits with zeros and the
 resulting word complemented and loaded into register R1. Overflow cannot occur. The loaded
 value is compared with zero to set the CCR.
 
@@ -275,7 +282,7 @@ value is compared with zero to set the CCR.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |       Store Register            |    RR    |   02       |     ```STR, R1 R2```              |     GLE        |
-   
+
 The value in R1 is stored in the word at the effective address. The stored value is compared
 to zero to set the CCR. A _word-addressing exception_ may occur.
 
@@ -283,8 +290,8 @@ to zero to set the CCR. A _word-addressing exception_ may occur.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|       Store            |   RS     |     22         |      ```ST, R1 A, R2```              |    GLE        |
-  
+|       Store            |   RS     |     22         |      ```ST, R1 [A,R2]```              |    GLE        |
+
 This instruction operates in the same way as the ```Store Register``` instruction with the effective
 address calculated by the ```register-and-storage``` addressing algorithm.
 
@@ -294,7 +301,7 @@ p. 112 (14 ops codes)
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|      Store Character             |   CH     |    62         |      ```STC, R1 A, R2```             |    GE        |
+|      Store Character             |   CH     |    62         |      ```STC, R1 [A,R2]```             |    GE        |
 
 Bits 24 through 31 are stored in the character at the effective address. The stored value is
 compared to zero to set the CCR.
@@ -305,7 +312,7 @@ compared to zero to set the CCR.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |       Swap Register            |   RR     |     03        |   ```SWAPR, R1 R2```                |    GLE        |
 
-    
+
 The word in register R1 is exchanged with the word at the effective address. The CCR is
 set by comparing the value moved into register R1 with zero. A _word-addressing exception_ may occur.
 
@@ -313,17 +320,17 @@ set by comparing the value moved into register R1 with zero. A _word-addressing 
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|       Swap            |    RS    |     23        |     ```SWAP, R1 A, R2```              |     GLE       |
-    
-This instruction operates in the same way as the ```Swap Register``` instruction with the 
+|       Swap            |    RS    |     23        |     ```SWAP, R1 [A,R2]```              |     GLE       |
+
+This instruction operates in the same way as the ```Swap Register``` instruction with the
 effective address calculated by the ```register-and-storage``` algorithm.
 
 ### 14. SWAPC
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|  Swap Character                 |  CH      |    63         |     ```SWAPC, R1 A, R2```              |   GE         |
-    
+|  Swap Character                 |  CH      |    63         |     ```SWAPC, R1 [A,R2]```              |   GE         |
+
 Bits 24 through 31 are exchanged with the character at the effective address. The CCR is
 set by comparing the character loaded into the register with zero. Bits 0 through 23 of
 register R1 are not affected.
@@ -333,7 +340,7 @@ register R1 are not affected.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |  ```AND``` Register                 |  RR      |      04       |     ```ANDR, R1 R2```              |    GLE        |
-    
+
 The logical ```AND``` of the word in R1 and the word at the effective address is formed and
 loaded into register R1. Bit G of the CCR is set if the final value in R1 is all ones, bit L
 is set if the result if mixed zeros and ones, and bit E is set if the result is all zeros.
@@ -343,8 +350,8 @@ A _word-addressing exception_ may occur.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|   ```AND```                |  RS      |    24         |    ```AND, R1 A, R2```               |    GLE        |
-  
+|   ```AND```                |  RS      |    24         |    ```AND, R1 [A,R2]```               |    GLE        |
+
 This instruction operates like the ```And Register``` except that the ```register-and-storage```
 addressing algorithm is used to calculate the effective address.
 
@@ -361,7 +368,7 @@ left with 12 zero bits is stored in R1. The CCR is set in the same way as the ``
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|   ```AND``` Character               |   CH     |   64          |   ```ANDC, R1 A, R2```                |  GLE          |
+|   ```AND``` Character               |   CH     |   64          |   ```ANDC, R1 [A,R2]```                |  GLE          |
 
 The character at the effective address is ANDed with bits 24 through 31 of register R1 and
 the result is replaced in bits 24 through 31 of R1. Bits 0 through 23 of R1 are not affected.
@@ -372,7 +379,7 @@ The CCR is set in the same way as the ```And Register``` instruction.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |    ```OR``` Register               | RR       |   05          |    ```ORR, R1 R2```               |    GLE        |
-    
+
 This instruction operates in the same way as the ```And Register``` with logical ```OR``` replacing
 logical ```AND```.
 
@@ -380,7 +387,7 @@ logical ```AND```.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|    ```OR```       | RS       |   25          |    ```OR,R1 A,R2```               |    GLE        |
+|    ```OR```       | RS       |   25          |    ```OR, R1 [A,R2]```               |    GLE        |
 
 This instruction operates in the same way as ```AND``` with logical ```OR``` replacing logical ```AND```.
 
@@ -396,7 +403,7 @@ This instruction operates in the same way as ```And Immediate``` with logical ``
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|  ```OR``` Character                 | CH       |   65          |    ```ORC, R1 A, R2```               |     GLE       |
+|  ```OR``` Character                 | CH       |   65          |    ```ORC, R1 [A,R2]```               |     GLE       |
 
 This instruction operates in the same way as ```And Character``` with logical and replaced by logical ```OR```.
 
@@ -405,15 +412,15 @@ This instruction operates in the same way as ```And Character``` with logical an
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |   Exclusive ```OR``` Register                | RR       |   06          |    ```XORR, R1 R2```               |  GLE          |
-    
-This instruction operates in the same way as ```And Register``` with logical ```AND``` replaced by 
+
+This instruction operates in the same way as ```And Register``` with logical ```AND``` replaced by
 logical ```exclusive OR```.
 
 ### 24. XOR
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|  Exclusive ```OR```                 |  RS      | 26            |  ```XOR, R1 A, R2```                 |       GLE         |
+|  Exclusive ```OR```                 |  RS      | 26            |  ```XOR, R1 [A,R2]```                 |       GLE         |
 
 This instruction operates in the same way as ```And``` with logical ```AND``` replaced by logical
 ```exclusive OR```.
@@ -433,7 +440,7 @@ logical ```exclusive OR```.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|  Exclusive OR Character                 | CH       |    66         |   ```XORC, R1 A, R2```                |  GLE          |
+|  Exclusive OR Character                 | CH       |    66         |   ```XORC, R1 [A,R2]```                |  GLE          |
 
 This instruction operates in the same as ```And Character``` with logical ```AND``` replaced by logical
 ```exclusive OR```.
@@ -443,7 +450,7 @@ This instruction operates in the same as ```And Character``` with logical ```AND
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |  ```NOT``` Register                  |  RR      |   07          |    ```NOTR, R1 R2```               |  GLE          |
-    
+
 This instruction operates in the same way as ```And Register``` with logical ```AND``` replaced by
 logical complement of the second operand, the original value in register R1 being ignored.
 
@@ -451,9 +458,9 @@ logical complement of the second operand, the original value in register R1 bein
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-| ```NOT```         |   RS   |  27         |```NOT, R1 A, R2```|   GLE      |
+| ```NOT```         |   RS   |  27         |```NOT, R1 [A,R2]```|   GLE      |
 
-This instruction operates in the same way as ```And``` with logical ```AND``` replaced by logical 
+This instruction operates in the same way as ```And``` with logical ```AND``` replaced by logical
 complement of the second operand, the original value in register R1 being ignored.
 
 ### 29. NOTI
@@ -469,7 +476,7 @@ logical complement of the extended immediate value, the original value in regist
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|   NOT Character                |  CH      |   67          |   ```NOTC, R1 A, R2```                |    GLE        |
+|   NOT Character                |  CH      |   67          |   ```NOTC, R1 [A,R2]```                |    GLE        |
 
 This instruction operates in the same way as ```And Character``` with logical ```AND``` replaced by
 logical complement of the second operand, the original value of bits 24 through 31 of register R1 being ignored.
@@ -478,7 +485,7 @@ logical complement of the second operand, the original value of bits 24 through 
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|Branch Conditions Set Register| RR       |  08           |   ```BCSR ,M1 R2```               |   None         |
+|Branch Conditions Set Register| RR       |  08           |   ```BCSR, M1 R2```               |   None         |
 
 If the logical ```AND``` of the contents of the CCR and the 4-bit logical mask M1 is nonzero,
 the contents of the ILC are replaced by the effective address.
@@ -487,9 +494,9 @@ the contents of the ILC are replaced by the effective address.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|Branch Conditions Set                   | RS       |  28           |   ```BCS, M1 A, R2```                 |  None          |
-  
-This instruction operates in the same way as ```Branch Conditions Set Register``` with the 
+|Branch Conditions Set                   | RS       |  28           |   ```BCS, M1 [A,R2]```                 |  None          |
+
+This instruction operates in the same way as ```Branch Conditions Set Register``` with the
 effective address calculated by the ```register-and-storage``` addressing algorithm.
 
 ### 33. BCRR
@@ -497,16 +504,16 @@ effective address calculated by the ```register-and-storage``` addressing algori
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |Branch Conditions Reset Register                   | RR       | 09            |  ```BCRR, M1 R2```                 |     None       |
-    
-If the logical ```AND``` of the contents of the CCR and the 4-bit logical mask M1 is zero, the 
+
+If the logical ```AND``` of the contents of the CCR and the 4-bit logical mask M1 is zero, the
 contents of the ILC are replaced by the effective address.
 
 ### 34. BCR
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|Branch Condition Reset                   |  RS      |  29           | ```BCR, M1 A, R2```                  |   None         |
-    
+|Branch Condition Reset                   |  RS      |  29           | ```BCR, M1 [A,R2]```                  |   None         |
+
 This instruction operates in the same way as ```Branch Conditions Reset Register``` with the
 effective address calculated by the ```register-and-storage``` addressing algorithm.
 
@@ -524,7 +531,7 @@ R2 multiplied by 4.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|Branch and Link                   | RS       |   2A          |   ```BAL, R1 A, R2```                |   None         |
+|Branch and Link                   | RS       |   2A          |   ```BAL, R1 [A,R2]```                |   None         |
 
 The current contents of the ILC are stored in register R1 and the ILC is loaded with the
 effective address of the instruction.
@@ -543,7 +550,7 @@ A _word-addressing exception_ may occur.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|Save Condition                   |  RS      |   2B          |    ```SAC, M1 A, R2```               |   None         |
+|Save Condition                   |  RS      |   2B          |    ```SAC, M1 [A,R2]```               |   None         |
 
 This instruction operates in the same way as the ```Store Conditions Register``` instruction with
 the effective address calculated by the ```register-and-storage addressing``` algorithm.
@@ -554,8 +561,8 @@ p. 114 (7 ops codes)
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|Save Condition Character                   | CH       |   6B          | ```SACC, M1 A, R2```                  |   None         |
-   
+|Save Condition Character                   | CH       |   6B          | ```SACC, M1 [A,R2]```                  |   None         |
+
 If the logical ```AND``` of the CCR and the 4 bit mask field M1 is nonzero, a character of all **one**
 bits is stored at the effective address; otherwise a character of all **zero** bits is stored.
 
@@ -564,7 +571,7 @@ bits is stored at the effective address; otherwise a character of all **zero** b
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Compare Register                  | RR       |     0C        |   ```CR, R1 R2```                 |     GLE       |
-   
+
 The results of an algebraic comparison between the contents of register R1 and the word at
 the effective address are used to set the G, L, or E bits of the CCR as appropriate.
 A _word-addressing exception_ may occur.
@@ -573,17 +580,17 @@ A _word-addressing exception_ may occur.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|  Compare                 |  RS      |  2C           |    ```C, R1 A, R2```               |    GLE         |
-   
-This instruction operates the same way as ```Compare Register``` except that the effective 
+|  Compare                 |  RS      |  2C           |    ```C, R1 [A,R2]```               |    GLE         |
+
+This instruction operates the same way as ```Compare Register``` except that the effective
 address is calculated by the ```register-and-storage``` addressing algorithm.
 
 ### 42. CI
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-| Compare Immediate                  | IM       |   4C          |     ``` CI, R1, I```             |  GLE          |
-    
+| Compare Immediate                  | IM       |   4C          |     ```CI, R1, I```             |  GLE          |
+
 The 32-bit value in register R1 is compared algebraically with the 32-bit value constructed
 by propagating the immediate operand's sign bit leftward 12 bits, and the result is used to
 set the G, L, or E bit of the CCR as appropriate.
@@ -592,9 +599,9 @@ set the G, L, or E bit of the CCR as appropriate.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|  Compare Character                 |  CH      |  6C           |     ```CC, R1 A, R2```              | GLE           |
- 
-Bits 24 through 31 of register R1 are compared as an 8-bit positive integer with the 
+|  Compare Character                 |  CH      |  6C           |     ```CC, R1 [A,R2]```              | GLE           |
+
+Bits 24 through 31 of register R1 are compared as an 8-bit positive integer with the
 character at the effective address, and the result is used to set the G, L, or E bit of the CCR as
 appropriate.
 
@@ -603,9 +610,9 @@ appropriate.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Compare Character String                  | RR       |  0E           |    ```CCS, M1 R2```               |    GLE        |
-    
-Register designator R2 names a register pair R2 and (R2+1) mod 16 (the second register
-will be called R2+1 throughout). The pair R2 and R2+1 should contain a string descriptor
+
+Register designator R2 names a register pair R2 and (R2+1) `mod` 16 (the second register
+will be called R2+1 throughout). The pair R2 and R2+1(double word) should contain a string descriptor
 doubleword, with a character address A1 in bits 16 through 31 of register R2, a length L in
 bits 0 through 15 of register R2+1, and a character address A2 in bits 16 through 31 of
 register R2+1. To begin execution, A1, A2, and L are moved to internal registers, the CCR is
@@ -634,7 +641,7 @@ set to zero, and the E bit of the CCR is set to one. A loop is started.
 | Move Character String                  | RR       |   0F          |    ```MCS, M1 R2```               | None           |
 
 Registers R2 and (R2+1) mod 16 contain a string descriptor doubleword as described in
-```Compare Character String```. The L, A1, and A2 fields are loaded into internal registers. A
+```Compare Character String(CCS)```. The L, A1, and A2 fields are loaded into internal registers. A
 loop is begun.
 
 - First, if L is zero, bits 0 through 15 of registers R2 and R2+1 are set to zero, bits 16
@@ -653,7 +660,7 @@ p. 115 (12 ops codes)
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-| Supervisor Call                  |  RS      |  2E           |  ```SVC, R1 A, R2```                 |   None         |
+| Supervisor Call                  |  RS      |  2E           |  ```SVC, R1 [A,R2]```                 |   None         |
 
 Program execution is interrupted and a call made to a controlling supervisor program.
 
@@ -661,10 +668,10 @@ Program execution is interrupted and a call made to a controlling supervisor pro
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|  Execute                 | RS       |  2F           |  ```EX, R1 A, R2```                 |  None          |
+|  Execute                 | RS       |  2F           |  ```EX, R1 [A,R2]```                 |  None          |
 
 The instruction at the effective address is executed. The effects of the subject instruction
-become the effects of the Execute instruction. If the effective address is **not even**, an
+become the effects of the Execute(EX) instruction. If the effective address is **not even**, an
 _execute address exception_ occurs. **Execute instructions may be nested to any depth**. Note
 that the ILC is changed only if explicitly modified by the subject instruction.
 
@@ -672,15 +679,15 @@ that the ILC is changed only if explicitly modified by the subject instruction.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|Load Address                   |  RS      |    4E         |      ```LA, R1 A, R2```             |    None        |
-    
+|Load Address                   |  RS      |    4E         |      ```LA, R1 [A,R2]```             |    None        |
+
 Register R1 is loaded with the instruction's effective address.
 
 ### 49. LM
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-| Load Multiple                  |RS        |   6E          | ```LM, R1 A, R2```                  |     None       |
+| Load Multiple                  |RS        |   6E          | ```LM, R1 [A,R2]```                  |     None       |
 
 Registers R1 through R2 are loaded from consecutive words in memory, beginning at the
 effective address (the effective address is calculated by assuming that the index register
@@ -691,10 +698,10 @@ loaded. A _word-addressing exception_ may occur.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-| Store Multiple                  | RS       |   6F          |   ```STM, R1 A, R2```                |   None         |
+| Store Multiple                  | RS       |   6F          |   ```STM, R1 [A,R2]```                |   None         |
 
 Registers R1 through R2 are stored into consecutive words of memory, beginning at the
-effective address (the effective address is calculated by assuming the index register 
+effective address (the effective address is calculated by assuming the index register
 designator is zero). If R2 is less than R1, registers R1 through 15 and 0 through R2 are stored.
 A _word-addressing exception_ may occur.
 
@@ -703,7 +710,7 @@ A _word-addressing exception_ may occur.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |Add Register                   |  RR      |  10           |     ```AR, R1 R2```              |   OGLE         |
-   
+
 The word in R1 is added to the word at the effective address and the result is placed in R1.
 The sum is compared to zero to set the CCR. If _overflow occurs_, only the **O** bit of the CCR
 is set. A _word-addressing exception_ may occur.
@@ -712,9 +719,9 @@ is set. A _word-addressing exception_ may occur.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-| Add               |   RS     |   30          | ```A, R1 A, R2```                  |   OGLE         |
-    
-This instruction operates in the same way as ```Add Register``` with the effective address 
+| Add               |   RS     |   30          | ```A, R1 [A,R2]```                  |   OGLE         |
+
+This instruction operates in the same way as ```Add Register``` with the effective address
 calculated by the ```register-and-storage``` addressing algorithm.
 
 ### 53. AI
@@ -723,7 +730,7 @@ calculated by the ```register-and-storage``` addressing algorithm.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Add Immediate                  |  IM      |   50          |    ```AI, R1 I```               |   OGLE         |
 
-    
+
 The 20-bit two's complement immediate operand I is added to the value in register R1 and
 the sum stored in R1. The sum is compared to zero to set the CCR. If _overflow occurs_, only
 the **O** bit of the CCR is set.
@@ -732,9 +739,9 @@ the **O** bit of the CCR is set.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|Add Character                   |   CH     |  70           |  ```AC, R1 A, R2```                 |   OGLE         |
+|Add Character                   |   CH     |  70           |  ```AC, R1 [A,R2]```                 |   OGLE         |
 
-   
+
 The character at the effective address is extended 24 bits to the left with zeros and added to
 the value in register R1 with the result loaded into R1. The sum is compared to zero to set
 the CCR. If _overflow occurs_, only the **O** bit of the CCR is set.
@@ -744,7 +751,7 @@ the CCR. If _overflow occurs_, only the **O** bit of the CCR is set.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |  Subtract Register                 | RR       |   11          |    ```SR, R1 R2```               |   OGLE         |
-    
+
 The word at the effective address (the subtrahend) is subtracted from the value in register
 R1 (the minuend) and the difference is stored in R1. The difference is compared to zero to
 set the CCR. If _overflow occurs_, only the **O** bit of the CCR is set. A _word-addressing exception_ may occur.
@@ -753,9 +760,9 @@ set the CCR. If _overflow occurs_, only the **O** bit of the CCR is set. A _word
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|  Subtract                 |   RS     |    31         |    ```S, R1 A, R2```               |    OGLE        |
+|  Subtract                 |   RS     |    31         |    ```S, R1 [A,R2]```               |    OGLE        |
 
-    
+
 This instruction operates the same way as ```Subtract Register``` with the effective address
 calculated by the ```register-and-storage``` addressing algorithm.
 
@@ -764,7 +771,7 @@ calculated by the ```register-and-storage``` addressing algorithm.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |  Subtract Immediate                 |   IM     |   51          |    ```SI, R1 I```               |    OGLE        |
-    
+
 The 20-bit two's complement integer immediate operand I (the subtrahend) is subtracted
 from the value in register R1 (the minuend) and the result stored in register R1. The difference
 is compared to zero to set the CCR. If _overflow occurs_, only the **O** bit of the CCR is set.
@@ -775,8 +782,8 @@ p. 116 (12 ops codes)
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-| Subtract Character                  |   CH     |    71         |    ```SC, R1 A, R2```               |   OGLE         |
-   
+| Subtract Character                  |   CH     |    71         |    ```SC, R1 [A,R2]```               |   OGLE         |
+
 The character at the effective address (the subtrahend), treated as a positive integer by
 extension 24 bits leftward with zeros, is subtracted from the value in register R1 (the
 minuend) and the result stored in R1. The difference is compared to zero to set the CCR.
@@ -787,7 +794,7 @@ If _overflow occurs_, only the **O** bit of the CCR is set.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Reverse Subtract Register                  |  RR      |    12         |    ```RSR, R1 R2```               |    OGLE        |
-    
+
 This instruction operates the same way as the ```Subtract Register``` instruction except that the
 roles of the minuend and the subtrahend are reversed.
 
@@ -798,8 +805,8 @@ NOTE: In all the reversed instructions, although the roles of the two operand va
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-| Reverse Subtract                  | RS       |  32           |    ```RS, R1 A, R2```               |  OGLE          |
-    
+| Reverse Subtract                  | RS       |  32           |    ```RS, R1 [A,R2]```               |  OGLE          |
+
 This instruction operates the same way as ```Subtract``` except that the roles of the minuend
 and the subtrahend are reversed.
 
@@ -808,7 +815,7 @@ and the subtrahend are reversed.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Reverse Subtract Immediate                  |  IM      |   52          |     ```RSI, R1 I```              |  OGLE          |
-    
+
 This instruction operates the same way as ```Subtract Immediate``` except that the roles of the
 minuend and the subtrahend are reversed.
 
@@ -816,8 +823,8 @@ minuend and the subtrahend are reversed.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-| Reverse Subtract Character                  |    CH    |   72          |   ```RSC, R1 A, R2```                |    OGLE        |
-    
+| Reverse Subtract Character                  |    CH    |   72          |   ```RSC, R1 [A,R2]```                |    OGLE        |
+
 This instruction operates the same way as the ```Subtract Character``` with the roles of the
 minuend and the subtrahend reversed.
 
@@ -826,7 +833,7 @@ minuend and the subtrahend reversed.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Multiply Register                  | RR       |    13         |    ```MR, R1 R2```               |     OGLE       |
-    
+
 The value in register R1 and the word at the effective address are multiplied and the low-
 order 32 bits of the product are stored in register R1. The result in register R1 is compared
 to zero to set the CCR. If _overflow occurs_, only the **O** bit of the CCR is set.
@@ -836,9 +843,9 @@ A _word-addressing exception_ may occur.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|  Multiply                 |  RS      |    33         |   ```M, R1 A, R2```                |     OGLE       |
-    
-This instruction operates the same way as ```Multiply Register``` except that the effective 
+|  Multiply                 |  RS      |    33         |   ```M, R1 [A,R2]```                |     OGLE       |
+
+This instruction operates the same way as ```Multiply Register``` except that the effective
 address is calculated by the ```register-and-storage``` addressing algorithm.
 
 ### 65. MI
@@ -846,7 +853,7 @@ address is calculated by the ```register-and-storage``` addressing algorithm.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Multiply Immediate                  |  IM      |   53          |   ```MI, R1 I```                |    OGLE        |
-    
+
 The low 32 bits of the product of the value in register R1 and the 20-bit immediate value I
 are stored in register R1. The product in register R1 is compared to zero to set the CCR.
 If _overflow occurs_, only the **O** bit of the CCR is set.
@@ -855,8 +862,8 @@ If _overflow occurs_, only the **O** bit of the CCR is set.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|  Multiply Character                 |  CH      |   73          |        ```MC, R1 A, R2```          |  OGLE          |
-    
+|  Multiply Character                 |  CH      |   73          |        ```MC, R1 [A,R2]```          |  OGLE          |
+
 The low 32 bits of the product of the value in register R1 and the positive 8-bit integer
 in the character at the effective address are stored in register R1. The value in register R1
 is compared to zero to set the CCR. If _overflow occurs_, only the **O** bit of the CCR is set.
@@ -866,9 +873,9 @@ is compared to zero to set the CCR. If _overflow occurs_, only the **O** bit of 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |   Divide Register                | RR       |  14           |   ```DR, R1 R2```                |    OGLE        |
-    
+
 The value in register R1 (the _dividend_) is divided by the word at the effective address (the
-_divisor_) and the quotient is stored in register R1. The quotient is selected so that the 
+_divisor_) and the quotient is stored in register R1. The quotient is selected so that the
 remainder is non negative. The quotient is compared to zero to set the CCR. If _overflow
 occurs_, only the **O** bit of the CCR is set. A _word-addressing exception_ may occur. If
 the divisor is zero, the _zero divisor exception_ occurs and register R1 is unchanged.
@@ -877,9 +884,9 @@ the divisor is zero, the _zero divisor exception_ occurs and register R1 is unch
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|   Divide                |   RS     |   34          |    ```D, R1 A, R2```               |   OGLE         |
+|   Divide                |   RS     |   34          |    ```D, R1 [A,R2]```               |   OGLE         |
 
-   
+
 This instruction operates the same way as ```Divide Register``` except that the effective address
 is calculated with the register-and-storage addressing algorithm.
 
@@ -888,7 +895,7 @@ is calculated with the register-and-storage addressing algorithm.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |   Divide Immediate                |   IM     |   54          |    ```DI, R1 I```               |   OGLE         |
-    
+
 The value in register R1 (the dividend) is divided by the 20-bit two's complement integer
 immediate value I (the divisor) and the quotient is stored in register R1. The quotient is
 selected so that the remainder is non negative. The quotient is compared to zero to set the
@@ -901,9 +908,9 @@ p. 117 (12 ops codes)
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|  Divide Character                 |   CH     | 74            |      ```DC, R1 A, R2```            |     GLE       |
- 
-The value in register R1 (the dividend) is divided by the positive 8-bit integer at the 
+|  Divide Character                 |   CH     | 74            |      ```DC, R1 [A,R2]```            |     GLE       |
+
+The value in register R1 (the dividend) is divided by the positive 8-bit integer at the
 effective address (the divisor) and the quotient is stored in register R1. The quotient is selected
 so that the remainder is non negative. The quotient is compared to zero to set the CCR. If
 the divisor is zero, the zero divisor exception occurs and register R1 is unchanged. Overflow
@@ -916,7 +923,7 @@ p. 117 (12 ops codes)
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Reverse Divide Register                  |   RR     |     15        |   ``` RDR, R1 R2```                |    OGLE        |
-   
+
 This instruction operates the same way as ```Divide Register``` except that the roles of the
 dividend and divisor are reversed.
 
@@ -924,7 +931,7 @@ dividend and divisor are reversed.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-| Reverse Divide                  | RS       |     35        |   ```RD, R1 A, R2 ```                |     OGLE       |
+| Reverse Divide                  | RS       |     35        |   ```RD, R1 [A,R2] ```                |     OGLE       |
 
 This instruction operates the same way as ```Divide``` except that the roles of the dividend and
 the divisor are reversed.
@@ -934,7 +941,7 @@ the divisor are reversed.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |Reverse Divide Immediate                   |  IM      |  55           |  ```RDI, R1 I ```                 |   GLE         |
-   
+
 This instruction operates the same way as ```Divide Immediate``` except that the roles of the
 dividend and the divisor are reversed. Overflow is not possible.
 
@@ -942,8 +949,8 @@ dividend and the divisor are reversed. Overflow is not possible.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-| Reverse Divide Character                  | CH       |   75          |       ```RDC, R1 A, R2```            |    GLE        |
-    
+| Reverse Divide Character                  | CH       |   75          |       ```RDC, R1 [A,R2]```            |    GLE        |
+
 This instruction operates the same way as ```Divide Character``` except that the roles of the
 dividend and the divisor are reversed.
 
@@ -952,9 +959,9 @@ dividend and the divisor are reversed.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Remainder Register                  |   RR     |       16      |     ```REMR, R1 R2```              |   GE         |
-    
+
 The value in register R1 (the dividend) is divided by the word at the effective address (the
-divisor) and the non negative remainder is stored in register R1. The remainder is 
+divisor) and the non negative remainder is stored in register R1. The remainder is
 compared to zero to set the CCR. A _word-addressing exception_ may occur. If the divisor is zero,
 the zero divisor exception occurs and register R1 is unchanged.
 
@@ -962,8 +969,8 @@ the zero divisor exception occurs and register R1 is unchanged.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|   Remainder                |  RS      |    36         |     ```REM, R1 A, R2```              |   GE         |
-   
+|   Remainder                |  RS      |    36         |     ```REM, R1 [A,R2]```              |   GE         |
+
 This instruction operates the same way as ```Remainder Register``` except that the effective
 address is calculated by the ```register-and-storage``` addressing algorithm.
 
@@ -972,9 +979,9 @@ address is calculated by the ```register-and-storage``` addressing algorithm.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Remainder Immediate                  | IM       |  56           |    ```REMI, R1 I```               |   GE         |
-    
+
 The value in register R1 (the dividend) is divided by the 20-bit two's complement value I
-(the divisor) and the non negative remainder is stored in register R1. The remainder is 
+(the divisor) and the non negative remainder is stored in register R1. The remainder is
 compared to zero to set the CCR. If the divisor is zero, the zero divisor exception occurs and
 register R1 is unchanged.
 
@@ -982,10 +989,10 @@ register R1 is unchanged.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|  Remainder Character                 |   CH     |  76           |    ```REMC, R1 A, R2```               |   GE         |
-    
+|  Remainder Character                 |   CH     |  76           |    ```REMC, R1 [A,R2]```               |   GE         |
+
 The value in register R1 (the dividend) is divided by the 8-bit positive integer (the divisor)
-at the effective address and the non negative remainder is stored in register R1. The 
+at the effective address and the non negative remainder is stored in register R1. The
 remainder is compared to zero to set the CCR. If the divisor is zero, the zero divisor exception
 occurs and register R1 is unchanged.
 
@@ -994,7 +1001,7 @@ occurs and register R1 is unchanged.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |  Reverse Remainder Register                 | RR       |   17          |     ```RREMR, R1 R2```              |    GE        |
-    
+
 This instruction operates the same way as ```Remainder Register``` except that the roles of
 dividend and divisor are reversed.
 
@@ -1002,8 +1009,8 @@ dividend and divisor are reversed.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|  Reverse Remainder                 |  RS      |   37          |   ```RREM, R1 A, R2```                |    GE        |
-    
+|  Reverse Remainder                 |  RS      |   37          |   ```RREM, R1 [A,R2]```                |    GE        |
+
 This instruction operates the same way as ```Remainder``` except that the roles of dividend and
 divisor are reversed.
 
@@ -1012,7 +1019,7 @@ divisor are reversed.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Reverse Remainder Immediate                  |  IM      |    57         |    ```RREMI, R1 I```               |     GE       |
-   
+
 This instruction is the same as ```Remainder Immediate``` except that the roles of dividend and
 divisor are reversed.
 
@@ -1022,8 +1029,8 @@ p. 118 (13 ops codes)
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-| Reverse Remainder Character                  |  CH      |   77          |    ```RREMC, R1 A, R2```               |    GE        |
-    
+| Reverse Remainder Character                  |  CH      |   77          |    ```RREMC, R1 [A,R2]```               |    GE        |
+
 This instruction is the same as ```Remainder Character``` except that the roles of dividend and
 divisor are reversed.
 
@@ -1032,22 +1039,22 @@ divisor are reversed.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |  Real Add Register                 |   RR     |   18          |   ```FAR, R1 R2```                |   GLE         |
-    
+
 The value in register R1 is added to the real number at the effective address and the sum is
 stored in register R1. The sum is compared to zero to set the CCR. Both word-addressing
 and real-format exceptions may occur.
 
 NOTE: The mnemonics for the real arithmetic instructions are prefixed with the letter "F" because the historical name for
       real-number implementations is "floating point." This name also gives rise to the the FLOATR, FLOAT, and
-      FLOATI mnemonic opcodes. 
+      FLOATI mnemonic opcodes.
 
 ### 84. FA
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|  Real Add                 |  RS      |  38           |  ```FA, R1 A, R2```                 |  GLE          |
-    
-This instruction is the same as ```Real Add Register``` except that the effective address is 
+|  Real Add                 |  RS      |  38           |  ```FA, R1 [A,R2]```                 |  GLE          |
+
+This instruction is the same as ```Real Add Register``` except that the effective address is
 calculated by the register-and-storage addressing algorithm.
 
 ### 85. FAI
@@ -1055,7 +1062,7 @@ calculated by the register-and-storage addressing algorithm.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Real Add Immediate                   | IM       |   58          |      ```FAI, R1 I```             |   GLE         |
-   
+
 The sum of the value in register R1 and the real short format immediate operand I is stored
 in register R1. A _real format exception_ may occur.
 
@@ -1064,17 +1071,17 @@ in register R1. A _real format exception_ may occur.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |Real Subtract Register                   | RR       |  19           |   ```FSR, R1 R2```                |   GLE         |
-    
+
 The real number at the effective address (the subtrahend) is subtracted from the value in the
-register R1 (the minuend) and the difference is stored in register R1. The difference is 
+register R1 (the minuend) and the difference is stored in register R1. The difference is
 compared to zero to set the CCR. Both word-addressing and _real format exceptions_ may occur.
 
 ### 87. FS
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|  Real Subtract    |  RS      |  39           |   ```FS, R1 A,R2```                | GLE           |
-    
+|  Real Subtract    |  RS      |  39           |   ```FS, R1 [A,R2]```                | GLE           |
+
 This instruction is the same as ```Real Subtract Register``` except that the effective address is
 calculated by the register-and-storage addressing algorithm.
 
@@ -1083,9 +1090,9 @@ calculated by the register-and-storage addressing algorithm.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Real Subtract Immediate                  | IM       | 59            |  ```FSI, RI I```                 |   GLE         |
-    
+
 The short format real immediate operand I (the subtrahend) is subtracted from the value in
-register R1 (the minuend) and the difference is stored in register R1. The difference is 
+register R1 (the minuend) and the difference is stored in register R1. The difference is
 compared to zero to set the CCR. A _real-format exception_ can occur.
 
 ### 89. RFSR
@@ -1093,7 +1100,7 @@ compared to zero to set the CCR. A _real-format exception_ can occur.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Reverse Real Subtract Register                  | RR       |  1A           |   ```RFSR, R1 R2```                |  GLE          |
-    
+
 This instruction is the same as ```Real Subtract Register``` with the roles of the minuend and
 subtrahend reversed.
 
@@ -1101,8 +1108,8 @@ subtrahend reversed.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-| Reverse Real Subtract                  |  RS      |    3A         |  ```RFS, R1 A, R2```                 | GLE           |
-    
+| Reverse Real Subtract                  |  RS      |    3A         |  ```RFS, R1 [A,R2]```                 | GLE           |
+
 This instruction is the same as ```Real Subtract``` with the roles of the minuend and subtrahend
 reversed.
 
@@ -1111,7 +1118,7 @@ reversed.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |Reverse Real Subtract Immediate                   |  IM      |  5A           |   ```RFSI, R1 I```                |  GLE          |
-   
+
 This instruction is the same as ```Real Subtract Immediate``` with the roles of the minuend and
 the subtrahend reversed.
 
@@ -1120,7 +1127,7 @@ the subtrahend reversed.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Real Multiply Register                  |  RR      |  1B           |   ```FMR, R1, R2```                |   GLE         |
-    
+
 The value in register R1 and the real number at the effective address are multiplied and the
 product is stored in register R1. The product is compared to zero to set the CCR. Both
 word-addressing and real format exceptions may occur.
@@ -1129,8 +1136,8 @@ word-addressing and real format exceptions may occur.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-| Real Multiply                  | RS       |    3B         | ```FM, R1 A, R2```                  |   GLE         |
-    
+| Real Multiply                  | RS       |    3B         | ```FM, R1 [A,R2]```                  |   GLE         |
+
 This instruction is the same as ```Real Multiply Register``` except that the effective address is
 calculated by the ```register-and-storage``` addressing routine.
 
@@ -1139,7 +1146,7 @@ calculated by the ```register-and-storage``` addressing routine.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |  Real Multiply Immediate                 |  IM      |   5B          |     ```FMI, R1 I```              |   GLE         |
-    
+
 The value in register R1 is multiplied by the real short format immediate value I and the
 product is stored in register R1. The product is compared to zero to set the CCR.
 A _real format exception_ may occur.
@@ -1151,7 +1158,7 @@ p. 119 (13 ops codes)
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |  Real Divide Register                 |  RR      |     1C        |    ```FDR, R1 R2```              |   GLE         |
-    
+
 The value in register R1 (the dividend) is divided by the real number at the effective address
 (the divisor) and the quotient is stored in register R1. The quotient is compared with zero
 to set the CCR. _Word-addressing, real format_, and _zero divisor exceptions_ may occur.
@@ -1160,9 +1167,9 @@ to set the CCR. _Word-addressing, real format_, and _zero divisor exceptions_ ma
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-| Real Divide                  |  RS      |   3C          |   ```FD, R1 A, R2```                | GLE           |
-    
-This instruction is the same as ```Real Divide Register``` except that the effective address is 
+| Real Divide                  |  RS      |   3C          |   ```FD, R1 [A,R2]```                | GLE           |
+
+This instruction is the same as ```Real Divide Register``` except that the effective address is
 calculated by the ```register-and-storage``` addressing algorithm.
 
 ### 97. FDI
@@ -1170,7 +1177,7 @@ calculated by the ```register-and-storage``` addressing algorithm.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Real Divide Immediate                  | IM       |  5C           |     ```FDI, R1 I```              |    GLE        |
-    
+
 The value in register R1 (the dividend) is divided by the real short format immediate value I
 (the divisor) and the result stored in register R1. The quotient is compared to zero to set the
 CCR. Both _real format_ and _zero divisor exceptions_ may occur.
@@ -1180,7 +1187,7 @@ CCR. Both _real format_ and _zero divisor exceptions_ may occur.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |  Reverse Real Divide Register                 |  RR      |   1D          |  ```RFDR, R1 R2```                 |  GLE          |
-    
+
 This instruction is the same as ```Real Divide Register``` with the roles of dividend and divisor
 reversed.
 
@@ -1188,8 +1195,8 @@ reversed.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|  Reverse Real Divide                 |  RS      |    3D         |  ```RFD, R1 A, R2```                 |   GLE         |
-    
+|  Reverse Real Divide                 |  RS      |    3D         |  ```RFD, R1 [A,R2]```                 |   GLE         |
+
 This instruction is the same as ```Real Divide``` with the roles of dividend and divisor reversed.
 
 ### 100. RFDI
@@ -1197,7 +1204,7 @@ This instruction is the same as ```Real Divide``` with the roles of dividend and
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Reverse Real Divide Immediate                  |  IM      |  5D           |  ```RFDI, R1 I```                 |    GLE        |
-    
+
 This instruction is the same as ```Real Divide Immediate``` with the roles of dividend and divisor
 reversed.
 
@@ -1206,17 +1213,17 @@ reversed.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |  Convert To Real Register                 |  RR      |  1E           |   ```FLOATR, R1 R2```                |    GLE        |
-    
+
 The 32-bit two's complement integer at the effective address is converted to a real number
-and stored in register R1. The real result is compared to zero to set the CCR. 
+and stored in register R1. The real result is compared to zero to set the CCR.
 A _word-addressing exception_ may occur.
 
 ### 102. FLOAT
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|  Convert To Real                 | RS       |  3E           |  ```FLOAT, R1 A, R2```                 |   GLE         |
-    
+|  Convert To Real                 | RS       |  3E           |  ```FLOAT, R1 [A,R2]```                 |   GLE         |
+
 This instruction is the same as ```Convert To Real Register``` except that the effective address
 is calculated by the ```register-and-storage``` addressing algorithm.
 
@@ -1225,7 +1232,7 @@ is calculated by the ```register-and-storage``` addressing algorithm.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |   Convert To Real Immediate                 |   IM     |  5E           |  ```FLOATI, R1 I```                 |  GLE          |
-  
+
 The 20-bit two's complement integer immediate operand I is converted to real format and
 stored in register R1. The result is compared to zero to set the CCR.
 
@@ -1234,7 +1241,7 @@ stored in register R1. The result is compared to zero to set the CCR.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |  Convert To Integer Register                 |  RR      |   1F          |  ```FIXR, R1 R2```                 |  OGLE          |
-    
+
 The integer portion of the real number at the effective address is converted to a 32-bit two's
 complement integer and stored in register R1. If overflow occurs, the result is zero and the
 O bit of the CCR is set. The result is compared to zero to set the other bits of the CCR.
@@ -1247,8 +1254,8 @@ NOTE: These instructions are named FIXR, FIX, and FIXI because integer implement
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-| Convert To Integer                  | RS       |   3F          |    ```FIX, R1 A, R2```               |  OGLE          |
-   
+| Convert To Integer                  | RS       |   3F          |    ```FIX, R1 [A,R2]```               |  OGLE          |
+
 This instruction is the same as ```Convert To Integer Register``` except that the effective address
 is calculated by the register-and-storage addressing algorithm.
 
@@ -1257,7 +1264,7 @@ is calculated by the register-and-storage addressing algorithm.
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Convert to Integer Immediate                  |  IM      |   5F          |  ```FIXI, R1 I```                 |    OGLE        |
-    
+
 The real short format immediate operand I is converted to a 32-bit two's complement
 integer and the result stored in register R1. If overflow occurs, the result is zero and the O
 bit of the CCR is set. The result is compared to zero to set the other CCR bits.
@@ -1266,8 +1273,8 @@ bit of the CCR is set. The result is compared to zero to set the other CCR bits.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-| Real Floor                | RS       |   78          |    ```FLOOR, R1 A, R2```              |  GLE          |
-    
+| Real Floor                | RS       |   78          |    ```FLOOR, R1 [A,R2]```              |  GLE          |
+
 The real format integer not greater algebraically than the real number at the effective
 address is stored in register R1. The result is compared to zero to set the CCR.
 A _word-addressing exception_ can occur.
@@ -1278,8 +1285,8 @@ p. 120 (7 ops codes)
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-| Real Ceiling                   |  RS      |   79          |   ```CEIL, R1 A, R2```                |  GLE          |
-  
+| Real Ceiling                   |  RS      |   79          |   ```CEIL, R1 [A,R2]```                |  GLE          |
+
 The real format integer not smaller algebraically than the real number at the effective
 address is stored in register R1. The result is compared to zero to set the CCR.
 A _word-addressing exception_ may occur.
@@ -1288,8 +1295,8 @@ A _word-addressing exception_ may occur.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-| Minimum                  |  RS      |  7A           |   ```MIN, R1 A, R2```                |   LE         |
-    
+| Minimum                  |  RS      |  7A           |   ```MIN, R1 [A,R2]```                |   LE         |
+
 The values in register R1 and in the word at the effective address are compared and the
 minimum stored in register R1. The CCR is set by comparing the original register R1 value
 with the final one. A _word-addressing exception_ may occur.
@@ -1298,16 +1305,16 @@ with the final one. A _word-addressing exception_ may occur.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-| Maximum                  |   RS     |   7B          |   ```MAX, R1 A, R2```                |  GE          |
-    
+| Maximum                  |   RS     |   7B          |   ```MAX, R1 [A,R2]```                |  GE          |
+
 This instruction is the same as ```Minimum``` except that the **maximum** replaces the minimum.
 
 ### 111. SHIFTL
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|  Shift Logical                 | RS       |   7C          |    ```SHIFTL, R1 A, R2```               |  OGLE          |
-    
+|  Shift Logical                 | RS       |   7C          |    ```SHIFTL, R1 [A,R2]```               |  OGLE          |
+
 The effective address is treated as a 16-bit two's complement integer called the shift count.
 The value in register R1 is shifted leftward by the amount of the shift count if positive and
 rightward if negative, the shift distance measured in bits. Bits shifted off either end of the
@@ -1321,8 +1328,8 @@ NOTE: A shift count with absolute value greater than 32 causes the same effect a
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-| Shift Circular                 |  RS      |   7D          |   ```SHIFTC, R1 A, R2```                |  GLE          |
-   
+| Shift Circular                 |  RS      |   7D          |   ```SHIFTC, R1 [A,R2]```                |  GLE          |
+
 This instruction works the same way as ```Shift Logical``` except that bits shifted off one end of
 the register fill vacated positions on the other. _Overflow is not possible._
 
@@ -1330,8 +1337,8 @@ the register fill vacated positions on the other. _Overflow is not possible._
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|  Shift Arithmetic                 | RS       |   7E          |  ```SHIFTA, R1 A, R2```                 |   OGLE         |
-    
+|  Shift Arithmetic                 | RS       |   7E          |  ```SHIFTA, R1 [A,R2]```                 |   OGLE         |
+
 This instruction works like Shift Logical on left shifts and propagates bit 0 rightward on
 right shifts. Overflow occurs only on left shifts when a bit shifted into the sign bit differs
 from one shifted out.
@@ -1340,8 +1347,8 @@ from one shifted out.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|   Shift Real                |  RS      |   7F          | ``` SHIFTR, R1 A, R2```                  |   GLE         |
-   
+|   Shift Real                |  RS      |   7F          | ``` SHIFTR, R1 [A,R2]```                  |   GLE         |
+
 The effective address is interpreted as a 16-bit two's complement shift count. The fraction
 part of the absolute value of the real number in register R1 is shifted left or right in 4-bit
 units logically, vacated 4-bit positions being filled with hexadecimal zeros. If the resulting
