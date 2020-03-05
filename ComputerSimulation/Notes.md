@@ -51,7 +51,7 @@ address field. Example:
 BAL, 15 Square + 4   * 'Square' is a lable(address) and the 4 is the offset and assembler place it in R2
 ```
 
-__Indirect addressing_ may be used for code or data. It can make implementation of
+_Indirect addressing_ may be used for code or data. It can make implementation of
 pointers, references, or handles much easier, and can also make it easier to
 call subroutines which are not otherwise addressable. Indirect addressing does
 carry a performance penalty due to the extra memory access involved.
@@ -67,68 +67,82 @@ Same as previous one except that R2 adds offset. Could be used to work with two 
 
 ![Displacement Addressing Mode](images/displacement-addressing-mode.png)
 
-## Example Assembler Program
+## Assembler syntax
+
+Note that the assembler syntax is not defined in book. So I have to think about what
+should include from directives and macros.
+
+## Example Assembler Program from book
+
+Changes:
+- additional comments
+- comments starts with `;`
+- directives starts with `.`
 
 ```
-* This program tests the Pythagorean relation on the values stored at
-* X, Y, and Z. The external procedure Square (result in reg. 1)
-* is used to calculate the square of a value and is entered one word
-* past its head (offset**. The symbol Good goes on the map only.
-*
-* NOTE: That's why we do + 4 to find the real start addres of Square
-* NOTE2: ICL = Program Counter
+;
+; This program tests the Pythagorean relation on the values stored at
+; X, Y, and Z. The external procedure 'Square' (result in reg. 1)
+; is used to calculate the square of a value and is entered one word
+; past its head (offset). That's why we do + 4 to find the real start
+; address of Square. The symbol Good goes on the map only.
+;
+; NOTE: ICL = Program Counter
 
-   DEF Pythagoras
+   .DEF Pythagoras  ; Identifies one or more symbols that are defined in current module
+                    ; and that can be used in other modules.
 
-   REF Square  * Linker will handle this
-   MAP Good    * ??
+   .REF Square      ; Identifies one or more symbols used in the current module that are
+                    ; defined in another module. Linker will handle this.
+   .MAP Good        ; The MAP directive sets the origin of a storage map to a specified address.
+                    ; The storage-map location counter, is set to this address
 
-* Like a procedure
-* With given values in registers 1 and 2 returns the sum in reg 2
-Add         FAR,  2  1    * Sum reg 1 and reg 2 (the result goes in reg 2)
-            BCRR, 0  *15  * Procedure return.
-                          * If ICL is 0 we return to the address that reg 15 contains
+;
+; Helper function. With given values in registers 1 and 2
+; returns the sum in reg 2.
+;
+Add         FAR,  2  1    ; Sum reg 1 and reg 2 (the result goes in reg 2)
+            BCRR, 0  *15  ; Procedure return.
+                          ; If ICL is 0 we return to the address that reg 15 contains
 
-* pow(Х) + pow(Y) = pow(Z)
-Pythagoras  L,   1   X           * Load what we have in X. Then the
-            BAL, 15  Square + 4  * content of the current ICL is moved to reg 15
-                                 * and the address of Square is placed in ICL. It's kind of
-                                 * calling a procedure.
+; pow(Х) + pow(Y) = pow(Z)
+Pythagoras  L,   1   X           ; Load what we have in X. Then the
+            BAL, 15  Square + 4  ; content of the current ICL is moved to reg 15
+                                 ; and the address of Square is placed in ICL. It's kind of
+                                 ; calling a procedure.
 
-            LR,  2   1           * The result from reg 1 (Square procedure place result there)
-                                 * we move to reg 2
+            LR,  2   1           ; The result from reg 1 (Square procedure place result there)
+                                 ; we move to reg 2
 
-            L,   1   Y           * For Y we do the same. Reg 1 contains the result.
-            BAL, 15  Square + 4  * What we achieve: pow(X) in reg 2 and
-                                 *                  pow(Y) in reg 1
+            L,   1   Y           ; For Y we do the same. Reg 1 contains the result.
+            BAL, 15  Square + 4  ; What we achieve: pow(X) in reg 2 and
+                                 ;                  pow(Y) in reg 1
 
-            BAL, 15  Add         * Having this we can sum them
-                                 * and the result(pow(X) + pow(Y)) goes in reg 2
+            BAL, 15  Add         ; Having this we can sum them
+                                 ; and the result(pow(X) + pow(Y)) goes in reg 2
 
-            L,   1   Z           * For Z we do the same and result is in reg 1
+            L,   1   Z           ; For Z we do the same and result is in reg 1
             BAL, 15  Square + 4
 
-            FSR, 1   2           * reg 2 (pow(X) + pow(Y)) we compare with reg 1 (pow(Z))
-            BCS, 1   Good        * Branching condition. If they are the same go to lable Good,
-            SVC, 7   False       * else make interrupt with code 7 ('F' is displayed)
-            SVC, 0   0           * and exit. For codes see: Exceptions and supervisor calls
+            FSR, 1   2           ; reg 2 (pow(X) + pow(Y)) we compare with reg 1 (pow(Z))
+            BCS, 1   Good        ; Branching condition. If they are the same go to lable Good,
+            SVC, 7   False       ; else make interrupt with code 7 ('F' is displayed)
+            SVC, 0   0           ; and exit. For codes see: Exceptions and supervisor calls
 
-Good        SVC, 7   True        * Interrupt with code 7 ('T' is displayed)
-            BCRR,0   *14         * and exit with "success" - so 0 in reg 14
-                                 * The programmer who use Pythagoras must know that
-                                 * the result is in reg 14
+; Start mappings
 
-* Assembler specific not opscodes
+Good        SVC, 7   True        ; Interrupt with code 7 ('T' is displayed)
+            BCRR,0   *14         ; and exit with "success" - so 0 in reg 14
+                                 ; The programmer who use Pythagoras must know that
+                                 ; the result is in reg 14
 
-True        DSC       'T'      * DSC - defines char
-False       DSC       'F'
+True        .DSC       'T'         ; DSC - defines char
+False       .DSC       'F'
 
-X           DSF       3.	   * DSF - defines float
-Y           DSF       4.
-Z           DSF       5.
+X           .DSF       3.          ; DSF - defines real
+Y           .DSF       4.
+Z           .DSF       5.
 
-            END       Pythagoras
+            .END       Pythagoras  ; Ends program
 
 ```
-
-Note that the assembler syntax is not defined in book.
