@@ -6,8 +6,8 @@ class WordFormats {
 
     private static final int MEMORY_WORD_SIZE = 8
 
+    // + 0 bit which is sign bit
     private static final int EXPONENT_SIZE = 7
-
     private static final int FRACTION_SIZE = 24
 
     private static final int IMMEDIATE_FRACTION_SIZE = FRACTION_SIZE / 2
@@ -34,13 +34,17 @@ class WordFormats {
         return displayGenericReal(binNum, exponentSize)
     }
 
+    List<String> formInteger(int num) {
+
+    }
+
     static int displayInteger(List<String> binNum) {
         return Integer.parseInt(binNum.join(), 2)
     }
 
-    static List<List<String>> toMachineWords(String stringLiteral) {
+    static List<List<String>> toMachineWord(String stringLiteral) {
 
-        final List<List<String>> binaryWords = new ArrayList<>()
+        final List<List<String>> binaryWord = new ArrayList<>()
 
         // Use standard ASCII
         byte[] bytes = stringLiteral.getBytes(StandardCharsets.US_ASCII)
@@ -56,11 +60,11 @@ class WordFormats {
                 binary.append(" ")
             }
 
-            binaryWords.add(binary.toString().tokenize())
+            binaryWord.add(binary.toString().tokenize())
             binary = new StringBuilder(MEMORY_WORD_SIZE)
         }
 
-        return binaryWords
+        return binaryWord
     }
 
     static char toASCII(int code) {
@@ -283,6 +287,7 @@ class WordFormats {
         return fitFraction
     }
 
+    // Convert the exponent to the biased form (see excess-M representation)
     private static List<String> fitExponent(List<String> exponent, int exponentSize) {
         List<String> fitExponent = new ArrayList<>(exponentSize)
 

@@ -51,8 +51,10 @@ class Memory {
         return MEMORY.size()
     }
 
+    // Helper class
+
     /**
-     * Programming counter
+     * Programming counter. In book is called ILC.
      */
     private static class PC {
         private int PC = 0
@@ -86,7 +88,6 @@ class Memory {
                 sb.append(key)
                 sb.append(')')
                 sb.append(':')
-                // TODO: every address value should be interpreted
                 sb.append(address.value)
                 sb.append('\n')
             }

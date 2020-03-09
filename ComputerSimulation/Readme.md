@@ -62,10 +62,11 @@ with words, the shorter value has its sign bit propagated leftward to fill the m
 
 _Real numbers_ also occupy a word. Bit 0 is the sign bit, bits 1 through 7 constitute the _exponent_,
 and bits 8 through 31 the _fraction_. In a positive real number, the sign bit is zero, the exponent field
-contains an excess(излишък) 40(hex) exponent of 16, and the fraction contains a 24-bit normalized hexadecimal
+contains an excess `40hex`(`excess-7` system) exponent of 16, and the fraction contains a 24-bit normalized hexadecimal
 fraction with an assumed hexadecimal point on its left.
 
-NOTE: Excess 40(hex) notation means that the true exponent is found by subtracting 40(hex) from the recorded exponent.
+NOTE: Excess 40(hex) notation means that the true exponent is found by subtracting `40hex`(or 7 dec) from the recorded exponent.
+      _Excess-M_ representation also called **offset binary** representation.
 
 Normalization of the hexadecimal fraction requires that at least the leftmost hexadecimal digit be nonzero
 if any are. If the fraction becomes zero, the entire number is set to zero. Any final result of a real arithmetic
@@ -77,7 +78,7 @@ in real immediate instructions and have their rightmost three fraction digits dr
 ## Instruction formats
 
 Instructions occur in **short** two-character format and **long** four-character format. All instructions
-must begin on even-character boundaries; failure of the ILC to contain an even address at the
+must begin on even-character boundaries; failure of the `ILC` to contain an even address at the
 beginning of an instruction execution cycle causes an _illegal instruction address exception_. The first
 character of every instruction contains the _indirect bit_ in bit 0 and the _operation code_ (the ```opcode```) in
 bits 1 through 7. Not all opcodes are meaningful and not all instructions make use of the indirect
@@ -179,7 +180,7 @@ Exceptions occur when errors arise during the course of instruction execution. T
 interrupted and the supervisor notified of the cause of the exception and the location of the offending
 instruction. A summary of exceptions follows.
 
-   **Illegal Instruction Address.** At the start of an instruction execution cycle, the ILC does
+   **Illegal Instruction Address.** At the start of an instruction execution cycle, the `ILC` does
       not contain an even value.
 
    **Unimplemented Instruction.** There is no operation defined for this operation code.

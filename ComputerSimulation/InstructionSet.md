@@ -229,11 +229,11 @@ p. 111 (10 ops codes)
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |   Load Register   |   RR   |     00      |    ```LR, R1 R2```       |    GLE     |
 
-The register R1 is loaded with the word at the effective address. The load value is compared
-with zero and the `G`, `L`, or `E` bit of the CCR set as appropriate. If the effective address does
+The register `R1` is loaded with the word at the effective address. The load value is compared
+with zero and the `G`, `L`, or `E` bit of the `CCR` set as appropriate. If the effective address does
 not fall on a word boundary, a _word-addressing exception_ occurs.
 
-NOTE: In a comparison to set the CCR, the final result is assumed to hold if the first operand mentioned is on the left of
+NOTE: In a comparison to set the `CCR`, the final result is assumed to hold if the first operand mentioned is on the left of
       the relation and the second on the right. That is, if the result is less than, it means that the first operand is less than
       the second.
 
@@ -261,8 +261,8 @@ the immediate operand `I` with its _sign bit extended left_ **12** bits. No exce
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |      Load Character             |  CH    |    60         |      ```LC, R1 [A,R2]```               |      GE      |
 
-Register R1 is cleared to _zero_, and the character at the effective address is loaded into bits
-24 through 31. The loaded value is compared to zero and either the `G` or `E` bit of the CCR set.
+Register `R1` is cleared to _zero_, and the character at the effective address is loaded into bits
+24 through 31. The loaded value is compared to zero and either the `G` or `E` bit of the `CCR` set.
 
 ### 5. LNR
 
@@ -270,9 +270,9 @@ Register R1 is cleared to _zero_, and the character at the effective address is 
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |    Load Negative Register               |   RR     |    01         |       ```LNR, R1 R2```     |     OGLE       |
 
-The register R1 is loaded with the two's complement of the word at the effective address.
-The loaded result is compared to zero to set the CCR. If overflow occurs, only the `O`-bit of
-the CCR is set. A _word-addressing exception_ may occur.
+The register `R1` is loaded with the two's complement of the word at the effective address.
+The loaded result is compared to zero to set the `CCR`. If overflow occurs, only the `O`-bit of
+the `CCR` is set. A _word-addressing exception_ may occur.
 
 ### 6. LN
 
@@ -289,8 +289,8 @@ effective address is calculated by the ```register-and-storage``` addressing alg
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |    Load Negative Immediate               |    IM    |     41        |    ```LNI, R1 I```   |      GLE      |
 
-The value loaded into register R1 is the 32-bit two's complement of the 20-bit two's
-complement value `I`. Overflow cannot occur. The CCR is set by comparing the loaded value with
+The value loaded into register `R1` is the 32-bit two's complement of the 20-bit two's
+complement value `I`. Overflow cannot occur. The `CCR` is set by comparing the loaded value with
 zero.
 
 ### 8. LNC
@@ -300,8 +300,8 @@ zero.
 |       Load Negative Character            |    CH      |      61       |     ```LNC, R1 [A,R2]```   |    LE         |
 
 The character at the effective address is _extended leftward_ **24** bits with zeros and the
-resulting word complemented and loaded into register R1. Overflow cannot occur. The loaded
-value is compared with zero to set the CCR.
+resulting word complemented and loaded into register `R1`. Overflow cannot occur. The loaded
+value is compared with zero to set the `CCR`.
 
 ### 9. STR
 
@@ -309,8 +309,8 @@ value is compared with zero to set the CCR.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |       Store Register            |    RR    |   02       |     ```STR, R1 R2```              |     GLE        |
 
-The value in R1 is stored in the word at the effective address. The stored value is compared
-to zero to set the CCR. A _word-addressing exception_ may occur.
+The value in `R1` is stored in the word at the effective address. The stored value is compared
+to zero to set the `CCR`. A _word-addressing exception_ may occur.
 
 ### 10. ST
 
@@ -330,7 +330,7 @@ p. 112 (14 ops codes)
 |      Store Character             |   CH     |    62         |      ```STC, R1 [A,R2]```             |    GE        |
 
 Bits 24 through 31 are stored in the character at the effective address. The stored value is
-compared to zero to set the CCR.
+compared to zero to set the `CCR`.
 
 ### 12. SWAPR
 
@@ -339,8 +339,8 @@ compared to zero to set the CCR.
 |       Swap Register            |   RR     |     03        |   ```SWAPR, R1 R2```                |    GLE        |
 
 
-The word in register R1 is exchanged with the word at the effective address. The CCR is
-set by comparing the value moved into register R1 with zero. A _word-addressing exception_ may occur.
+The word in register `R1` is exchanged with the word at the effective address. The `CCR` is
+set by comparing the value moved into register `R1` with zero. A _word-addressing exception_ may occur.
 
 ### 13. SWAP
 
@@ -357,9 +357,9 @@ effective address calculated by the ```register-and-storage``` algorithm.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |  Swap Character                 |  CH      |    63         |     ```SWAPC, R1 [A,R2]```              |   GE         |
 
-Bits 24 through 31 are exchanged with the character at the effective address. The CCR is
+Bits 24 through 31 are exchanged with the character at the effective address. The `CCR` is
 set by comparing the character loaded into the register with zero. Bits 0 through 23 of
-register R1 are not affected.
+register `R1` are not affected.
 
 ### 15. ANDR
 
@@ -367,8 +367,8 @@ register R1 are not affected.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |  ```AND``` Register                 |  RR      |      04       |     ```ANDR, R1 R2```              |    GLE        |
 
-The logical ```AND``` of the word in R1 and the word at the effective address is formed and
-loaded into register R1. Bit `G` of the CCR is set if the final value in R1 is all ones, bit `L`
+The logical ```AND``` of the word in `R1` and the word at the effective address is formed and
+loaded into register `R1`. Bit `G` of the `CCR` is set if the final value in `R1` is all ones, bit `L`
 is set if the result if mixed zeros and ones, and bit `E` is set if the result is all zeros.
 A _word-addressing exception_ may occur.
 
@@ -387,8 +387,8 @@ addressing algorithm is used to calculate the effective address.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |    ```AND``` Immediate               |  IM      |  44           |   ```ANDI, R1 I```                |     LE       |
 
-The logical ```AND``` of the word in register R1 and the 20-bit immediate value `I` extended on the
-left with 12 zero bits is stored in R1. The CCR is set in the same way as the ```And Register(ANDR)``` instruction.
+The logical ```AND``` of the word in register `R1` and the 20-bit immediate value `I` extended on the
+left with 12 zero bits is stored in `R1`. The `CCR` is set in the same way as the ```And Register(ANDR)``` instruction.
 
 ### 18. ANDC
 
@@ -396,9 +396,9 @@ left with 12 zero bits is stored in R1. The CCR is set in the same way as the ``
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |   ```AND``` Character               |   CH     |   64          |   ```ANDC, R1 [A,R2]```                |  GLE          |
 
-The character at the effective address is _AND_ed with bits 24 through 31 of register R1 and
-the result is replaced in bits 24 through 31 of R1. Bits 0 through 23 of R1 are not affected.
-The CCR is set in the same way as the ```And Register(ANDR)``` instruction.
+The character at the effective address is _AND_ed with bits 24 through 31 of register `R1` and
+the result is replaced in bits 24 through 31 of `R1`. Bits 0 through 23 of `R1` are not affected.
+The `CCR` is set in the same way as the ```And Register(ANDR)``` instruction.
 
 ### 19. ORR
 
@@ -478,7 +478,7 @@ This instruction operates in the same as ```And Character(ANDC)``` with logical 
 |  ```NOT``` Register                  |  RR      |   07          |    ```NOTR, R1 R2```               |  GLE          |
 
 This instruction operates in the same way as ```And Register(ANDR)``` with logical ```And``` replaced by
-_logical complement_ of the second operand, the original value in register R1 being ignored.
+_logical complement_ of the second operand, the original value in register `R1` being ignored.
 
 ### 28. NOT
 
@@ -487,7 +487,7 @@ _logical complement_ of the second operand, the original value in register R1 be
 | ```NOT```         |   RS   |  27         |```NOT, R1 [A,R2]```|   GLE      |
 
 This instruction operates in the same way as ```And(AND)``` with logical ```And``` replaced by logical
-complement of the second operand, the original value in register R1 being ignored.
+complement of the second operand, the original value in register `R1` being ignored.
 
 ### 29. NOTI
 
@@ -496,7 +496,7 @@ complement of the second operand, the original value in register R1 being ignore
 |  NOT Immediate                 | IM       |   47          | ```NOTI, R1 I```   |  GLE          |
 
 This instruction operates in the same way as ```And Immediate(ANDI)``` with logical ```And``` replaced by
-logical complement of the extended immediate value, the original value in register R1 being ignored.
+logical complement of the extended immediate value, the original value in register `R1` being ignored.
 
 ### 30. NOTC
 
@@ -505,7 +505,7 @@ logical complement of the extended immediate value, the original value in regist
 |   NOT Character                |  CH      |   67          |   ```NOTC, R1 [A,R2]```                |    GLE        |
 
 This instruction operates in the same way as ```And Character``` with logical ```And``` replaced by
-logical complement of the second operand, the original value of bits 24 through 31 of register R1 being ignored.
+logical complement of the second operand, the original value of bits 24 through 31 of register `R1` being ignored.
 
 ### 31. BCSR
 
@@ -513,8 +513,8 @@ logical complement of the second operand, the original value of bits 24 through 
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |Branch Conditions Set Register| RR       |  08           |   ```BCSR, M1 R2```               |   None         |
 
-If the logical ```And``` of the contents of the CCR and the 4-bit logical mask `M1` is nonzero,
-the contents of the ILC are replaced by the effective address.
+If the logical ```And``` of the contents of the `CCR` and the 4-bit logical mask `M1` is nonzero,
+the contents of the `ILC` are replaced by the effective address.
 
 ### 32. BCS
 
@@ -531,8 +531,8 @@ effective address calculated by the ```register-and-storage``` addressing algori
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |Branch Conditions Reset Register                   | RR       | 09            |  ```BCRR, M1 R2```                 |     None       |
 
-If the logical ```And``` of the contents of the CCR and the 4-bit logical mask `M1` is zero, the
-contents of the ILC are replaced by the effective address.
+If the logical ```And``` of the contents of the `CCR` and the 4-bit logical mask `M1` is zero, the
+contents of the `ILC` are replaced by the effective address.
 
 ### 34. BCR
 
@@ -549,9 +549,9 @@ effective address calculated by the ```register-and-storage``` addressing algori
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |Branch and Link Register                   | RR       |    0A         |  ```BALR, R1 R2```                 |    None        |
 
-The current contents of the ILC are loaded into register R1 and the effective address is
-loaded into the ILC. If the _indirect bit_ is not ```ON```, the effective address is register designator
-R2 _multiplied_ by **4**.
+The current contents of the `ILC` are loaded into register `R1` and the effective address is
+loaded into the `ILC`. If the _indirect bit_ is not ```ON```, the effective address is register designator
+`R2` _multiplied_ by **4**.
 
 ### 36. BAL
 
@@ -559,7 +559,7 @@ R2 _multiplied_ by **4**.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |Branch and Link                   | RS       |   2A          |   ```BAL, R1 [A,R2]```                |   None         |
 
-The current contents of the ILC are stored in register R1 and the ILC is loaded with the
+The current contents of the `ILC` are stored in register `R1` and the `ILC` is loaded with the
 effective address of the instruction.
 
 ### 37. SACR
@@ -568,7 +568,7 @@ effective address of the instruction.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |Save Condition Register                   |  RR      |   0B          |    ```SACR, M1 R2```               |   None         |
 
-If the logical ```And``` of the CCR and the 4-bit mask field M1 is nonzero, a word of all **one** bits
+If the logical ```And``` of the `CCR` and the 4-bit mask field M1 is nonzero, a word of all **one** bits
 is stored in the effective address; otherwise a word of all **zeros** is stored.
 A _word-addressing exception_ may occur.
 
@@ -589,7 +589,7 @@ p. 114 (7 ops codes)
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |Save Condition Character                   | CH       |   6B          | ```SACC, M1 [A,R2]```                  |   None         |
 
-If the logical ```And``` of the CCR and the 4 bit mask field M1 is nonzero, a character of all **one**
+If the logical ```And``` of the `CCR` and the 4 bit mask field M1 is nonzero, a character of all **one**
 bits is stored at the effective address; otherwise a character of all **zero** bits is stored.
 
 ### 40. CR
@@ -598,8 +598,8 @@ bits is stored at the effective address; otherwise a character of all **zero** b
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Compare Register                  | RR       |     0C        |   ```CR, R1 R2```                 |     GLE       |
 
-The results of an algebraic comparison between the contents of register R1 and the word at
-the effective address are used to set the G, L, or E bits of the CCR as appropriate.
+The results of an algebraic comparison between the contents of register `R1` and the word at
+the effective address are used to set the `G`, `L`, or `E` bits of the `CCR` as appropriate.
 A _word-addressing exception_ may occur.
 
 ### 41. C
@@ -617,9 +617,9 @@ address is calculated by the ```register-and-storage``` addressing algorithm.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Compare Immediate                  | IM       |   4C          |     ```CI, R1, I```             |  GLE          |
 
-The 32-bit value in register R1 is compared algebraically with the 32-bit value constructed
+The 32-bit value in register `R1` is compared algebraically with the 32-bit value constructed
 by propagating the immediate operand's sign bit leftward 12 bits, and the result is used to
-set the `G`, `L`, or `E` bit of the CCR as appropriate.
+set the `G`, `L`, or `E` bit of the `CCR` as appropriate.
 
 ### 43. CC
 
@@ -627,8 +627,8 @@ set the `G`, `L`, or `E` bit of the CCR as appropriate.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |  Compare Character                 |  CH      |  6C           |     ```CC, R1 [A,R2]```              | GLE           |
 
-Bits 24 through 31 of register R1 are compared as an 8-bit positive integer with the
-character at the effective address, and the result is used to set the G, L, or E bit of the CCR as
+Bits 24 through 31 of register `R1` are compared as an 8-bit positive integer with the
+character at the effective address, and the result is used to set the `G`, `L`, or `E` bit of the `CCR` as
 appropriate.
 
 ### 44. CCS
@@ -637,27 +637,27 @@ appropriate.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Compare Character String                  | RR       |  0E           |    ```CCS, M1 R2```               |    GLE        |
 
-Register designator R2 names a register pair R2 and (`R2+1`) `mod` 16 (the second register
-will be called `R2+1` throughout). The pair R2 and R2+1(double word) should contain a string descriptor
-doubleword, with a character address A1 in bits 16 through 31 of register R2, a length L in
-bits 0 through 15 of register R2+1, and a character address A2 in bits 16 through 31 of
-register R2+1. To begin execution, A1, A2, and L are moved to internal registers, the CCR is
-set to zero, and the E bit of the CCR is set to one. A loop is started.
+Register designator `R2` names a register pair `R2` and (`R2+1`) `mod` 16 (the second register
+will be called `R2+1` throughout). The pair `R2` and `R2+1`(double word) should contain a string descriptor
+doubleword, with a character address `A1` in bits 16 through 31 of register `R2`, a length `L` in
+bits 0 through 15 of register `R2+1`, and a character address `A2` in bits 16 through 31 of
+register `R2+1`. To begin execution, `A1`, `A2`, and `L` are moved to internal registers, the `CCR` is
+set to zero, and the `E` bit of the `CCR` is set to one. A loop is started.
 
-- First, if L is zero, bits 0 through 15 of both registers are set to zero, bits 16 to 31 of R2
-  are set to the internal value of A1, bits 16 through 31 of R2+1 are set to the internal
-  value of A2, and the instruction terminates.
+- First, if `L` is zero, bits 0 through 15 of both registers are set to zero, bits 16 to 31 of `R2`
+  are set to the internal value of `A1`, bits 16 through 31 of `R2+1` are set to the internal
+  value of `A2`, and the instruction terminates.
 
-- Second, the character of A1 is compared as an 8-bit integer to the character at A2 and the
-  result used to set the appropriate bits of the CCR.
+- Second, the character of `A1` is compared as an 8-bit integer to the character at `A2` and the
+  result used to set the appropriate bits of the `CCR`.
 
-- Third, if the E bit of the CCR is not one, bits 0 through 15 of register R2 are set to
-  zero, bits 16 through 31 of R2 to the internal value of A1, bits 0 through 15 of R2+1
-  to the internal value of L, bits 16 through 31 of R2+1 to the internal value of A2, and
+- Third, if the `E` bit of the `CCR` is not one, bits 0 through 15 of register `R2` are set to
+  zero, bits 16 through 31 of `R2` to the internal value of `A1`, bits 0 through 15 of `R2+1`
+  to the internal value of `L`, bits 16 through 31 of `R2+1` to the internal value of `A2`, and
   the instruction terminates.
 
-- Finally, L is decremented by 1, A1 is incremented by the mask M1 interpreted as a 4-bit
-  two's complement integer, and A2 is incremented by 1, and the loop returns to the
+- Finally, `L` is decremented by 1, `A1` is incremented by the mask M1 interpreted as a 4-bit
+  two's complement integer, and `A2` is incremented by 1, and the loop returns to the
   first step.
 
 ### 45. MCS
@@ -666,17 +666,17 @@ set to zero, and the E bit of the CCR is set to one. A loop is started.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Move Character String                  | RR       |   0F          |    ```MCS, M1 R2```               | None           |
 
-Registers R2 and (R2+1) mod 16 contain a string descriptor doubleword as described in
-```Compare Character String(CCS)```. The L, A1, and A2 fields are loaded into internal registers. A loop is begun.
+Registers `R2` and (`R2+1`) mod 16 contain a string descriptor doubleword as described in
+```Compare Character String(CCS)```. The `L`, `A1`, and `A2` fields are loaded into internal registers. A loop is begun.
 
-- First, if L is zero, bits 0 through 15 of registers R2 and R2+1 are set to zero, bits 16
-  through 31 of R2 to A1, bits 16 through 31 of R2+1 to A2, and the instruction terminates.
+- First, if `L` is zero, bits 0 through 15 of registers `R2` and `R2+1` are set to zero, bits 16
+  through 31 of `R2` to `A1`, bits 16 through 31 of `R2+1` to `A2`, and the instruction terminates.
 
-- Second, the character at location A1 is stored at character location A2.
+- Second, the character at location `A1` is stored at character location `A2`.
 
-- Third, L is decremented by 1 and A2 is incremented by 1.
+- Third, `L` is decremented by 1 and `A2` is incremented by 1.
 
-- Finally, A1 is incremented by the mask M1 interpreted as a 4-bit two's complement
+- Finally, `A1` is incremented by the mask M1 interpreted as a 4-bit two's complement
   integer and the loop returns to its first step.
 
 p. 115 (12 ops codes)
@@ -698,7 +698,7 @@ Program execution is interrupted and a call made to a controlling supervisor pro
 The instruction at the effective address is executed. The effects of the subject instruction
 become the effects of the `Execute(EX)` instruction. If the effective address is **not even**, an
 _execute address exception_ occurs. **Execute instructions may be nested to any depth**. Note
-that the ILC is changed only if explicitly modified by the subject instruction.
+that the `ILC` is changed only if explicitly modified by the subject instruction.
 
 ### 48. LA
 
@@ -706,7 +706,7 @@ that the ILC is changed only if explicitly modified by the subject instruction.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |Load Address                   |  RS      |    4E         |      ```LA, R1 [A,R2]```             |    None        |
 
-Register R1 is loaded with the instruction's effective address.
+Register `R1` is loaded with the instruction's effective address.
 
 ### 49. LM
 
@@ -714,9 +714,9 @@ Register R1 is loaded with the instruction's effective address.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Load Multiple                  |RS        |   6E          | ```LM, R1 [A,R2]```                  |     None       |
 
-Registers R1 through R2 are loaded from consecutive words in memory, beginning at the
+Registers `R1` through `R2` are loaded from consecutive words in memory, beginning at the
 effective address (the effective address is calculated by assuming that the index register
-designator is zero). If R2 is less than R1, registers R1 through 15 and 0 through R2 are
+designator is zero). If `R2` is less than `R1`, registers `R1` through 15 and 0 through `R2` are
 loaded. A _word-addressing exception_ may occur.
 
 ### 50. STM
@@ -725,9 +725,9 @@ loaded. A _word-addressing exception_ may occur.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Store Multiple                  | RS       |   6F          |   ```STM, R1 [A,R2]```                |   None         |
 
-Registers R1 through R2 are stored into consecutive words of memory, beginning at the
+Registers `R1` through `R2` are stored into consecutive words of memory, beginning at the
 effective address (the effective address is calculated by assuming the index register
-designator is zero). If R2 is less than R1, registers R1 through 15 and 0 through R2 are stored.
+designator is zero). If `R2` is less than `R1`, registers `R1` through 15 and 0 through `R2` are stored.
 A _word-addressing exception_ may occur.
 
 ### 51. AR
@@ -736,8 +736,8 @@ A _word-addressing exception_ may occur.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |Add Register                   |  RR      |  10           |     ```AR, R1 R2```              |   OGLE         |
 
-The word in R1 is added to the word at the effective address and the result is placed in R1.
-The sum is compared to zero to set the CCR. If _overflow occurs_, only the `O`-bit of the CCR
+The word in `R1` is added to the word at the effective address and the result is placed in `R1`.
+The sum is compared to zero to set the `CCR`. If _overflow occurs_, only the `O`-bit of the `CCR`
 is set. A _word-addressing exception_ may occur.
 
 ### 52. A
@@ -756,9 +756,9 @@ calculated by the ```register-and-storage``` addressing algorithm.
 | Add Immediate                  |  IM      |   50          |    ```AI, R1 I```               |   OGLE         |
 
 
-The 20-bit two's complement immediate operand `I` is added to the value in register R1 and
-the sum stored in R1. The sum is compared to zero to set the CCR. If _overflow occurs_, only
-the `O`-bit of the CCR is set.
+The 20-bit two's complement immediate operand `I` is added to the value in register `R1` and
+the sum stored in `R1`. The sum is compared to zero to set the `CCR`. If _overflow occurs_, only
+the `O`-bit of the `CCR` is set.
 
 ### 54. AC
 
@@ -768,8 +768,8 @@ the `O`-bit of the CCR is set.
 
 
 The character at the effective address is extended 24 bits to the left with zeros and added to
-the value in register R1 with the result loaded into R1. The sum is compared to zero to set
-the CCR. If _overflow occurs_, only the `O`-bit of the CCR is set.
+the value in register `R1` with the result loaded into `R1`. The sum is compared to zero to set
+the `CCR`. If _overflow occurs_, only the `O`-bit of the `CCR` is set.
 
 ### 55. SR
 
@@ -778,8 +778,8 @@ the CCR. If _overflow occurs_, only the `O`-bit of the CCR is set.
 |  Subtract Register                 | RR       |   11          |    ```SR, R1 R2```               |   OGLE         |
 
 The word at the effective address (the subtrahend) is subtracted from the value in register
-R1 (the minuend) and the difference is stored in R1. The difference is compared to zero to
-set the CCR. If _overflow occurs_, only the `O`-bit of the CCR is set. A _word-addressing exception_ may occur.
+`R1` (the minuend) and the difference is stored in `R1`. The difference is compared to zero to
+set the `CCR`. If _overflow occurs_, only the `O`-bit of the `CCR` is set. A _word-addressing exception_ may occur.
 
 ### 56. S
 
@@ -798,8 +798,8 @@ calculated by the ```register-and-storage``` addressing algorithm.
 |  Subtract Immediate                 |   IM     |   51          |    ```SI, R1 I```               |    OGLE        |
 
 The 20-bit two's complement integer immediate operand `I` (the subtrahend) is subtracted
-from the value in register R1 (the minuend) and the result stored in register R1. The difference
-is compared to zero to set the CCR. If _overflow occurs_, only the `O`-bit of the CCR is set.
+from the value in register `R1` (the minuend) and the result stored in register `R1`. The difference
+is compared to zero to set the `CCR`. If _overflow occurs_, only the `O`-bit of the `CCR` is set.
 
 p. 116 (12 ops codes)
 
@@ -810,9 +810,9 @@ p. 116 (12 ops codes)
 | Subtract Character                  |   CH     |    71         |    ```SC, R1 [A,R2]```               |   OGLE         |
 
 The character at the effective address (the subtrahend), treated as a positive integer by
-extension 24 bits leftward with zeros, is subtracted from the value in register R1 (the
-minuend) and the result stored in R1. The difference is compared to zero to set the CCR.
-If _overflow occurs_, only the `O`-bit of the CCR is set.
+extension 24 bits leftward with zeros, is subtracted from the value in register `R1` (the
+minuend) and the result stored in `R1`. The difference is compared to zero to set the `CCR`.
+If _overflow occurs_, only the `O`-bit of the `CCR` is set.
 
 ### 59. RSR
 
@@ -859,9 +859,9 @@ minuend and the subtrahend reversed.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Multiply Register                  | RR       |    13         |    ```MR, R1 R2```               |     OGLE       |
 
-The value in register R1 and the word at the effective address are multiplied and the low-
-order 32 bits of the product are stored in register R1. The result in register R1 is compared
-to zero to set the CCR. If _overflow occurs_, only the `O`-bit of the CCR is set.
+The value in register `R1` and the word at the effective address are multiplied and the low-
+order 32 bits of the product are stored in register `R1`. The result in register `R1` is compared
+to zero to set the `CCR`. If _overflow occurs_, only the `O`-bit of the `CCR` is set.
 A _word-addressing exception_ may occur.
 
 ### 64. M
@@ -879,9 +879,9 @@ address is calculated by the ```register-and-storage``` addressing algorithm.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Multiply Immediate                  |  IM      |   53          |   ```MI, R1 I```                |    OGLE        |
 
-The low 32 bits of the product of the value in register R1 and the 20-bit immediate value I
-are stored in register R1. The product in register R1 is compared to zero to set the CCR.
-If _overflow occurs_, only the `O`-bit of the CCR is set.
+The low 32 bits of the product of the value in register `R1` and the 20-bit immediate value I
+are stored in register `R1`. The product in register `R1` is compared to zero to set the `CCR`.
+If _overflow occurs_, only the `O`-bit of the `CCR` is set.
 
 ### 66. MC
 
@@ -889,9 +889,9 @@ If _overflow occurs_, only the `O`-bit of the CCR is set.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |  Multiply Character                 |  CH      |   73          |        ```MC, R1 [A,R2]```          |  OGLE          |
 
-The low 32 bits of the product of the value in register R1 and the positive 8-bit integer
-in the character at the effective address are stored in register R1. The value in register R1
-is compared to zero to set the CCR. If _overflow occurs_, only the `O`-bit of the CCR is set.
+The low 32 bits of the product of the value in register `R1` and the positive 8-bit integer
+in the character at the effective address are stored in register `R1`. The value in register `R1`
+is compared to zero to set the `CCR`. If _overflow occurs_, only the `O`-bit of the `CCR` is set.
 
 ### 67. DR
 
@@ -899,11 +899,11 @@ is compared to zero to set the CCR. If _overflow occurs_, only the `O`-bit of th
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |   Divide Register                | RR       |  14           |   ```DR, R1 R2```                |    OGLE        |
 
-The value in register R1 (the _dividend_) is divided by the word at the effective address (the
-_divisor_) and the quotient is stored in register R1. The quotient is selected so that the
-remainder is non negative. The quotient is compared to zero to set the CCR. If _overflow
-occurs_, only the `O`-bit of the CCR is set. A _word-addressing exception_ may occur. If
-the divisor is zero, the _zero divisor exception_ occurs and register R1 is unchanged.
+The value in register `R1` (the _dividend_) is divided by the word at the effective address (the
+_divisor_) and the quotient is stored in register `R1`. The quotient is selected so that the
+remainder is non negative. The quotient is compared to zero to set the `CCR`. If _overflow
+occurs_, only the `O`-bit of the `CCR` is set. A _word-addressing exception_ may occur. If
+the divisor is zero, the _zero divisor exception_ occurs and register `R1` is unchanged.
 
 ### 68. D
 
@@ -921,11 +921,11 @@ is calculated with the register-and-storage addressing algorithm.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |   Divide Immediate                |   IM     |   54          |    ```DI, R1 I```               |   OGLE         |
 
-The value in register R1 (the dividend) is divided by the 20-bit two's complement integer
-immediate value I (the divisor) and the quotient is stored in register R1. The quotient is
+The value in register `R1` (the dividend) is divided by the 20-bit two's complement integer
+immediate value I (the divisor) and the quotient is stored in register `R1`. The quotient is
 selected so that the remainder is non negative. The quotient is compared to zero to set the
-CCR. If _overflow occurs_, only the `O`-bit of the CCR is set. If the divisor is zero, the zero
-divisor exception occurs and the register R1 is unchanged.
+`CCR`. If _overflow occurs_, only the `O`-bit of the `CCR` is set. If the divisor is zero, the zero
+divisor exception occurs and the register `R1` is unchanged.
 
 p. 117 (12 ops codes)
 
@@ -935,10 +935,10 @@ p. 117 (12 ops codes)
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |  Divide Character                 |   CH     | 74            |      ```DC, R1 [A,R2]```            |     GLE       |
 
-The value in register R1 (the dividend) is divided by the positive 8-bit integer at the
-effective address (the divisor) and the quotient is stored in register R1. The quotient is selected
-so that the remainder is non negative. The quotient is compared to zero to set the CCR. If
-the divisor is zero, the zero divisor exception occurs and register R1 is unchanged. Overflow
+The value in register `R1` (the dividend) is divided by the positive 8-bit integer at the
+effective address (the divisor) and the quotient is stored in register `R1`. The quotient is selected
+so that the remainder is non negative. The quotient is compared to zero to set the `CCR`. If
+the divisor is zero, the zero divisor exception occurs and register `R1` is unchanged. Overflow
 is not possible.
 
 p. 117 (12 ops codes)
@@ -985,10 +985,10 @@ dividend and the divisor are reversed.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Remainder Register                  |   RR     |       16      |     ```REMR, R1 R2```              |   GE         |
 
-The value in register R1 (the dividend) is divided by the word at the effective address (the
-divisor) and the non negative remainder is stored in register R1. The remainder is
-compared to zero to set the CCR. A _word-addressing exception_ may occur. If the divisor is zero,
-the zero divisor exception occurs and register R1 is unchanged.
+The value in register `R1` (the dividend) is divided by the word at the effective address (the
+divisor) and the non negative remainder is stored in register `R1`. The remainder is
+compared to zero to set the `CCR`. A _word-addressing exception_ may occur. If the divisor is zero,
+the zero divisor exception occurs and register `R1` is unchanged.
 
 ### 76. REM
 
@@ -1005,10 +1005,10 @@ address is calculated by the ```register-and-storage``` addressing algorithm.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Remainder Immediate                  | IM       |  56           |    ```REMI, R1 I```               |   GE         |
 
-The value in register R1 (the dividend) is divided by the 20-bit two's complement value I
-(the divisor) and the non negative remainder is stored in register R1. The remainder is
-compared to zero to set the CCR. If the divisor is zero, the zero divisor exception occurs and
-register R1 is unchanged.
+The value in register `R1` (the dividend) is divided by the 20-bit two's complement value I
+(the divisor) and the non negative remainder is stored in register `R1`. The remainder is
+compared to zero to set the `CCR`. If the divisor is zero, the zero divisor exception occurs and
+register `R1` is unchanged.
 
 ### 78. REMC
 
@@ -1016,10 +1016,10 @@ register R1 is unchanged.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |  Remainder Character                 |   CH     |  76           |    ```REMC, R1 [A,R2]```               |   GE         |
 
-The value in register R1 (the dividend) is divided by the 8-bit positive integer (the divisor)
-at the effective address and the non negative remainder is stored in register R1. The
-remainder is compared to zero to set the CCR. If the divisor is zero, the zero divisor exception
-occurs and register R1 is unchanged.
+The value in register `R1` (the dividend) is divided by the 8-bit positive integer (the divisor)
+at the effective address and the non negative remainder is stored in register `R1`. The
+remainder is compared to zero to set the `CCR`. If the divisor is zero, the zero divisor exception
+occurs and register `R1` is unchanged.
 
 ### 79. RREMR
 
@@ -1065,8 +1065,8 @@ divisor are reversed.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |  Real Add Register                 |   RR     |   18          |   ```FAR, R1 R2```                |   GLE         |
 
-The value in register R1 is added to the real number at the effective address and the sum is
-stored in register R1. The sum is compared to zero to set the CCR. Both word-addressing
+The value in register `R1` is added to the real number at the effective address and the sum is
+stored in register `R1`. The sum is compared to zero to set the `CCR`. Both word-addressing
 and real-format exceptions may occur.
 
 NOTE: The mnemonics for the real arithmetic instructions are prefixed with the letter "F" because the historical name for
@@ -1088,8 +1088,8 @@ calculated by the register-and-storage addressing algorithm.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Real Add Immediate                   | IM       |   58          |      ```FAI, R1 I```             |   GLE         |
 
-The sum of the value in register R1 and the real short format immediate operand `I` is stored
-in register R1. A _real format exception_ may occur.
+The sum of the value in register `R1` and the real short format immediate operand `I` is stored
+in register `R1`. A _real format exception_ may occur.
 
 ### 86. FSR
 
@@ -1098,8 +1098,8 @@ in register R1. A _real format exception_ may occur.
 |Real Subtract Register                   | RR       |  19           |   ```FSR, R1 R2```                |   GLE         |
 
 The real number at the effective address (the subtrahend) is subtracted from the value in the
-register R1 (the minuend) and the difference is stored in register R1. The difference is
-compared to zero to set the CCR. Both word-addressing and _real format exceptions_ may occur.
+register `R1` (the minuend) and the difference is stored in register `R1`. The difference is
+compared to zero to set the `CCR`. Both word-addressing and _real format exceptions_ may occur.
 
 ### 87. FS
 
@@ -1117,8 +1117,8 @@ calculated by the register-and-storage addressing algorithm.
 | Real Subtract Immediate                  | IM       | 59            |  ```FSI, RI I```                 |   GLE         |
 
 The short format real immediate operand `I` (the subtrahend) is subtracted from the value in
-register R1 (the minuend) and the difference is stored in register R1. The difference is
-compared to zero to set the CCR. A _real-format exception_ can occur.
+register `R1` (the minuend) and the difference is stored in register `R1`. The difference is
+compared to zero to set the `CCR`. A _real-format exception_ can occur.
 
 ### 89. RFSR
 
@@ -1153,8 +1153,8 @@ the subtrahend reversed.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Real Multiply Register                  |  RR      |  1B           |   ```FMR, R1, R2```                |   GLE         |
 
-The value in register R1 and the real number at the effective address are multiplied and the
-product is stored in register R1. The product is compared to zero to set the CCR. Both
+The value in register `R1` and the real number at the effective address are multiplied and the
+product is stored in register `R1`. The product is compared to zero to set the `CCR`. Both
 word-addressing and real format exceptions may occur.
 
 ### 93. FM
@@ -1172,8 +1172,8 @@ calculated by the ```register-and-storage``` addressing routine.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |  Real Multiply Immediate                 |  IM      |   5B          |     ```FMI, R1 I```              |   GLE         |
 
-The value in register R1 is multiplied by the real short format immediate value I and the
-product is stored in register R1. The product is compared to zero to set the CCR.
+The value in register `R1` is multiplied by the real short format immediate value I and the
+product is stored in register `R1`. The product is compared to zero to set the `CCR`.
 A _real format exception_ may occur.
 
 p. 119 (13 ops codes)
@@ -1184,9 +1184,9 @@ p. 119 (13 ops codes)
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 |  Real Divide Register                 |  RR      |     1C        |    ```FDR, R1 R2```              |   GLE         |
 
-The value in register R1 (the dividend) is divided by the real number at the effective address
-(the divisor) and the quotient is stored in register R1. The quotient is compared with zero
-to set the CCR. _Word-addressing, real format_, and _zero divisor exceptions_ may occur.
+The value in register `R1` (the dividend) is divided by the real number at the effective address
+(the divisor) and the quotient is stored in register `R1`. The quotient is compared with zero
+to set the `CCR`. _Word-addressing, real format_, and _zero divisor exceptions_ may occur.
 
 ### 96. FD
 
@@ -1203,9 +1203,9 @@ calculated by the ```register-and-storage``` addressing algorithm.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Real Divide Immediate                  | IM       |  5C           |     ```FDI, R1 I```              |    GLE        |
 
-The value in register R1 (the dividend) is divided by the real short format immediate value I
-(the divisor) and the result stored in register R1. The quotient is compared to zero to set the
-CCR. Both _real format_ and _zero divisor exceptions_ may occur.
+The value in register `R1` (the dividend) is divided by the real short format immediate value I
+(the divisor) and the result stored in register `R1`. The quotient is compared to zero to set the
+`CCR`. Both _real format_ and _zero divisor exceptions_ may occur.
 
 ### 98. RFDR
 
@@ -1240,7 +1240,7 @@ reversed.
 |  Convert To Real Register                 |  RR      |  1E           |   ```FLOATR, R1 R2```                |    GLE        |
 
 The 32-bit two's complement integer at the effective address is converted to a real number
-and stored in register R1. The real result is compared to zero to set the CCR.
+and stored in register `R1`. The real result is compared to zero to set the `CCR`.
 A _word-addressing exception_ may occur.
 
 ### 102. FLOAT
@@ -1259,7 +1259,7 @@ is calculated by the ```register-and-storage``` addressing algorithm.
 |   Convert To Real Immediate                 |   IM     |  5E           |  ```FLOATI, R1 I```                 |  GLE          |
 
 The 20-bit two's complement integer immediate operand `I` is converted to real format and
-stored in register R1. The result is compared to zero to set the CCR.
+stored in register `R1`. The result is compared to zero to set the `CCR`.
 
 ### 104. FIXR
 
@@ -1268,12 +1268,12 @@ stored in register R1. The result is compared to zero to set the CCR.
 |  Convert To Integer Register                 |  RR      |   1F          |  ```FIXR, R1 R2```                 |  OGLE          |
 
 The integer portion of the real number at the effective address is converted to a 32-bit two's
-complement integer and stored in register R1. If overflow occurs, the result is zero and the
-O bit of the CCR is set. The result is compared to zero to set the other bits of the CCR.
+complement integer and stored in register `R1`. If overflow occurs, the result is zero and the
+O bit of the `CCR` is set. The result is compared to zero to set the other bits of the `CCR`.
 A _word-addressing exception_ may occur.
 
 NOTE: These instructions are named `FIXR`, `FIX`, and `FIXI` because integer implementations have been called
-      "fixed point" historically.
+      _"fixed point"_ historically.
 
 ### 105. FIX
 
@@ -1291,8 +1291,8 @@ is calculated by the register-and-storage addressing algorithm.
 | Convert to Integer Immediate                  |  IM      |   5F          |  ```FIXI, R1 I```                 |    OGLE        |
 
 The real short format immediate operand `I` is converted to a 32-bit two's complement
-integer and the result stored in register R1. If overflow occurs, the result is zero and the O
-bit of the CCR is set. The result is compared to zero to set the other CCR bits.
+integer and the result stored in register `R1`. If overflow occurs, the result is zero and the O
+bit of the `CCR` is set. The result is compared to zero to set the other `CCR` bits.
 
 ### 107. FLOOR
 
@@ -1301,7 +1301,7 @@ bit of the CCR is set. The result is compared to zero to set the other CCR bits.
 | Real Floor                | RS       |   78          |    ```FLOOR, R1 [A,R2]```              |  GLE          |
 
 The real format integer not greater algebraically than the real number at the effective
-address is stored in register R1. The result is compared to zero to set the CCR.
+address is stored in register `R1`. The result is compared to zero to set the `CCR`.
 A _word-addressing exception_ can occur.
 
 p. 120 (7 ops codes)
@@ -1313,7 +1313,7 @@ p. 120 (7 ops codes)
 | Real Ceiling                   |  RS      |   79          |   ```CEIL, R1 [A,R2]```                |  GLE          |
 
 The real format integer not smaller algebraically than the real number at the effective
-address is stored in register R1. The result is compared to zero to set the CCR.
+address is stored in register `R1`. The result is compared to zero to set the `CCR`.
 A _word-addressing exception_ may occur.
 
 ### 109. MIN
@@ -1322,8 +1322,8 @@ A _word-addressing exception_ may occur.
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
 | Minimum                  |  RS      |  7A           |   ```MIN, R1 [A,R2]```                |   LE         |
 
-The values in register R1 and in the word at the effective address are compared and the
-minimum stored in register R1. The CCR is set by comparing the original register R1 value
+The values in register `R1` and in the word at the effective address are compared and the
+minimum stored in register `R1`. The `CCR` is set by comparing the original register `R1` value
 with the final one. A _word-addressing exception_ may occur.
 
 ### 110. MAX
@@ -1341,10 +1341,10 @@ This instruction is the same as ```Minimum(MIN)``` except that the **maximum** r
 |  Shift Logical                 | RS       |   7C          |    ```SHIFTL, R1 [A,R2]```               |  OGLE          |
 
 The effective address is treated as a 16-bit two's complement integer called the shift count.
-The value in register R1 is shifted leftward by the amount of the shift count if positive and
+The value in register `R1` is shifted leftward by the amount of the shift count if positive and
 rightward if negative, the shift distance measured in bits. Bits shifted off either end of the
-register are lost. If a 1 bit is lost, the `O`-bit of the CCR is set. The result is compared to zero
-to set the other CCR bits.
+register are lost. If a 1 bit is lost, the `O`-bit of the `CCR` is set. The result is compared to zero
+to set the other `CCR` bits.
 
 NOTE: A shift count with absolute value greater than 32 causes the same effect as some count with absolute value 32 or
       less. The smaller count can replace the larger when any shift instruction is executed.
@@ -1372,14 +1372,14 @@ from one shifted out.
 
 | ```Instruction name```  | ```Format``` | ```OpCode(hex)``` | ```Assembly language``` | ```CCR effect``` |
 |:-----------------:|:------:|:-----------:|:-----------------:|:----------:|
-|   Shift Real                |  RS      |   7F          | ``` SHIFTR, R1 [A,R2]```                  |   GLE         |
+|   Shift Real                |  RS      |   7F          | ```SHIFTR, R1 [A,R2]```                  |   GLE         |
 
 The effective address is interpreted as a 16-bit two's complement shift count. The fraction
-part of the absolute value of the real number in register R1 is shifted left or right in 4-bit
+part of the absolute value of the real number in register `R1` is shifted left or right in 4-bit
 units logically, vacated 4-bit positions being filled with hexadecimal zeros. If the resulting
 fraction is zero, so is the result. Otherwise the shift count is subtracted from the exponent
-and the resulting value stored with the original sign in register R1. Overflow cannot occur,
-but a real format exception may. The result is compared to zero to set the CCR.
+and the resulting value stored with the original sign in register `R1`. Overflow cannot occur,
+but a real format exception may. The result is compared to zero to set the `CCR`.
 
 ### Similar projects
 

@@ -101,9 +101,11 @@ class WordFormatsSpec extends Specification {
         String binInteger = "abc"
 
         when: 'Converter is called'
-        List<List<String>> machineWord = WordFormats.toMachineWords(binInteger)
+        List<List<String>> machineWord = WordFormats.toMachineWord(binInteger)
 
         then: 'Array of machine words should be created'
+        assert machineWord.get(0).size() == 8
+
         assert wordFormats.displayInteger(machineWord.get(0)) == 97
         assert wordFormats.displayInteger(machineWord.get(1)) == 98
         assert wordFormats.displayInteger(machineWord.get(2)) == 99
