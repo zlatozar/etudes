@@ -5,6 +5,7 @@ package ComputerSimulation.computer
  */
 class Memory {
 
+    // FFFF hex
     private static final int CAPACITY = Math.pow(2, 16) - 1
 
     private static final int NUMBER_OF_ADDRESSES = CAPACITY / 4
@@ -12,6 +13,7 @@ class Memory {
     // use TreeMap to guarantee display order
     private static final Map<Integer, List<String>> MEMORY = new TreeMap<>()
 
+    // 32 bits
     protected static final List<String> EMPTY_WORD = ['0', '0', '0', '0', '0', '0', '0', '0',
                                                       '0', '0', '0', '0', '0', '0', '0', '0',
                                                       '0', '0', '0', '0', '0', '0', '0', '0',

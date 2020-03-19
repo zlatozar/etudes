@@ -53,7 +53,7 @@ number. The indirect bit is ignored by immediate instructions.
 4. ```Character``` (```CH```). Character instructions operate the same way as register-and-storage
 instructions.
 
-Additional comments and an example you can find in ![Notes.md](Note.md)
+Additional comments and an example you can find in ![Notes](Notes.md)
 
 ![EC-1 format for hardware data items](images/format.png "data_format")
 

@@ -2,9 +2,12 @@ package ComputerSimulation.computer
 
 import java.nio.charset.StandardCharsets
 
-class WordFormats {
+class Convert {
 
+    private static final int FULL_WORD_SIZE = 32
     private static final int MEMORY_WORD_SIZE = 8
+
+    private static final int IMMEDIATE_INTEGER_SIZE = 20
 
     // + 0 bit which is sign bit
     private static final int EXPONENT_SIZE = 7
@@ -16,33 +19,57 @@ class WordFormats {
     private final int fractionSize
     private final int immediateFractionSize
 
-    WordFormats(int exponentSize=EXPONENT_SIZE, int fractionSize=FRACTION_SIZE, int immediateFractionSize=IMMEDIATE_FRACTION_SIZE) {
+    Convert(int exponentSize=EXPONENT_SIZE, int fractionSize=FRACTION_SIZE, int immediateFractionSize=IMMEDIATE_FRACTION_SIZE) {
         this.exponentSize = exponentSize
         this.fractionSize = fractionSize
         this.immediateFractionSize = immediateFractionSize
     }
 
-    List<String> formReal(float num) {
+    // size is 32 in book
+    List<String> toBinaryReal(float num) {
         return formGenericReal(num, exponentSize, fractionSize)
     }
 
-    List<String> formImmediateReal(float num) {
+    // size is 20 in book
+    List<String> toImmediateBinaryReal(float num) {
         return formGenericReal(num, exponentSize, immediateFractionSize)
     }
 
-    float displayReal(List<String> binNum) {
+    float toReal(List<String> binNum) {
         return displayGenericReal(binNum, exponentSize)
     }
 
-    List<String> formInteger(int num) {
-
+    List<String> toBinaryInteger(int num) {
+        return formGenericInteger(num, FULL_WORD_SIZE)
     }
 
-    static int displayInteger(List<String> binNum) {
-        return Integer.parseInt(binNum.join(), 2)
+    List<String> toImmediateBinaryInteger(def num) {
+        return formGenericInteger(num, IMMEDIATE_INTEGER_SIZE)
     }
 
-    static List<List<String>> toMachineWord(String stringLiteral) {
+    /**
+     * Two's compliment algorithm depends from the size. If the binary is
+     * positive Java automatically adds 0s if not we add 1s in front up to 32.
+     */
+    int toInteger(List<String> binNum) {
+        int origSize = binNum.size()
+        List<String> fullSize = new ArrayList<>(FULL_WORD_SIZE)
+
+        // Negative with size small than 32
+        if (origSize < FULL_WORD_SIZE && binNum.get(0) == '1') {
+            int offset = FULL_WORD_SIZE - origSize
+            for (int i = 0; i < offset; i++) {
+                fullSize.add('1')
+            }
+
+            fullSize.addAll(binNum)
+            return Long.parseLong(fullSize.join(), 2)
+        }
+
+        return Long.parseLong(binNum.join(), 2)
+    }
+
+    static List<List<String>> toBinaryString(String stringLiteral) {
 
         final List<List<String>> binaryWord = new ArrayList<>()
 
@@ -67,11 +94,24 @@ class WordFormats {
         return binaryWord
     }
 
-    static char toASCII(int code) {
+    static char toChar(int code) {
         return (char)code
     }
 
     // Helper methods
+
+    private List<String> formGenericInteger(def num, int size) {
+        checkForOverflowFirst(num, size)
+
+        List<String> result = new ArrayList<>()
+
+        for (int i = size - 1; i >= 0; i--) {
+            int mask = 1 << i
+            result.add((num & mask) != 0 ? '1' : '0')
+        }
+
+        return result
+    }
 
     private static List<String> formGenericReal(float c, int exponentSize, int fractionSize) {
 
@@ -84,15 +124,30 @@ class WordFormats {
 
         List<String> sign = inferSign(c)
 
-        List<String> binNum = new ArrayList<>()
+        List<String> result = new ArrayList<>()
 
-        binNum.addAll(sign)
-        binNum.addAll(fitExponent)
-        binNum.addAll(fitFraction)
+        result.addAll(sign)
+        result.addAll(fitExponent)
+        result.addAll(fitFraction)
 
-        return binNum
+        return result
     }
 
+    private void checkForOverflowFirst(def num, int size) {
+        long limit = num > 0 ? Math.pow(2, (size - 1)) - 1 : Math.pow(2, (size - 1))
+
+        // TODO: should set O-bit
+        if (Math.abs(num) > limit) throw new NumberFormatException("Overflow")
+    }
+
+    private List<String> checkOverflow(def num, List<String> result) {
+        if (num > 0 && result.get(0) == '0' || num < 0 && result.get(0) == '1') {
+            return result
+        }
+
+        throw new NumberFormatException("Overflow")
+    }
+    
     private static float displayGenericReal(List<String> binFloat, int exponentSize) {
 
         String sign = binFloat[0]

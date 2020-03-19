@@ -1,6 +1,6 @@
 package ComputerSimulation.computer.components
 
-trait Delays {
+interface Delays {
 
     // tick every second to illustrate simulation
     int CLOCK = 1000
