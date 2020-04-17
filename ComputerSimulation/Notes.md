@@ -1,11 +1,13 @@
 ## Basics of Computers
 
-Flat memory we could imagine as named(addressed) boxes and we have many of them.
-We have to create **basic** structures as combine(stick) them. The same as mathematics
-needs axioms. Using them we could create a complex one.
+Flat memory could be described as named(addressed) boxes and we have many of them.
+**Basic** data structures are created as combine(stick) them. Cells are the building blocks.
+On top of them could create a complex one.
 
-Basic ones are: String, Array, Record. To achieve that we need different **types of addressing**.
-Having structures now we need a functions that work on them - **instructions**.
+Basic ones are: String, Array, Record. Having structures functions are needed to work on them - **instructions**.
+The length of the instructions is fixed so particular amount of memory could be addressed(reached). To address
+even more **indirect** addressing was invented. It is also used for easy access to composite structures
+such as arrays.
 
 To be our machine _Turing complete_ we need also instructions for **conditions**,
 **loops** and **assignment**
@@ -21,32 +23,19 @@ That's why **activation records** was invented.
 Two's complement is a **clever way** of storing integers so that **common** math problems
 are very simple to implement.
 
-To understand, you have to think of the numbers in binary. It basically says,
-
 - for _zero_, use all 0's.
 - for _positive integers_, start counting up to `2^(number of bits - 1) - 1`.
-- for _negative integers_, do exactly the same thing, but switch the role of 0's and 1's
-  (so instead of starting with `0000`, start with `1111` - that's the "complement" part).
+- for _negative integers_, up to `2^(number of bits)`. One more, this is because of zero.
 
-Let's try it with a _mini-byte_ of 4 bits (we'll call it a `nibble`(aka 1/2 a byte)).
+Some special cases:
 ```
-    0000 - zero
-    0001 - one
-    0010 - two
-    0011 - three
-    from 0100 to 0111 - from four to seven
+Number        Exponent   Signiticand
+-------------------------------------------------
+Zero          00000000   00000000000000000000000
+Denormalized  00000000   Any nonzero value
+Infinity      11111111   00000000000000000000000
+Not a Number  11111111   Any nonzero value
 ```
-That's as far as we can go in positives. `2^3 - 1` = 7.
-
-For negatives:
-```
-    1111 - negative one
-    1110 - negative two
-    1101 - negative three
-    from 1100 to 1000 - from negative four to negative eight
-```
-Note that you get one extra value for negatives (1000 = -8) that you don't for positives.
-This is because `0000` is used for zero. This can be considered as Number Line of computers.
 
 ### Distinguishing between positive and negative numbers
 
@@ -112,16 +101,41 @@ _Indirect addressing_ may be used for code or data. It can make implementation
 of pointers, array elements acces, references, or handles much easier, and can
 also make it easier to call subroutines which are not otherwise addressable.
 Indirect addressing does carry a performance penalty due to the extra memory
-access involved.
+access involved. Also using it significant bigger memory could be addressed.
 
+Also OS place program in the `data segment` which address is unknown during assembling.
+In this way OS should pass only start address of the `data segment` and program works using offsets
+from this staring point. No need to recalculate addresses. Assembler program should do the calculations
+and use one of the following.
+
+Example:
+
+```
+Indirect addressing allows you to reference memory locations, larger than the operand limit R2.
+
+1 | ADD 2 *3
+2 | ...
+3 | *32000      ;; address may exceed the operand size limit
+...
+32000 | 42
+
+This will add memory location 2 and 3, 3 points to location 32000, so when it's evaluated, the effect is:
+
+1 | ADD 2 42
+```
 #### Indirect bit is 1, R2 is not set and address field is set
 Kind of _pointer to pointer_. Address filed points to the pointer(situated) in memory. From that address we
-obtain second operand.
+obtain second operand. Example:
+
+```
+BAL, 15 *(Square + 4)  ;; like array in an array access
+```
 
 ![Indirect Addressing Mode](images/indirect-addressing-mode.png)
 
 #### Indirect bit is 1, R2 is set and address field is set
-Same as previous one except that R2 adds offset. Could be used to work with _two dimensional_ arrays.
+Same as previous one except that R2 adds offset. Could be used to work with composite structures when OS place
+them _at the end_ of the memory space. If offset from the beginning is bigger and do not fit in previous - use this one.
 
 ![Displacement Addressing Mode](images/displacement-addressing-mode.png)
 
@@ -187,12 +201,12 @@ Pythagoras  L,   1   X           ; Load what we have in X. Then the
             SVC, 7   False       ; else make interrupt with code 7 ('F' is displayed)
             SVC, 0   0           ; and exit. For codes see: Exceptions and supervisor calls
 
-; Start mappings
-
 Good        SVC, 7   True        ; Interrupt with code 7 ('T' is displayed)
             BCRR,0   *14         ; and exit with "success" - so 0 in reg 14
                                  ; The programmer who use Pythagoras must know that
                                  ; the result is in reg 14
+
+; Define constants
 
 True        .DSC     'T'         ; DSC - defines char
 False       .DSC     'F'
@@ -223,6 +237,19 @@ Z           .DSF     5.
 
 ```
 
+### Operating System
+
+- How logically memory should be divided?
+- BIOS to load OS in proper memory location
+
+#### Minimal OS functionality
+
+- Basic OS functions
+  `initArray`, `checkArrayBounds`, `allocRecord`, `print`, `flush`,
+  `size`, `getchar`, string operations (`concat`, `substring`, etc.), `not`, `main` and `exit`
+
+- _Kernel trap_ should be written in assembly language to handle interrupts
+
 #### Notes
 
   - Directives starts with `dot`
@@ -244,6 +271,41 @@ occurred using the map file.
   - Comments starts with `;`
   - Like in other assembler (MIPS for example) it is good idea to create convention
     for register usage.
+  - Add `.data` and `.text`
+
+```
+    ;; Subprogram1/Label1:
+
+        .data
+        ;; Variables for subprogram 1
+
+        .text
+        ;; Subprogram body
+
+        ret
+
+    ;; Subprogram2/Label2:
+
+        .data
+        ;; Variables for subprogram 2
+
+        .text
+        ;; Subprogram body
+
+        ret
+
+    ;; Main program/MainLable:
+
+        .data
+        ;; Variables for main
+
+        .text
+        ;; Main body
+
+        ret
+```
+Why use multiple `.text` and `.data` sections in a program?
+Variables should be defined along with the subprogram that uses them, for the sake of readability.
 
 ### Book
 
