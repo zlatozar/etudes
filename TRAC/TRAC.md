@@ -1,11 +1,8 @@
-
-
-
-                               _"... the facilities provided by the language should be
+                               "... the facilities provided by the language should be
                                constructed from as few basic ideas as possible, and
                                ... these should be general-purpose and interrelated
                                in the language in a way which avoided special cases
-                               wherever possible."_ 
+                               wherever possible."
                                          (Harrison, Data-Structures and Programming)
 
 ## TRAC language
@@ -57,12 +54,12 @@ This gives rise to certain interesting kinds of compatibility.
   CREATES AN ERROR CONDITION.``` **If enough information is not supplied to execute a
   command, the command is ignored. If too much information is supplied, the extra is
   ignored.**
-  
+
 - Complete compatibility exists in the data: **letters and numbers and spaces may be
   freely intermixed.** Special terminal characters (like carriage returns and backspaces)
   are handled just like other characters, giving the programmer complete control of the
   arrangement of output on the page.
-  
+
 #### Command format
 
 A TRAC command has the following form. The cross hatch or sharp-sign is the way this
@@ -104,7 +101,7 @@ for that:
 +> 2. RESOLVE THE CONTENTS OF THE PAIRED COMMAND PARENTHESISES
 |    (execute and replace by the command's result);
 |
-|  3. STARTING AT THE BEGINNING OF THE RESULT, KEEP SCANNING LEFT 
+|  3. STARTING AT THE BEGINNING OF THE RESULT, KEEP SCANNING LEFT
 |     - TO RIGHT UNTIL A RIGHT PARENTHESIS, --+
 +---------------------------------------------|
 
@@ -204,7 +201,7 @@ form. So now if you type: `#(AD, #(HAROLD), #(ELVIS))`
   It will first note, on reaching the right paren of the HAROLD command , that since
 HAROLD is 54321, you evidently wanted this: `#(AD, 54321, '(ELVIS))` then `#(AD, 54321,1234)` then 55555
 
-ATTENTION: 
+ATTENTION:
 This language is marvellously suited to data base management, management information
 systems, interactive query systems, and the broad spectrum of "business" programming.  For
 large-scale scientific number crunching, not so good.  With one exception: "Infinite
@@ -283,7 +280,7 @@ plugging of holes by the implicit call and the Magic Scan procedure of the TRAC 
 **TRAC language is:**
 - an interpretive language (each step carried out directly by the processor without
   conversion to another form first);
-   
+
 - an extensible language (you can add your own commands for your own purposes);
 
 - a list-processing language (for handling complex and amorphous forms of data that don't
@@ -398,7 +395,7 @@ The last thing we'll talk about is the other two syntactic layouts.  We've alrea
 you about the main syntactic layout of TRAC Language, which is `#(  )` It turns out that
 two more layouts are needed, which we may call `PROTECTION` and `ONE-SHOT`. Protection is
 simply:
- 
+
  `(   )`
 
 which *prevents the execution of anything between the parentheses.* The TRAC processor
@@ -420,6 +417,6 @@ to try to figure out why this is needed.
 Whatever can be executed is replaced by its result.  This may or may not yield something
 which is in turn executable. When nothing left is executable, what's left is
 printed out. That's the TRAC language.
-      
+
 TRAC Language,is, besides being an easy language to learn, very powerful for text and
 storage applications.
