@@ -82,6 +82,8 @@ Register indirect addressing mode requires three read operations to access an op
 - Read the pointer register to find the oprand address
 - Read memory at the operand address to find the operand
 
+In this way we add a context in the calculation - it depends what we currently have in the register.
+
 ### Register and Storage (RS)
 
 #### Indirect bit is 0, R2 is not set and address field is set
