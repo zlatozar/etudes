@@ -3,6 +3,7 @@ package PrintersDevil.demo
 import PrintersDevil.Environment
 import PrintersDevil.Formatter
 
+// NOTE: Structured programming using Warnier/Orr diagrams will fit well for this etude. 
 class Main {
 
     private static final String DEMO_FILE_NAME = 'src/main/resources/example-page.txt'
