@@ -12,3 +12,5 @@ born in the square.
 4. Births and deaths all take place exactly at the change of generations. Thus a dying cell
 may help birth a new one, but a newborn cell may not resurrect a dying cell, nor may one
 dying cell stave off death for another by lowering the local population density.
+
+![Game of Life](image.png)
