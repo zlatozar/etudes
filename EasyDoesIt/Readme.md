@@ -1,7 +1,7 @@
 ## Easy Language
 
-This is the largest project in the book.<br/>
-The implementation follows the approach described in the book "Programming Language Processors in Java: Compilers and Interpreters" 2000 by David Watt, Deryck Brown
+This is the largest project in the book. The implementation follows the approach described in the book <br/>
+_"Programming Language Processors in Java: Compilers and Interpreters" 2000 by David Watt, Deryck Brown_
 
 ## Specification
 
